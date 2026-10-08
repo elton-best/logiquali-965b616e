@@ -1,8 +1,8 @@
-create type public.account_type as enum ('company', 'individual');
-create type public.account_status as enum ('active', 'pending', 'rejected', 'suspended');
-create type public.app_role as enum ('admin', 'user');
+do $$ begin create type public.account_type as enum ('company', 'individual'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.account_status as enum ('active', 'pending', 'rejected', 'suspended'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.app_role as enum ('admin', 'user'); exception when duplicate_object then null; end $$;
 
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   email text,
   first_name text not null default '',
@@ -18,7 +18,7 @@ create table public.profiles (
   updated_at timestamptz not null default now()
 );
 
-create table public.user_roles (
+create table if not exists public.user_roles (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade not null,
   role app_role not null,
@@ -47,19 +47,23 @@ GRANT EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) TO authenticate
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 
+drop policy if exists "Users can view own profile" on public.profiles;
 create policy "Users can view own profile"
   on public.profiles for select to authenticated
   using (id = auth.uid() or public.has_role(auth.uid(), 'admin'));
 
+drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile"
   on public.profiles for update to authenticated
   using (id = auth.uid()) with check (id = auth.uid());
 
+drop policy if exists "Admins can update any profile" on public.profiles;
 create policy "Admins can update any profile"
   on public.profiles for update to authenticated
   using (public.has_role(auth.uid(), 'admin'))
   with check (public.has_role(auth.uid(), 'admin'));
 
+drop policy if exists "Users can view own roles" on public.user_roles;
 create policy "Users can view own roles"
   on public.user_roles for select to authenticated
   using (user_id = auth.uid());
@@ -98,6 +102,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
@@ -110,6 +115,7 @@ begin
 end;
 $$;
 
+drop trigger if exists profiles_updated_at on public.profiles;
 create trigger profiles_updated_at
 before update on public.profiles
 for each row execute function public.set_updated_at();
