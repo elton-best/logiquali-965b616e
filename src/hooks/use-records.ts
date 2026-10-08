@@ -34,7 +34,7 @@ export function useRecords() {
 export function useSaveRecord() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { id?: string; kind: string; title: string; status: string; data: QRecord["data"] }) => {
+    mutationFn: async (input: { id?: string | undefined; kind: string; title: string; status: string; data: QRecord["data"] }) => {
       if (input.id) {
         const { error } = await supabase
           .from("qhse_records")
@@ -51,7 +51,7 @@ export function useSaveRecord() {
       const reference = `${cfg?.prefix ?? "REF"}-${String((count ?? 0) + 1).padStart(3, "0")}`;
       const { data: u } = await supabase.auth.getUser();
       const { error } = await supabase.from("qhse_records").insert({
-        company_id: u.user?.id,
+        company_id: u.user?.id ?? "",
         kind: input.kind,
         reference,
         title: input.title,

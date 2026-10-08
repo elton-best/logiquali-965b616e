@@ -5,7 +5,7 @@ import { CompanyPage, RolesPage, SubscriptionPage } from "@/components/app/Custo
 
 const CUSTOM = ["entreprise", "roles", "abonnement"];
 
-type Search = { open?: string; new?: number; origin?: string };
+type Search = { open?: string | undefined; new?: number | undefined; origin?: string | undefined };
 
 export const Route = createFileRoute("/_authenticated/app/$section")({
   validateSearch: (s: Record<string, unknown>): Search => ({

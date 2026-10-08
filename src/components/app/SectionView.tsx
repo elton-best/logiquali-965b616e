@@ -40,7 +40,7 @@ function formatValue(f: Field, v: unknown, byId: Map<string, QRecord>) {
   return String(v);
 }
 
-type Props = { section: SectionConfig; openId?: string; createNew?: boolean; prefill?: Record<string, string> };
+type Props = { section: SectionConfig; openId?: string | undefined; createNew?: boolean | undefined; prefill?: Record<string, string> | undefined };
 
 export function SectionView({ section, openId, createNew, prefill }: Props) {
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ export function SectionView({ section, openId, createNew, prefill }: Props) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [detail, setDetail] = useState<QRecord | null>(null);
-  const [editing, setEditing] = useState<{ cfg: KindConfig; record?: QRecord; prefill?: Record<string, string> } | null>(null);
+  const [editing, setEditing] = useState<{ cfg: KindConfig; record?: QRecord | undefined; prefill?: Record<string, string> | undefined } | null>(null);
 
   const cfg = KINDS[tab] ?? section.kinds[0];
   const byId = useMemo(() => new Map(records.map((r) => [r.id, r])), [records]);
@@ -227,7 +227,7 @@ export function SectionView({ section, openId, createNew, prefill }: Props) {
         records={records}
         byId={byId}
         onClose={() => { setDetail(null); clearSearch(); }}
-        onEdit={(r) => setEditing({ cfg: KINDS[r.kind], record: r })}
+        onEdit={(r) => { const c = KINDS[r.kind]; if (c) setEditing({ cfg: c, record: r }); }}
         onOpen={(r) => {
           const slug = sectionForKind(r.kind);
           if (slug === section.slug) { setTab(r.kind); setDetail(r); }
@@ -269,7 +269,7 @@ function DetailSheet({
   const incoming = record ? records.filter((r) => r.id !== record.id && Object.values(r.data).includes(record.id)) : [];
 
   const idx = cfg && record ? cfg.statuses.findIndex((s) => s.value === record.status) : -1;
-  const next = cfg?.workflow && idx >= 0 && idx < cfg.statuses.length - 1 ? cfg.statuses[idx + 1].value : null;
+  const next = cfg?.workflow && idx >= 0 && idx < cfg.statuses.length - 1 ? cfg.statuses[idx + 1]!.value : null;
 
   return (
     <Sheet open={!!record} onOpenChange={(o) => !o && onClose()}>
@@ -397,14 +397,14 @@ function RecordForm({
   cfg, record, prefill, records, onClose,
 }: {
   cfg: KindConfig;
-  record?: QRecord;
-  prefill?: Record<string, string>;
+  record?: QRecord | undefined;
+  prefill?: Record<string, string> | undefined;
   records: QRecord[];
   onClose: () => void;
 }) {
   const save = useSaveRecord();
   const [title, setTitle] = useState(record?.title ?? "");
-  const [status, setStatus] = useState(record?.status ?? cfg.statuses[0].value);
+  const [status, setStatus] = useState(record?.status ?? cfg.statuses[0]?.value ?? "");
   const [data, setData] = useState<QRecord["data"]>(() => ({ ...(prefill ?? {}), ...(record?.data ?? {}) }));
   const [error, setError] = useState("");
 
