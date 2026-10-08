@@ -26,6 +26,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { LqButton } from "@/components/lq/LqButton";
 import { Reveal } from "@/components/lq/Reveal";
+import { DashboardPreview } from "@/components/landing/DashboardPreview";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -59,10 +60,10 @@ const STANDARDS = [
 ];
 
 const PROCESS_STEPS = [
-  { n: "01", title: "Cadrer", desc: "Définissez votre contexte, vos parties intéressées et le périmètre de votre système de management.", icon: Target },
-  { n: "02", title: "Centraliser", desc: "Rassemblez documents, enregistrements et preuves dans un référentiel unique et versionné.", icon: FolderKanban },
-  { n: "03", title: "Piloter", desc: "Suivez audits, non-conformités, actions et indicateurs depuis votre cockpit QHSE.", icon: Gauge },
-  { n: "04", title: "Arbitrer", desc: "Décidez sur des données fiables : revues de direction, tableaux de bord et exports prêts à l'emploi.", icon: BarChart3 },
+  { n: "01", duration: "1 semaine", title: "Cadrer", desc: "Définissez votre contexte, vos parties intéressées et le périmètre de votre système de management.", icon: Target },
+  { n: "02", duration: "2 semaines", title: "Centraliser", desc: "Rassemblez documents, enregistrements et preuves dans un référentiel unique et versionné.", icon: FolderKanban },
+  { n: "03", duration: "1–2 jours", title: "Piloter", desc: "Suivez audits, non-conformités, actions et indicateurs depuis votre cockpit QHSE.", icon: Gauge },
+  { n: "04", duration: "1–2 jours", title: "Arbitrer", desc: "Décidez sur des données fiables : revues de direction, tableaux de bord et exports prêts à l'emploi.", icon: BarChart3 },
 ];
 
 const MODULES = [
@@ -152,6 +153,7 @@ function LandingPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <Hero />
+      <DashboardPreview />
       <Standards />
       <Process />
       <Modules />
@@ -267,7 +269,7 @@ function Standards() {
 
 function Process() {
   return (
-    <section id="processus" className="relative scroll-mt-28 py-20 md:py-28">
+    <section id="processus" className="relative scroll-mt-28 overflow-hidden bg-[#fbfcf8] py-20 md:py-28">
       <svg
         className="absolute inset-x-0 top-0 h-10 w-full text-card"
         viewBox="0 0 1440 40"
@@ -282,25 +284,48 @@ function Process() {
           title="De la mise en place à la décision, en 4 étapes"
           desc="Une méthode éprouvée pour passer d'un système dispersé à un pilotage continu de la conformité."
         />
-        <div className="relative mt-16">
-          <div className="absolute left-6 top-0 h-full w-0.5 bg-gradient-to-b from-primary/60 via-primary/25 to-transparent md:left-0 md:right-0 md:top-8 md:h-0.5 md:w-full md:bg-gradient-to-r" />
-          <div className="grid gap-10 md:grid-cols-4 md:gap-6">
-            {PROCESS_STEPS.map((step, i) => (
-              <Reveal key={step.n} delay={i * 120}>
-                <div className="relative flex gap-5 md:flex-col md:gap-0">
-                  <div className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary font-display text-sm font-extrabold text-primary-foreground shadow-lg shadow-primary/30 md:mx-0">
-                    {step.n}
-                  </div>
-                  <div className="md:mt-6">
-                    <div className="flex items-center gap-2">
-                      <step.icon className="h-5 w-5 text-primary" />
-                      <h3 className="font-display text-lg font-bold text-foreground">{step.title}</h3>
+
+        <div className="relative mx-auto mt-16 max-w-5xl md:mt-20">
+          <svg
+            className="pointer-events-none absolute inset-0 hidden h-full w-full md:block"
+            viewBox="0 0 1000 650"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <defs>
+              <marker id="process-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M0,0 L8,4 L0,8" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              </marker>
+            </defs>
+            <path d="M390 92 C535 92 520 157 650 157" fill="none" stroke="currentColor" strokeDasharray="5 7" strokeWidth="1.5" markerEnd="url(#process-arrow)" className="text-primary/35" />
+            <path d="M610 270 C460 270 480 370 330 370" fill="none" stroke="currentColor" strokeDasharray="5 7" strokeWidth="1.5" markerEnd="url(#process-arrow)" className="text-primary/35" />
+            <path d="M390 482 C540 482 520 548 650 548" fill="none" stroke="currentColor" strokeDasharray="5 7" strokeWidth="1.5" markerEnd="url(#process-arrow)" className="text-primary/35" />
+          </svg>
+
+          <div className="relative grid gap-8 md:grid-cols-2 md:gap-x-24 md:gap-y-10">
+            {PROCESS_STEPS.map((step, i) => {
+              const Icon = step.icon;
+              const highlighted = i === 0 || i === 3;
+              return (
+                <Reveal key={step.n} delay={i * 120} className={i % 2 === 1 ? "md:translate-y-16" : ""}>
+                  <article className={`group relative min-h-[190px] overflow-hidden rounded-[1.65rem] border p-6 pl-20 shadow-[0_18px_40px_-30px_rgba(15,23,42,.38)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${highlighted ? "border-success/20 bg-success/10" : "border-border/70 bg-white"}`}>
+                    <div className={`absolute bottom-4 left-4 top-4 flex w-9 items-center justify-center rounded-full ${highlighted ? "bg-[#087653]" : "bg-[#242424]"}`}>
+                      <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-extrabold tracking-wide text-white">{step.duration}</span>
                     </div>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
+                    <div className="flex items-center gap-3">
+                      <span className={`grid h-10 w-10 place-items-center rounded-full ${highlighted ? "bg-success/20 text-[#087653]" : "bg-secondary text-foreground"}`}>
+                        <Icon className="h-[18px] w-[18px]" />
+                      </span>
+                      <div>
+                        <p className={`text-[10px] font-extrabold uppercase tracking-[0.16em] ${highlighted ? "text-[#087653]" : "text-muted-foreground"}`}>Étape {step.n}</p>
+                        <h3 className="font-display text-xl font-extrabold text-foreground">{step.title}</h3>
+                      </div>
+                    </div>
+                    <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
+                  </article>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </div>
