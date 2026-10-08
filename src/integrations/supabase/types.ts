@@ -71,6 +71,7 @@ export type Database = {
           kind: string
           reference: string
           status: string
+          target_company_id: string | null
           title: string
           updated_at: string
         }
@@ -82,6 +83,7 @@ export type Database = {
           kind: string
           reference?: string
           status?: string
+          target_company_id?: string | null
           title: string
           updated_at?: string
         }
@@ -93,6 +95,7 @@ export type Database = {
           kind?: string
           reference?: string
           status?: string
+          target_company_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -127,6 +130,13 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      list_companies: {
+        Args: never
+        Returns: {
+          id: string
+          name: string
+        }[]
       }
     }
     Enums: {
