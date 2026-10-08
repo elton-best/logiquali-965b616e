@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, Clock3, User, Zap } from "lucide-react";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 
-export const Route = createFileRoute("/auth/signup")({
+export const Route = createFileRoute("/auth/signup/")({
   head: () => ({
     meta: [
       { title: "Créer un compte — LOGIQUALI" },
