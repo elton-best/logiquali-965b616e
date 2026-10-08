@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Award,
+  ArrowRight,
   BadgeCheck,
   BarChart3,
   Building2,
@@ -285,43 +286,23 @@ function Process() {
           desc="Une méthode éprouvée pour passer d'un système dispersé à un pilotage continu de la conformité."
         />
 
-        <div className="relative mx-auto mt-20 max-w-6xl md:mt-24">
-          <svg
-            className="pointer-events-none absolute inset-0 hidden h-full w-full md:block"
-            viewBox="0 0 1000 650"
-            preserveAspectRatio="none"
-            aria-hidden
-          >
-            <defs>
-              <marker id="process-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-                <path d="M0,0 L8,4 L0,8" fill="none" stroke="currentColor" strokeWidth="1.5" />
-              </marker>
-            </defs>
-            <path d="M390 92 C535 92 520 157 650 157" fill="none" stroke="currentColor" strokeDasharray="5 7" strokeWidth="1.5" markerEnd="url(#process-arrow)" className="text-primary/35" />
-            <path d="M610 270 C460 270 480 370 330 370" fill="none" stroke="currentColor" strokeDasharray="5 7" strokeWidth="1.5" markerEnd="url(#process-arrow)" className="text-primary/35" />
-            <path d="M390 482 C540 482 520 548 650 548" fill="none" stroke="currentColor" strokeDasharray="5 7" strokeWidth="1.5" markerEnd="url(#process-arrow)" className="text-primary/35" />
-          </svg>
-
-          <div className="relative grid gap-10 md:grid-cols-2 md:gap-x-32 md:gap-y-16">
+        <div className="relative mx-auto mt-14 max-w-6xl md:mt-16">
+          <div className="hidden h-px bg-primary/20 md:block" aria-hidden="true" />
+          <div className="grid gap-5 md:grid-cols-4 md:gap-4">
             {PROCESS_STEPS.map((step, i) => {
               const Icon = step.icon;
               const highlighted = i === 0 || i === 3;
               return (
-                <Reveal key={step.n} delay={i * 120} className={i % 2 === 1 ? "md:translate-y-16" : ""}>
-                  <article className={`group relative min-h-[230px] overflow-hidden rounded-[1.65rem] border p-8 pl-28 shadow-[0_18px_40px_-30px_rgba(15,23,42,.38)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${highlighted ? "border-success/20 bg-success/10" : "border-border/70 bg-white"}`}>
-                    <div className={`absolute bottom-5 left-5 top-5 flex w-11 items-center justify-center rounded-full ${highlighted ? "bg-[#087653]" : "bg-[#242424]"}`}>
-                      <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-extrabold tracking-wide text-white">{step.duration}</span>
+                <Reveal key={step.n} delay={i * 120} className="relative">
+                  {i < PROCESS_STEPS.length - 1 && <ArrowRight className="absolute -right-4 top-12 z-10 hidden h-7 w-7 text-primary/45 md:block" aria-hidden="true" />}
+                  <article className={`group relative flex min-h-[285px] flex-col rounded-[1.5rem] border p-6 shadow-[0_18px_40px_-30px_rgba(15,23,42,.38)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${highlighted ? "border-success/30 bg-success/10" : "border-border/70 bg-white"}`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <span className={`grid h-12 w-12 place-items-center rounded-2xl ${highlighted ? "bg-[#087653] text-white" : "bg-secondary text-foreground"}`}><Icon className="h-5 w-5" /></span>
+                      <span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold ${highlighted ? "bg-success/20 text-[#087653]" : "bg-background text-muted-foreground"}`}>Étape {step.n}</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className={`grid h-12 w-12 place-items-center rounded-full ${highlighted ? "bg-success/20 text-[#087653]" : "bg-secondary text-foreground"}`}>
-                        <Icon className="h-5 w-5" />
-                      </span>
-                      <div>
-                        <p className={`text-[10px] font-extrabold uppercase tracking-[0.16em] ${highlighted ? "text-[#087653]" : "text-muted-foreground"}`}>Étape {step.n}</p>
-                        <h3 className="font-display text-2xl font-extrabold text-foreground">{step.title}</h3>
-                      </div>
-                    </div>
-                    <p className="mt-7 max-w-lg text-base leading-relaxed text-muted-foreground">{step.desc}</p>
+                    <div className="mt-6"><h3 className="font-display text-2xl font-extrabold text-foreground">{step.title}</h3><p className={`mt-1 text-xs font-bold ${highlighted ? "text-[#087653]" : "text-muted-foreground"}`}>{step.duration}</p></div>
+                    <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
+                    <div className="mt-auto flex items-center gap-2 pt-5 text-xs font-bold text-primary"><span className="grid h-5 w-5 place-items-center rounded-full bg-primary text-primary-foreground">{i + 1}</span> {i === PROCESS_STEPS.length - 1 ? "Décider avec confiance" : "Étape suivante"}</div>
                   </article>
                 </Reveal>
               );

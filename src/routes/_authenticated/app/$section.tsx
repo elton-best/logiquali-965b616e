@@ -6,6 +6,7 @@ import {
 } from "@/components/app/CustomPages";
 import { InboxPage, MyActionsPage } from "@/components/app/Extras";
 import { DuerpView, GuideSection, ManagementConsolidation, ObjectivesGrid, ProcessReviewView, RisksView } from "@/components/app/GuidePages";
+import { ApplicationScopePage, ContextOrganisationPage, ManagementSystemPage, StakeholdersPage } from "@/components/app/OrganisationContextPages";
 
 const GUIDE: Record<string, { id: string; label: string; render: () => React.ReactNode }[]> = {
   risques: [{ id: "ro", label: "Risques & opportunités (grille, tableau, actions)", render: () => <RisksView /> }],
@@ -50,6 +51,10 @@ function SectionPage() {
     case "journal": return <JournalPage />;
     case "mes-actions": return <MyActionsPage />;
     case "boite-reception": return <InboxPage />;
+    case "contexte": return <ContextOrganisationPage />;
+    case "parties-interessees": return <StakeholdersPage />;
+    case "perimetre": return <ApplicationScopePage />;
+    case "processus": return <ManagementSystemPage />;
   }
   const section = SECTIONS[slug]!;
   if (GUIDE[slug] && !search.open && !search.new) return <GuideSection key={slug} slug={slug} views={GUIDE[slug]!} />;
