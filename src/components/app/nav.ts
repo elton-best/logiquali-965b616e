@@ -21,6 +21,7 @@ import {
   Users,
   Wrench,
   Factory,
+  ListChecks,
   type LucideIcon,
 } from "lucide-react";
 
@@ -46,8 +47,9 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { slug: "contexte", label: "Contexte", icon: Landmark },
       { slug: "risques", label: "Risques & objectifs", icon: Target },
+      { slug: "actions", label: "Plans d'actions", icon: ListChecks },
       { slug: "processus", label: "Processus", icon: GitBranch },
-      { slug: "documents", label: "Documents", icon: FileText, badge: "3" },
+      { slug: "documents", label: "Documents", icon: FileText },
     ],
   },
   {
@@ -57,7 +59,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { slug: "realisation", label: "Réalisation", icon: Factory },
       { slug: "fournisseurs", label: "Fournisseurs", icon: Truck },
-      { slug: "non-conformites", label: "Non-conformités", icon: ShieldAlert, badge: "2" },
+      { slug: "non-conformites", label: "Non-conformités", icon: ShieldAlert },
       { slug: "reclamations", label: "Réclamations", icon: MessageSquareWarning },
     ],
   },
