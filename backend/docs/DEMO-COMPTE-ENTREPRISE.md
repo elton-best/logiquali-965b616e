@@ -33,4 +33,4 @@ L'authentification Laravel impose la MFA. Pour un environnement local uniquement
 MFA_EXPOSE_OTP_FOR_E2E=true
 ```
 
-Ne pas activer cette option en production. Le bouton **Préremplir le compte démo entreprise** du frontend est disponible uniquement en mode Vite développement et ne crée aucune donnée locale côté navigateur.
+Ne pas activer cette option en production. Le bouton **Accéder au compte démo entreprise** du frontend est disponible uniquement en mode Vite développement. Il appelle directement l'API Laravel et ne crée aucune donnée locale côté navigateur. En développement local, lorsque `MFA_EXPOSE_OTP_FOR_E2E=true`, le code MFA est vérifié automatiquement.

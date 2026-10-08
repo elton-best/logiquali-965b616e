@@ -41,17 +41,17 @@ function LoginPage() {
 
   const finish = () => navigate({ to: search.redirect ?? "/app", replace: true });
 
-  const submitCredentials = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.includes("@")) {
-      setError("Adresse e-mail invalide.");
-      return;
-    }
+  const authenticate = async (loginEmail: string, loginPassword: string, autoVerifyMfa = false) => {
     setError("");
     setBusy(true);
     try {
-      const result = await backendApi.auth.login(email, password);
+      const result = await backendApi.auth.login(loginEmail, loginPassword);
       if (result.mfa_required) {
+        if (autoVerifyMfa && result.mfa_code) {
+          await backendApi.auth.verifyMfa(result.mfa_token, result.mfa_code);
+          finish();
+          return;
+        }
         setMfaToken(result.mfa_token);
         if (result.mfa_code) setMfaHint(`Code de démonstration : ${result.mfa_code}`);
         return;
@@ -62,6 +62,19 @@ function LoginPage() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const submitCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.includes("@")) {
+      setError("Adresse e-mail invalide.");
+      return;
+    }
+    await authenticate(email, password);
+  };
+
+  const accessDemo = async () => {
+    await authenticate(DEMO_EMAIL, DEMO_PASSWORD, true);
   };
 
   const submitMfa = async (e: React.FormEvent) => {
@@ -200,14 +213,11 @@ function LoginPage() {
         {import.meta.env.DEV && (
           <button
             type="button"
-            onClick={() => {
-              setEmail(DEMO_EMAIL);
-              setPassword(DEMO_PASSWORD);
-              setError("");
-            }}
-            className="w-full rounded-xl border border-dashed border-primary/50 px-4 py-3 text-xs font-bold text-primary hover:bg-primary-soft"
+            onClick={accessDemo}
+            disabled={busy}
+            className="w-full rounded-xl border border-dashed border-primary/50 px-4 py-3 text-xs font-bold text-primary hover:bg-primary-soft disabled:opacity-50"
           >
-            Préremplir le compte démo entreprise
+            {busy ? "Ouverture du compte démo…" : "Accéder au compte démo entreprise"}
           </button>
         )}
       </form>
