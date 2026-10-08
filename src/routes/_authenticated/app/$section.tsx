@@ -7,6 +7,7 @@ import {
 import { InboxPage, MyActionsPage } from "@/components/app/Extras";
 import { DuerpView, GuideSection, ManagementConsolidation, ObjectivesGrid, ProcessReviewView, RisksView } from "@/components/app/GuidePages";
 import { ApplicationScopePage, ContextOrganisationPage, ManagementSystemPage, StakeholdersPage } from "@/components/app/OrganisationContextPages";
+import { JobDescriptionsPage, OrgChartPage, PolicyPage, ResponsibilitiesPage } from "@/components/app/LeadershipPages";
 
 const GUIDE: Record<string, { id: string; label: string; render: () => React.ReactNode }[]> = {
   risques: [{ id: "ro", label: "Risques & opportunités (grille, tableau, actions)", render: () => <RisksView /> }],
@@ -55,6 +56,10 @@ function SectionPage() {
     case "parties-interessees": return <StakeholdersPage />;
     case "perimetre": return <ApplicationScopePage />;
     case "processus": return <ManagementSystemPage />;
+    case "politique": return <PolicyPage />;
+    case "organigramme": return <OrgChartPage />;
+    case "fiches-poste": return <JobDescriptionsPage />;
+    case "responsabilites": return <ResponsibilitiesPage />;
   }
   const section = SECTIONS[slug]!;
   if (GUIDE[slug] && !search.open && !search.new) return <GuideSection key={slug} slug={slug} views={GUIDE[slug]!} />;
