@@ -31,10 +31,10 @@ const primary = `${button} bg-primary text-primary-foreground hover:bg-primary-d
 const secondary = `${button} border border-border bg-card hover:border-primary hover:text-primary`;
 const muted = "text-sm text-muted-foreground";
 const LINKS = [
-  ["contexte", "Compréhension"],
+  ["contexte", "Compréhension de l'organisme"],
   ["parties-interessees", "Parties intéressées"],
   ["perimetre", "Domaine d'application"],
-  ["processus", "Processus"],
+  ["processus", "Système de management"],
 ] as const;
 const STEP_META: ReadonlyArray<readonly [string, LucideIcon]> = [
   ["Documents", FileText],
