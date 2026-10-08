@@ -132,6 +132,14 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
     toast.success(`${list.length} ligne(s) exportée(s)`);
   };
 
+  if (editing) {
+    return (
+      <div className="p-4 md:p-8">
+        <RecordForm cfg={editing.cfg} record={editing.record} prefill={editing.prefill} records={records} onClose={() => { setEditing(null); if (!detail) clearSearch(); }} />
+      </div>
+    );
+  }
+
   if (detail) {
     return (
       <div className="mx-auto max-w-4xl p-4 md:p-8">
@@ -147,7 +155,6 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
           else if (slug) navigate({ to: "/app/$section", params: { section: slug }, search: { open: r.id } });
         }}
       />
-        {editing && <RecordForm cfg={editing.cfg} record={editing.record} prefill={editing.prefill} records={records} onClose={() => setEditing(null)} />}
       </div>
     );
   }
@@ -677,11 +684,12 @@ function RecordForm({
   const input = "h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm outline-none focus:border-primary";
 
   return (
-    <Sheet open onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
+    <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 md:p-8">
+      <button type="button" onClick={onClose} className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">← Retour</button>
+      <div>
         <div>
           <h1 className="mt-1 font-display text-2xl font-bold text-foreground">{record ? "Modifier" : "Ajouter"} : {cfg.singular}</h1>
-          <SheetDescription>{record ? `${record.reference} · statut « ${record.status} » (modifiable via les boutons d'action)` : `Créé au statut « ${status} ».`}</div>
+          <p className="mt-1 text-sm text-muted-foreground">{record ? `${record.reference} · statut « ${record.status} » (modifiable via les boutons d'action)` : `Créé au statut « ${status} ».`}</p>
         </div>
         <form onSubmit={submit} className="mt-6 space-y-4 pb-6">
           <label className="block">
