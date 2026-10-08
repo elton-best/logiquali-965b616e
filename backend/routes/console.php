@@ -22,7 +22,6 @@ Schedule::command('notifications:send-deadline-reminders')->dailyAt('08:30');
 Schedule::command('habilitations:check-expiry')->dailyAt('08:30');
 Schedule::command('documents:check-revisions')->dailyAt('09:30');
 Schedule::command('actions:check-deadlines')->dailyAt('09:00');
-Schedule::command('notifications:deadline-reminders')->dailyAt('09:10');
 Schedule::command('incidents:check-alerts')->dailyAt('09:05');
 Schedule::command('subscriptions:check-expiry')->dailyAt('07:00');
 Schedule::command('trial:check')->daily();

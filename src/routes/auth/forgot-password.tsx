@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mail, MailCheck } from "lucide-react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { backendApi } from "@/integrations/backend/client";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LqInput } from "@/components/auth/LqInput";
 import { LqButton } from "@/components/lq/LqButton";
@@ -36,15 +36,14 @@ function ForgotPasswordPage() {
     }
     setError("");
     setBusy(true);
-    const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    });
-    setBusy(false);
-    if (authError) {
+    try {
+      await backendApi.auth.forgotPassword(email);
+      setSent(true);
+    } catch (authError) {
       setError(authErrorMessage(authError));
-      return;
+    } finally {
+      setBusy(false);
     }
-    setSent(true);
   };
 
   if (sent) {

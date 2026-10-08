@@ -64,11 +64,12 @@ class DocumentWorkflowNotification extends Notification
     {
         $actorName = $this->actor ? $this->actor->name : 'Un collaborateur';
         $documentUrl = $this->buildActionUrl("/documents/{$this->document->id}?action=approve");
-        
+        $userName = $notifiable->name ?? 'Utilisateur';
+
         return (new MailMessage)
-            ->subject($this->formatSubject("✏️ Approbation requise : {$this->document->title}"))
+            ->subject($this->formatSubject("Demande d'approbation : {$this->document->title}"))
             ->view('emails.document.workflows.approval-request', [
-                'userName' => $notifiable->name,
+                'userName' => $userName,
                 'actorName' => $actorName,
                 'documentTitle' => $this->document->title,
                 'documentCode' => $this->document->code,
@@ -87,11 +88,12 @@ class DocumentWorkflowNotification extends Notification
     {
         $actorName = $this->actor ? $this->actor->name : 'Un collaborateur';
         $documentUrl = $this->buildActionUrl("/documents/{$this->document->id}?action=verify");
+        $userName = $notifiable->name ?? 'Utilisateur';
 
         return (new MailMessage)
             ->subject($this->formatSubject("⏱️ Vérification requise : {$this->document->title}"))
             ->view('emails.document.workflows.verification-request', [
-                'userName' => $notifiable->name,
+                'userName' => $userName,
                 'actorName' => $actorName,
                 'documentTitle' => $this->document->title,
                 'documentCode' => $this->document->code,
@@ -110,11 +112,12 @@ class DocumentWorkflowNotification extends Notification
         $actorName = $this->actor ? $this->actor->name : 'Un valideur';
         $documentUrl = $this->buildActionUrl("/documents/{$this->document->id}?action=handle_rejection");
         $rejectionReason = $this->context['rejection_reason'] ?? $this->document->rejection_reason ?? 'Non précisé';
+        $userName = $notifiable->name ?? 'Utilisateur';
 
         return (new MailMessage)
             ->subject($this->formatSubject("❌ Décision requise : Rejet de {$this->document->title}"))
             ->view('emails.document.workflows.rejection-decision', [
-                'userName' => $notifiable->name,
+                'userName' => $userName,
                 'actorName' => $actorName,
                 'documentTitle' => $this->document->title,
                 'documentCode' => $this->document->code,
@@ -133,11 +136,12 @@ class DocumentWorkflowNotification extends Notification
     {
         $actorName = $this->actor ? $this->actor->name : 'Un administrateur';
         $documentUrl = $this->buildActionUrl("/documents/{$this->document->id}");
-        
+        $userName = $notifiable->name ?? 'Utilisateur';
+
         return (new MailMessage)
-            ->subject($this->formatSubject("✅ Nouveau document publié : {$this->document->title}"))
+            ->subject($this->formatSubject("Nouveau document publié : {$this->document->title}"))
             ->view('emails.document.workflows.publication', [
-                'userName' => $notifiable->name,
+                'userName' => $userName,
                 'actorName' => $actorName,
                 'documentTitle' => $this->document->title,
                 'documentCode' => $this->document->code,
@@ -152,7 +156,7 @@ class DocumentWorkflowNotification extends Notification
     {
         $actorName = $this->actor ? $this->actor->name : 'Un collaborateur';
         $documentUrl = $this->buildActionUrl("/documents/{$this->document->id}");
-        
+
         return (new MailMessage)
             ->subject($this->formatSubject("✓ Vérification complétée : {$this->document->title}"))
             ->view('emails.document.workflows.verification-completed', [
@@ -173,10 +177,11 @@ class DocumentWorkflowNotification extends Notification
         $actorName = $this->actor ? $this->actor->name : 'Un collaborateur';
         $outcome = (string) ($this->context['outcome'] ?? 'approved');
         $outcomeLabel = $outcome === 'rejected' ? 'rejete' : 'approuve';
+        $userName = $notifiable->name ?? 'Utilisateur';
 
         return (new MailMessage)
             ->subject($this->formatSubject("Approbation finalisee : {$this->document->title}"))
-            ->greeting("Bonjour {$notifiable->name},")
+            ->greeting("Bonjour {$userName},")
             ->line("L'approbation de **{$this->document->title}** a deja ete finalisee par {$actorName}.")
             ->line("Resultat: **{$outcomeLabel}**")
             ->line("**Code :** {$this->document->code}")

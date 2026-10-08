@@ -2,7 +2,8 @@ import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-
 import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Bell, Clock, MapPin, Menu, Search, Stamp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { backendApi } from "@/integrations/backend/client";
+import { useEnterpriseNorms } from "@/integrations/backend/norms";
 import { AppSidebar } from "@/components/app/AppSidebar";
 import { LqButton } from "@/components/lq/LqButton";
 import { getMyProfile } from "@/lib/profile.functions";
@@ -45,8 +46,12 @@ function AppLayout() {
   const [searchOpen, setSearchOpen] = useState(false);
   const { data: records = [] } = useRecords();
   const [site, setSite] = useCurrentSite();
+  const { data: normCatalog } = useEnterpriseNorms({ site_id: site || undefined });
   const ws = useWorkspace(records, profile.created_at, profile.email ?? "");
   const sites = records.filter((r) => r.kind === "site" && r.status !== "Archivé");
+  const backendActiveNorms = normCatalog
+    ? new Set(normCatalog.norms.map((norm) => norm.code))
+    : undefined;
 
   useEffect(() => {
     const on = (e: KeyboardEvent) => {
@@ -88,7 +93,7 @@ function AppLayout() {
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
+    await backendApi.auth.logout();
     navigate({ to: "/auth/login", replace: true });
   };
 
@@ -98,7 +103,7 @@ function AppLayout() {
     email: profile.email ?? "",
     company: profile.company_name ?? "",
     onSignOut: signOut,
-    activeNorms: ws.active,
+    activeNorms: backendActiveNorms,
     counts: { taches: ws.tasks.length, verification: ws.verifyCount, approbation: ws.approveCount, sites: sites.length },
   };
 

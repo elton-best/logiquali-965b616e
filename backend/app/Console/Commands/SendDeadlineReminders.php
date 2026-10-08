@@ -15,11 +15,11 @@ class SendDeadlineReminders extends Command
 
     public function handle(): int
     {
-        $actions = Action::whereNotIn('status', ['completed', 'verified', 'cancelled'])
+        $actions = Action::where('status', '!=', 'completed')
             ->whereNotNull('deadline')
             ->whereDate('deadline', '>=', now())
-            ->whereDate('deadline', '<=', now()->addDays(7))
-            ->with(['responsible', 'process.pilot', 'process.copilot'])
+            ->whereDate('deadline', '<=', now()->addDays(3))
+            ->with('responsible')
             ->get();
 
         $count = 0;
@@ -28,28 +28,19 @@ class SendDeadlineReminders extends Command
             if (!$action->responsible_id) continue;
 
             $daysRemaining = now()->diffInDays($action->deadline, false);
-            if (!in_array($daysRemaining, [1, 3, 7], true)) {
-                continue;
-            }
             
             // Vérifier si notification déjà envoyée aujourd'hui
             $alreadySent = DatabaseNotification::where('notifiable_id', $action->responsible_id)
                 ->where('notifiable_type', User::class)
                 ->where('type', SiteEventNotification::class)
                 ->whereRaw("data->>'type' = ?", ['action_deadline_reminder'])
-                ->whereRaw("data->'data'->>'action_id' = ?", [(string) $action->id])
-                ->whereRaw("data->'data'->>'days_remaining' = ?", [(string) $daysRemaining])
+                ->whereRaw("data->>'action_id' = ?", [(string) $action->id])
                 ->whereDate('created_at', now())
                 ->exists();
 
             if ($alreadySent) continue;
 
-            $recipients = collect([$action->responsible, $action->process?->pilot, $action->process?->copilot])
-                ->filter()
-                ->unique('id');
-
-            foreach ($recipients as $recipient) {
-                $recipient->notify(new SiteEventNotification('action_deadline_reminder', [
+            $action->responsible?->notify(new SiteEventNotification('action_deadline_reminder', [
                     'type' => 'action_deadline_reminder',
                     'message' => "Action '{$action->title}' - Échéance dans {$daysRemaining} jour(s)",
                     'urgency' => $daysRemaining <= 1 ? 'critical' : 'high',
@@ -57,12 +48,11 @@ class SendDeadlineReminders extends Command
                     'action_id' => $action->id,
                     'days_remaining' => $daysRemaining,
                 ], null));
-            }
 
             $count++;
         }
 
-        $this->info("✅ {$count} action(s) rappelée(s)");
+        $this->info("✅ {$count} rappel(s) de deadline envoyé(s)");
 
         return Command::SUCCESS;
     }

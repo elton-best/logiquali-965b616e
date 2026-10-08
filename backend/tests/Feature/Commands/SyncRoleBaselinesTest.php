@@ -37,8 +37,8 @@ class SyncRoleBaselinesTest extends TestCase
         Permission::firstOrCreate(['name' => 'sites.read', 'guard_name' => 'web']);
         Permission::firstOrCreate(['name' => 'securite.epi.read', 'guard_name' => 'web']);
 
-        $adminRole = Role::create(['name' => 'admin_entreprise', 'guard_name' => 'web']);
-        $siteManagerRole = Role::create(['name' => 'site_manager', 'guard_name' => 'web']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin_entreprise', 'guard_name' => 'web']);
+        $siteManagerRole = Role::firstOrCreate(['name' => 'site_manager', 'guard_name' => 'web']);
 
         // Etat volontairement incorrect.
         $adminRole->syncPermissions(['offers.create']);

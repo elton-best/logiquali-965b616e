@@ -6,6 +6,10 @@ import {
 } from "@/components/app/CustomPages";
 import { InboxPage, MyActionsPage } from "@/components/app/Extras";
 import { DuerpView, GuideSection, ManagementConsolidation, ObjectivesGrid, ProcessReviewView, RisksView } from "@/components/app/GuidePages";
+import { ContextOrganisationPage, StakeholdersPage } from "@/components/app/OrganisationContextPages";
+import { ProcessDetailsPage, ProcessEditorPage, ProcessManagementPage } from "@/components/app/ProcessPages";
+import { ScopePage } from "@/components/app/ScopePages";
+import { CollaboratorsPage, JobDescriptionsPage, OrgChartPage, PolicyPage, ResponsibilitiesPage } from "@/components/app/LeadershipPages";
 
 const GUIDE: Record<string, { id: string; label: string; render: () => React.ReactNode }[]> = {
   risques: [{ id: "ro", label: "Risques & opportunités (grille, tableau, actions)", render: () => <RisksView /> }],
@@ -50,6 +54,15 @@ function SectionPage() {
     case "journal": return <JournalPage />;
     case "mes-actions": return <MyActionsPage />;
     case "boite-reception": return <InboxPage />;
+    case "contexte": return <ContextOrganisationPage />;
+    case "parties-interessees": return <StakeholdersPage />;
+    case "perimetre": return <ScopePage />;
+    case "processus": return search.new ? <ProcessEditorPage /> : search.open ? <ProcessDetailsPage processId={search.open} /> : <ProcessManagementPage />;
+    case "politique": return <PolicyPage />;
+    case "organigramme": return <OrgChartPage />;
+    case "collaborateurs": return <CollaboratorsPage />;
+    case "fiches-poste": return <JobDescriptionsPage />;
+    case "responsabilites": return <ResponsibilitiesPage />;
   }
   const section = SECTIONS[slug]!;
   if (GUIDE[slug] && !search.open && !search.new) return <GuideSection key={slug} slug={slug} views={GUIDE[slug]!} />;

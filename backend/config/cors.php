@@ -38,7 +38,11 @@ return [
         'X-Skip-Auth-Redirect',
     ],
 
-    'exposed_headers' => ['Authorization'],
+    'exposed_headers' => [
+        'Authorization',
+        'X-Generated-Document-Id',
+        'Content-Disposition',
+    ],
 
     'max_age' => 86400,
 

@@ -45,8 +45,8 @@ class UserControllerSimpleTest extends TestCase
         $this->site = Site::factory()->create(['enterprise_id' => $this->enterprise->id]);
 
         // Créer les rôles et permissions nécessaires
-        $adminRole = Role::create(['name' => 'admin_entreprise', 'guard_name' => 'web']);
-        $siteManagerRole = Role::create(['name' => 'site_manager', 'guard_name' => 'web']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin_entreprise', 'guard_name' => 'web']);
+        $siteManagerRole = Role::firstOrCreate(['name' => 'site_manager', 'guard_name' => 'web']);
         Role::firstOrCreate(['name' => 'lecteur', 'guard_name' => 'web']);
 
         Permission::create(['name' => 'personnel.read', 'guard_name' => 'web']);
