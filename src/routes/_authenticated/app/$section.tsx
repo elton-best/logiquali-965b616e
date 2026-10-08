@@ -6,6 +6,7 @@ import {
 } from "@/components/app/CustomPages";
 import { InboxPage, MyActionsPage } from "@/components/app/Extras";
 import { DuerpView, GuideSection, ManagementConsolidation, ObjectivesGrid, ProcessReviewView, RisksView } from "@/components/app/GuidePages";
+import { RisksPage } from "@/components/app/RiskPages";
 import { ContextOrganisationPage, StakeholdersPage } from "@/components/app/OrganisationContextPages";
 import { ProcessDetailsPage, ProcessEditorPage, ProcessManagementPage } from "@/components/app/ProcessPages";
 import { ScopePage } from "@/components/app/ScopePages";
@@ -54,6 +55,7 @@ function SectionPage() {
     case "journal": return <JournalPage />;
     case "mes-actions": return <MyActionsPage />;
     case "boite-reception": return <InboxPage />;
+    case "risques": return <RisksPage />;
     case "contexte": return <ContextOrganisationPage />;
     case "parties-interessees": return <StakeholdersPage />;
     case "perimetre": return <ScopePage />;
