@@ -60,13 +60,16 @@ export function TasksPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
       <Header title="Mes tâches" desc="Tout ce qui attend une action de votre part : actions, validations, audits, indicateurs, formations et échéances." />
-      <div className="flex gap-1 overflow-x-auto rounded-2xl border border-border bg-card p-1">
+      <select
+        aria-label="Filtrer les tâches"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value as Task["type"] | "")}
+        className="h-11 w-full rounded-xl border border-input bg-card px-4 text-sm font-semibold outline-none focus:border-primary sm:w-72"
+      >
         {TASK_FILTERS.map((f) => (
-          <button key={f.id} onClick={() => setFilter(f.id)} className={`whitespace-nowrap rounded-xl px-3.5 py-2 text-sm font-semibold ${filter === f.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-            {f.label} <span className="opacity-70">{f.id ? ws.tasks.filter((t) => t.type === f.id).length : ws.tasks.length}</span>
-          </button>
+          <option key={f.id} value={f.id}>{f.label} ({f.id ? ws.tasks.filter((t) => t.type === f.id).length : ws.tasks.length})</option>
         ))}
-      </div>
+      </select>
       <div className="relative">
         <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher une tâche par titre ou référence…" className="h-11 w-full rounded-xl border border-input bg-card pl-11 pr-4 text-sm outline-none focus:border-primary" />
