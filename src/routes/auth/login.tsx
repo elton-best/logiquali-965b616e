@@ -1,11 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Lock, Mail } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LqInput } from "@/components/auth/LqInput";
 import { LqButton } from "@/components/lq/LqButton";
+import { authErrorMessage } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Connexion — LOGIQUALI" },
@@ -18,28 +23,40 @@ export const Route = createFileRoute("/auth/login")({
 });
 
 function LoginPage() {
+  const navigate = useNavigate();
+  const search = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.includes("@")) {
       setError("Adresse e-mail invalide.");
       return;
     }
-    if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères.");
+    setError("");
+    setBusy(true);
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (authError) {
+      setError(authErrorMessage(authError));
       return;
     }
-    setError("");
-    // La connexion réelle sera branchée lors de l'activation du backend.
+    const target =
+      typeof search.redirect === "string" &&
+      search.redirect.startsWith("/") &&
+      !search.redirect.startsWith("//")
+        ? search.redirect
+        : "/app";
+    navigate({ to: target, replace: true });
   };
 
   return (
     <AuthLayout
       title="Bon retour parmi nous"
-      subtitle="Connectez-vous à votre cockpit QHSE. Un code de vérification vous sera envoyé par e-mail."
+      subtitle="Connectez-vous à votre cockpit QHSE."
     >
       <form onSubmit={submit} className="space-y-5">
         <LqInput
@@ -62,9 +79,12 @@ function LoginPage() {
             required
           />
           <div className="mt-2 text-right">
-            <span className="cursor-pointer text-xs font-bold text-primary hover:underline">
+            <Link
+              to="/auth/forgot-password"
+              className="text-xs font-bold text-primary hover:underline"
+            >
               Mot de passe oublié ?
-            </span>
+            </Link>
           </div>
         </div>
         {error && (
@@ -73,7 +93,7 @@ function LoginPage() {
           </p>
         )}
         <LqButton type="submit" className="w-full" size="lg" withArrow>
-          Se connecter
+          {busy ? "Connexion…" : "Se connecter"}
         </LqButton>
       </form>
       <p className="mt-8 text-center text-sm text-muted-foreground">
