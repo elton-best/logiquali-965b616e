@@ -55,7 +55,7 @@ function SectionPage() {
     case "contexte": return <ContextOrganisationPage />;
     case "parties-interessees": return <StakeholdersPage />;
     case "perimetre": return <ApplicationScopePage />;
-    case "processus": return <ManagementSystemPage />;
+    case "processus": return search.open || search.new ? <SectionView key="processus-editor" section={SECTIONS.processus!} openId={search.open} createNew={!!search.new} newKind={search.kind} originId={search.origin} /> : <ManagementSystemPage />;
     case "politique": return <PolicyPage />;
     case "organigramme": return <OrgChartPage />;
     case "fiches-poste": return <JobDescriptionsPage />;

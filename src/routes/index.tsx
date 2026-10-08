@@ -27,7 +27,6 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { LqButton } from "@/components/lq/LqButton";
 import { Reveal } from "@/components/lq/Reveal";
-import { DashboardPreview } from "@/components/landing/DashboardPreview";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -154,7 +153,6 @@ function LandingPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <Hero />
-      <DashboardPreview />
       <Standards />
       <Process />
       <Modules />
