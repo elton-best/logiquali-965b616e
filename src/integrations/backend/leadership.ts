@@ -6,6 +6,7 @@ export const POLICY_KEY = ["qhse-policy"] as const;
 export const ORG_CHART_KEY = ["org-chart"] as const;
 export const JOB_DESCRIPTIONS_KEY = ["job-descriptions"] as const;
 export const RESPONSIBILITIES_KEY = ["responsibilities"] as const;
+export const COLLABORATORS_KEY = ["leadership-collaborators"] as const;
 
 export type QhsePolicy = {
   id?: string | number;
@@ -68,6 +69,11 @@ export async function fetchResponsibilities() {
   return listOf(payload);
 }
 
+export async function fetchCollaborators(siteId: string) {
+  const payload = await backendApi.request<unknown>(`users?site_id=${encodeURIComponent(siteId)}&per_page=100`);
+  return listOf(payload);
+}
+
 export function useCurrentPolicy(siteId: string) {
   return useQuery({ queryKey: [...POLICY_KEY, siteId], queryFn: () => fetchCurrentPolicy(siteId), enabled: Boolean(siteId), staleTime: 20_000 });
 }
@@ -82,6 +88,10 @@ export function useJobDescriptions(siteId: string) {
 
 export function useResponsibilities(siteId: string) {
   return useQuery({ queryKey: [...RESPONSIBILITIES_KEY, siteId], queryFn: fetchResponsibilities, enabled: Boolean(siteId), staleTime: 20_000 });
+}
+
+export function useCollaborators(siteId: string) {
+  return useQuery({ queryKey: [...COLLABORATORS_KEY, siteId], queryFn: () => fetchCollaborators(siteId), enabled: Boolean(siteId), staleTime: 20_000 });
 }
 
 export function usePolicyMutations(siteId: string) {
@@ -124,5 +134,17 @@ export function useResponsibilityMutations(siteId: string) {
   return {
     save: useMutation({ mutationFn: (input: { id?: string; payload: Record<string, unknown> }) => backendApi.request(input.id ? `responsibilities/${input.id}` : "responsibilities", { method: input.id ? "PUT" : "POST", body: JSON.stringify(input.payload) }), onSuccess: invalidate }),
     remove: useMutation({ mutationFn: (id: string) => backendApi.request(`responsibilities/${id}`, { method: "DELETE" }), onSuccess: invalidate }),
+  };
+}
+
+export function useCollaboratorMutations(siteId: string) {
+  const client = useQueryClient();
+  const invalidate = () => client.invalidateQueries({ queryKey: [...COLLABORATORS_KEY, siteId] });
+  return {
+    save: useMutation({
+      mutationFn: (input: { id?: string; payload: Record<string, unknown> }) => backendApi.request(input.id ? `users/${input.id}` : "users", { method: input.id ? "PUT" : "POST", body: JSON.stringify(input.payload) }),
+      onSuccess: invalidate,
+    }),
+    remove: useMutation({ mutationFn: (id: string) => backendApi.request(`users/${id}`, { method: "DELETE" }), onSuccess: invalidate }),
   };
 }

@@ -7,7 +7,7 @@ import {
 import { InboxPage, MyActionsPage } from "@/components/app/Extras";
 import { DuerpView, GuideSection, ManagementConsolidation, ObjectivesGrid, ProcessReviewView, RisksView } from "@/components/app/GuidePages";
 import { ApplicationScopePage, ContextOrganisationPage, ManagementSystemPage, StakeholdersPage } from "@/components/app/OrganisationContextPages";
-import { JobDescriptionsPage, OrgChartPage, PolicyPage, ResponsibilitiesPage } from "@/components/app/LeadershipPages";
+import { CollaboratorsPage, JobDescriptionsPage, OrgChartPage, PolicyPage, ResponsibilitiesPage } from "@/components/app/LeadershipPages";
 
 const GUIDE: Record<string, { id: string; label: string; render: () => React.ReactNode }[]> = {
   risques: [{ id: "ro", label: "Risques & opportunités (grille, tableau, actions)", render: () => <RisksView /> }],
@@ -58,6 +58,7 @@ function SectionPage() {
     case "processus": return search.open || search.new ? <SectionView key="processus-editor" section={SECTIONS.processus!} openId={search.open} createNew={!!search.new} newKind={search.kind} originId={search.origin} /> : <ManagementSystemPage />;
     case "politique": return <PolicyPage />;
     case "organigramme": return <OrgChartPage />;
+    case "collaborateurs": return <CollaboratorsPage />;
     case "fiches-poste": return <JobDescriptionsPage />;
     case "responsabilites": return <ResponsibilitiesPage />;
   }
