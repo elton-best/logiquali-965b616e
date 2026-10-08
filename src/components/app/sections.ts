@@ -455,6 +455,7 @@ const K = {
     statuses: [{ value: "En évaluation", tone: "info" }, { value: "Approuvé", tone: "success" }, { value: "Sous surveillance", tone: "warn" }, { value: "Refusé", tone: "danger" }, { value: "Archivé", tone: "neutral" }],
     actions: [
       { label: "Évaluer", from: ["En évaluation", "Approuvé", "Sous surveillance"], tone: "primary", number: { key: "score", label: "Note d'évaluation (/20)" } },
+      { label: "Réévaluation périodique", from: ["Approuvé", "Sous surveillance"], date: { key: "next_evaluation", label: "Prochaine évaluation" }, reason: "Synthèse de la réévaluation" },
       { label: "Approuver", to: "Approuvé", from: ["En évaluation", "Sous surveillance"], tone: "primary" },
       { label: "Mettre sous surveillance", to: "Sous surveillance", from: ["Approuvé"], reason: "Motif" },
       { label: "Refuser", to: "Refusé", from: ["En évaluation", "Sous surveillance"], tone: "danger", reason: "Motif du refus", confirm: true },
@@ -622,9 +623,11 @@ const K = {
     kind: "competence", label: "Compétences", singular: "compétence", prefix: "CMP", titleLabel: "Compétence",
     done: ["Acquise"],
     statuses: [{ value: "À acquérir", tone: "warn" }, { value: "En cours", tone: "info" }, { value: "Acquise", tone: "success" }],
-    actions: [{ label: "Démarrer", to: "En cours", from: ["À acquérir"] }, { label: "Valider l'acquisition", to: "Acquise", from: ["En cours", "À acquérir"], tone: "primary", reason: "Preuve" }],
+    actions: [{ label: "Démarrer", to: "En cours", from: ["À acquérir"] }, { label: "Valider l'acquisition", to: "Acquise", from: ["En cours", "À acquérir"], tone: "primary", reason: "Preuve" }, { label: "Réévaluer", to: "Acquise", from: ["Acquise"], tone: "primary", reason: "Résultat de la réévaluation", date: { key: "next_review", label: "Prochaine réévaluation" } }, { label: "Remettre à acquérir", to: "À acquérir", from: ["Acquise"], reason: "Motif" }],
+    due: "next_review",
     fields: [
       { key: "collaborator_id", label: "Collaborateur", type: "relation", kinds: ["collaborator"], column: true },
+      { key: "next_review", label: "Prochaine réévaluation", type: "date" },
       { key: "job_id", label: "Poste", type: "relation", kinds: ["job"] },
       { key: "level", label: "Niveau", type: "select", options: ["Débutant", "Confirmé", "Expert"], column: true },
     ],

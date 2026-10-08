@@ -451,6 +451,7 @@ function DetailSheet({
   onOpen: (r: QRecord) => void;
 }) {
   const setStatus = useSetStatus();
+  const save = useSaveRecord();
   const del = useDeleteRecord();
   const navigate = useNavigate();
   const cfg = record ? KINDS[record.kind] : undefined;
@@ -499,6 +500,23 @@ function DetailSheet({
                 </div>
               </details>
             </div>
+
+            {cfg.owner && (
+              <div className="mt-5">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Responsable (affectation rapide)</label>
+                <select
+                  value={String(record.data[cfg.owner] ?? "")}
+                  disabled={save.isPending}
+                  onChange={(e) => save.mutate({ id: record.id, kind: record.kind, title: record.title, status: record.status, data: { ...record.data, [cfg.owner!]: e.target.value }, previous: record })}
+                  className="mt-1.5 h-10 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none focus:border-primary"
+                >
+                  <option value="">— Non affecté —</option>
+                  {records.filter((r) => r.kind === "collaborator" && r.status !== "Archivé").map((c) => (
+                    <option key={c.id} value={c.id}>{c.reference} · {c.title}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <dl className="mt-6 divide-y divide-border rounded-2xl border border-border">
               {cfg.fields.map((f) => (
