@@ -46,7 +46,7 @@ function useClientRecords() {
     queryKey: KEY,
     queryFn: async () => {
       const { data, error } = await supabase.from("qhse_records").select("id, kind, reference, title, status, data, created_at, updated_at")
-        .in("kind", ["client_complaint", "client_survey", "client_ticket"]).order("created_at", { ascending: false });
+        .in("kind", ["client_complaint", "client_survey", "client_ticket"]).eq("company_id", (await supabase.auth.getUser()).data.user!.id).order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Rec[];
     },
@@ -56,11 +56,11 @@ function useClientRecords() {
 function useCreate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (v: { kind: string; prefix: string; title: string; status: string; data: Record<string, unknown>; count: number }) => {
+    mutationFn: async (v: { kind: string; prefix: string; title: string; status: string; data: Record<string, unknown>; count: number; target?: string }) => {
       const { data: u } = await supabase.auth.getUser();
       const { error } = await supabase.from("qhse_records").insert({
         company_id: u.user!.id, kind: v.kind, reference: `${v.prefix}-${String(v.count + 1).padStart(3, "0")}`,
-        title: v.title, status: v.status, data: v.data as Json,
+        title: v.title, status: v.status, data: v.data as Json, target_company_id: v.target ?? null,
       });
       if (error) throw error;
     },
@@ -205,6 +205,10 @@ function Complaints({ complaints }: { complaints: Rec[] }) {
   const [form, setForm] = useState(false);
   const [filter, setFilter] = useState("");
   const [f, setF] = useState({ title: "", company: "", category: "Qualité produit", description: "" });
+  const { data: companies = [] } = useQuery({
+    queryKey: ["companies"],
+    queryFn: async () => { const { data, error } = await supabase.rpc("list_companies"); if (error) throw error; return data ?? []; },
+  });
   const list = complaints.filter((c) => !filter || c.status === filter);
 
   if (open) {
@@ -244,14 +248,19 @@ function Complaints({ complaints }: { complaints: Rec[] }) {
       <form className={`${card} space-y-4`} onSubmit={async (e) => {
         e.preventDefault();
         if (!f.title.trim() || !f.description.trim()) { toast.error("Objet et description obligatoires."); return; }
-        await create.mutateAsync({ kind: "client_complaint", prefix: "PLT", title: f.title, status: "En attente", count: complaints.length,
-          data: { company: f.company, category: f.category, description: f.description, history: [{ at: new Date().toISOString(), text: "Plainte déposée" }] } });
+        if (!f.company) { toast.error("Choisissez l'entreprise concernée."); return; }
+        const co = companies.find((x) => x.id === f.company);
+        await create.mutateAsync({ kind: "client_complaint", prefix: "PLT", title: f.title, status: "En attente", count: complaints.length, target: f.company,
+          data: { company: co?.name ?? "", company_id: f.company, category: f.category, description: f.description, history: [{ at: new Date().toISOString(), text: "Plainte déposée" }] } });
         setForm(false); setF({ title: "", company: "", category: "Qualité produit", description: "" });
       }}>
         <button type="button" onClick={() => setForm(false)} className="text-sm font-semibold text-primary hover:underline">← Retour</button>
         <h2 className="font-display text-xl font-bold">Déposer une plainte</h2>
         <input className={inputCls} placeholder="Objet *" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} />
-        <input className={inputCls} placeholder="Entreprise concernée" value={f.company} onChange={(e) => setF({ ...f, company: e.target.value })} />
+        <select className={inputCls} value={f.company} onChange={(e) => setF({ ...f, company: e.target.value })}>
+          <option value="">Entreprise concernée *</option>
+          {companies.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+        </select>
         <select className={inputCls} value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })}>
           {["Qualité produit", "Délai de livraison", "Service client", "Facturation", "Sécurité", "Autre"].map((x) => <option key={x}>{x}</option>)}
         </select>
