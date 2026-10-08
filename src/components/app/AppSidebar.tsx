@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { useState } from "react";
 import logoAsset from "@/assets/bestqhse-logo.png.asset.json";
-import { BOTTOM_ITEMS, CONFIG_GROUP, DASHBOARD_ICON, NAV_GROUPS, TOP_ITEMS, type NavGroup, type NavItem } from "./nav";
+import { BOTTOM_ITEMS, CONFIG_GROUP, DASHBOARD_ICON, NAV_GROUPS, TOP_ITEMS, policyTitle, type NavGroup, type NavItem } from "./nav";
 
 type Props = {
   collapsed: boolean;
