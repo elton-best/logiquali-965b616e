@@ -5,6 +5,7 @@ export const CONTEXT_KEY = ["organisation-context"] as const;
 export const STAKEHOLDERS_KEY = ["organisation-stakeholders"] as const;
 export const SCOPE_KEY = ["organisation-scope"] as const;
 export const PROCESSES_KEY = ["organisation-processes"] as const;
+export const CARTOGRAPHY_KEY = ["organisation-cartography"] as const;
 
 function objectOf(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
@@ -48,6 +49,15 @@ export async function fetchProcesses(siteId: string) {
   return fetchResources("processes", { site_id: siteId, per_page: "100" });
 }
 
+export async function fetchCartography(siteId: string) {
+  const payload = await backendApi.request<unknown>(`processes-cartography?site_id=${encodeURIComponent(siteId)}`);
+  const root = objectOf(payload);
+  const data = objectOf(root.data);
+  return Object.entries(data).flatMap(([category, items]) =>
+    Array.isArray(items) ? items.map((item) => ({ ...flattenResource(item), category })) : [],
+  );
+}
+
 export function useContexts(siteId: string) {
   return useQuery({
     queryKey: [...CONTEXT_KEY, siteId],
@@ -79,6 +89,15 @@ export function useProcesses(siteId: string) {
   return useQuery({
     queryKey: [...PROCESSES_KEY, siteId],
     queryFn: () => fetchProcesses(siteId),
+    enabled: Boolean(siteId),
+    staleTime: 20_000,
+  });
+}
+
+export function useCartography(siteId: string) {
+  return useQuery({
+    queryKey: [...CARTOGRAPHY_KEY, siteId],
+    queryFn: () => fetchCartography(siteId),
     enabled: Boolean(siteId),
     staleTime: 20_000,
   });

@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useCurrentSite } from "@/hooks/use-workspace";
 import {
+  useCartography,
   useContextMutations,
   useContexts,
   useProcesses,
@@ -186,7 +187,7 @@ export function ApplicationScopePage() {
 
 export function ManagementSystemPage() {
   const [siteId] = useCurrentSite();
-  const { data: processes = [], isLoading } = useProcesses(siteId);
+  const { data: processes = [], isLoading } = useCartography(siteId);
   const groups = [{ key: "management", label: "Processus de management", color: "text-emerald-700 bg-emerald-50 border-emerald-200", icon: BarChart3 }, { key: "realization", label: "Processus de réalisation", color: "text-orange-700 bg-orange-50 border-orange-200", icon: GitBranch }, { key: "support", label: "Processus support", color: "text-violet-700 bg-violet-50 border-violet-200", icon: Settings2 }];
   const category = (item: Record<string, unknown>) => { const value = String(item.category ?? item.type ?? "").toLowerCase(); if (["management", "pilotage"].includes(value)) return "management"; if (["support", "soutien"].includes(value)) return "support"; return "realization"; };
   if (!siteId) return <div className="mx-auto max-w-7xl p-4 md:p-8"><SiteRequired /></div>;
