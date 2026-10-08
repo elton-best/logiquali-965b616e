@@ -693,7 +693,7 @@ function RecordForm({
   const input = "h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm outline-none focus:border-primary";
 
   return (
-    <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 md:p-8">
+    <div className="mx-auto max-w-5xl">
       <button type="button" onClick={onClose} className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">← Retour</button>
       <div>
         <div>
