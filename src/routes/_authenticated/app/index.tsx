@@ -279,7 +279,7 @@ function Dashboard() {
                   <li key={i.id}>
                     <div className="flex justify-between text-sm">
                       <span className="font-semibold text-foreground">{i.title}</span>
-                      <span className={`font-bold ${rate >= 100 ? "text-primary" : "text-destructive"}`}>{i.data["value"] ?? 0} / {i.data["target"]} {i.data["unit"] ?? ""}</span>
+                      <span className={`font-bold ${rate >= 100 ? "text-primary" : "text-destructive"}`}>{String(i.data["value"] ?? 0)} / {String(i.data["target"] ?? "")} {String(i.data["unit"] ?? "")}</span>
                     </div>
                     <div className="mt-1.5 h-2 rounded-full bg-secondary"><div className={`h-2 rounded-full ${rate >= 100 ? "bg-primary" : "bg-destructive/70"}`} style={{ width: `${Math.min(100, rate)}%` }} /></div>
                   </li>

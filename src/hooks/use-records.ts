@@ -52,7 +52,7 @@ export function useRecords() {
 async function update(id: string, patch: { title?: string; status?: string; data?: Record<string, unknown> }) {
   const { error } = await supabase
     .from("qhse_records")
-    .update({ ...patch, ...(patch.data ? { data: patch.data as Json } : {}) })
+    .update({ ...patch, ...(patch.data ? { data: patch.data as Json } : {}) } as never)
     .eq("id", id);
   if (error) throw error;
 }
