@@ -1,6 +1,6 @@
 import { getRouteApi, Link, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Building2, Check, CreditCard, Download, ExternalLink, Minus, RotateCcw, Search } from "lucide-react";
+import { Building2, Check, Plus, CreditCard, Download, ExternalLink, Minus, RotateCcw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,7 +59,9 @@ export function TasksPage() {
   const list = ws.tasks.filter((t) => (!filter || t.type === filter) && (!q || `${t.record.reference} ${t.record.title}`.toLowerCase().includes(q.toLowerCase())));
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-      <Header title="Mes tâches" desc="Tout ce qui attend une action de votre part : actions, validations, audits, indicateurs, formations et échéances." />
+      <Header title="Mes tâches" desc="Tout ce qui attend une action de votre part : actions, validations, audits, indicateurs, formations et échéances.">
+        <Link to="/app/$section" params={{ section: "actions" }} search={{ new: 1 }} className={primaryBtn}><Plus className="h-4 w-4" /> Créer une tâche</Link>
+      </Header>
       <select
         aria-label="Filtrer les tâches"
         value={filter}

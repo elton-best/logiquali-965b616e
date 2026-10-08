@@ -11,7 +11,8 @@ import {
 import {
   historyOf, isOverdue, useAddNote, useDeleteRecord, useRecords, useSaveRecord, useSetStatus, useTransition, type QRecord,
 } from "@/hooks/use-records";
-import { downloadCsv, useCurrentSite } from "@/hooks/use-workspace";
+import { useCurrentSite } from "@/hooks/use-workspace";
+import { ColumnPicker, ExportPreview, useColumns } from "./Extras";
 
 /** Which kinds can spawn which follow-up records from the detail sheet. */
 const FOLLOW_UPS: Record<string, { label: string; section: string; kind?: string }[]> = {
@@ -118,19 +119,20 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
       (statusFilter ? r.status === statusFilter : showArchived || r.status !== "Archivé") &&
       (!query || `${r.reference} ${r.title}`.toLowerCase().includes(query.toLowerCase()))
   );
-  const columns = cfg.fields.filter((f) => f.column).slice(0, 4);
+  const allColumns = cfg.fields.filter((f) => f.column);
+  const colState = useColumns(cfg.kind, ["title", ...allColumns.map((c) => c.key), "status"]);
+  const columns = allColumns.filter((c) => colState.isVisible(c.key));
+  const [preview, setPreview] = useState(false);
 
   const clearSearch = () => {
     if (openId || createNew) navigate({ to: "/app/$section", params: { section: section.slug }, search: {}, replace: true });
   };
 
-  const exportCsv = () => {
-    downloadCsv(`${section.slug}-${cfg.kind}.csv`, [
-      ["Référence", cfg.titleLabel, "Statut", ...cfg.fields.map((f) => f.label), "Créé le"],
-      ...list.map((r) => [r.reference, r.title, r.status, ...cfg.fields.map((f) => formatValue(f, r.data[f.key], byId)), new Date(r.created_at).toLocaleDateString("fr-FR")]),
-    ]);
-    toast.success(`${list.length} ligne(s) exportée(s)`);
-  };
+  const exportRows = (): string[][] => [
+    ["Référence", cfg.titleLabel, "Statut", ...cfg.fields.map((f) => f.label), "Créé le"],
+    ...list.map((r) => [r.reference, r.title, r.status, ...cfg.fields.map((f) => formatValue(f, r.data[f.key], byId)), new Date(r.created_at).toLocaleDateString("fr-FR")]),
+  ];
+  const exportCsv = () => setPreview(true);
 
   if (editing) {
     return (
@@ -167,7 +169,9 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
           <h1 className="mt-1 font-display text-2xl font-extrabold text-foreground md:text-3xl">{section.title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
         </div>
-        <div className="flex gap-2">
+        <ExportPreview open={preview} onClose={() => setPreview(false)} filename={`${section.slug}-${cfg.kind}.csv`} rows={preview ? exportRows() : []} />
+        <div className="flex flex-wrap gap-2">
+          <ColumnPicker cols={["title", ...allColumns.map((c) => c.key), "status"]} labels={{ title: cfg.titleLabel, status: "Statut", ...Object.fromEntries(allColumns.map((c) => [c.key, c.label])) }} state={colState} />
           <button onClick={exportCsv} className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground hover:border-primary hover:text-primary">
             <Download className="h-4 w-4" /> Exporter
           </button>
@@ -257,33 +261,35 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
           </div>
         ) : (
           <>
-            <table className="hidden w-full text-sm md:table">
+            <div className="hidden overflow-x-auto md:block"><table className="w-full text-sm">
               <thead className="border-b border-border bg-background text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">Réf.</th>
-                  <th className="px-4 py-3">{cfg.titleLabel}</th>
+                  <th className="sticky left-0 z-10 bg-background px-4 py-3">Réf.</th>
+                  {colState.isVisible("title") && <th className="px-4 py-3">{cfg.titleLabel}</th>}
                   {columns.map((c) => <th key={c.key} className="px-4 py-3">{c.label}</th>)}
-                  <th className="px-4 py-3">Statut</th>
+                  {colState.isVisible("status") && <th className="px-4 py-3">Statut</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {list.map((r) => (
                   <tr key={r.id} onClick={() => setDetailId(r.id)} className="cursor-pointer transition-colors hover:bg-primary-soft/40">
-                    <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-bold text-primary">{r.reference}</td>
-                    <td className="px-4 py-3 font-semibold text-foreground">
+                    <td className="sticky left-0 whitespace-nowrap bg-card px-4 py-3 font-mono text-xs font-bold text-primary">{r.reference}</td>
+                    {colState.isVisible("title") && <td className="px-4 py-3 font-semibold text-foreground">
                       <span className="flex items-center gap-2">
                         {r.title}
                         {isOverdue(r) && <AlertTriangle className="h-3.5 w-3.5 text-destructive" aria-label="En retard" />}
                       </span>
-                    </td>
+                    </td>}
                     {columns.map((c) => (
                       <td key={c.key} className="max-w-[200px] truncate px-4 py-3 text-muted-foreground">{formatValue(c, r.data[c.key], byId)}</td>
                     ))}
-                    <td className="px-4 py-3"><StatusBadge kind={r.kind} status={r.status} /></td>
+                    {colState.isVisible("status") && <td className="px-4 py-3">
+                      <button title="Filtrer sur ce statut" onClick={(e) => { e.stopPropagation(); setStatusFilter(statusFilter === r.status ? "" : r.status); }}><StatusBadge kind={r.kind} status={r.status} /></button>
+                    </td>}
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
             <ul className="divide-y divide-border md:hidden">
               {list.map((r) => (
                 <li key={r.id}>
