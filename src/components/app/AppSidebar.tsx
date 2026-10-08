@@ -41,7 +41,7 @@ export function AppSidebar({ collapsed, onToggle, name, email, company, onSignOu
         params={{ section: it.slug }}
         onClick={onNavigate}
         title={collapsed ? it.label : undefined}
-        className={`group flex items-center gap-3 rounded-xl text-[13.5px] font-semibold transition-colors ${
+        className={`group relative flex items-center gap-3 rounded-xl text-[13.5px] font-semibold transition-colors ${
           collapsed ? "mx-auto h-10 w-10 justify-center" : `h-9 px-3 ${nested ? "ml-1" : ""}`
         } ${
           active
@@ -51,7 +51,7 @@ export function AppSidebar({ collapsed, onToggle, name, email, company, onSignOu
       >
         <it.icon className="h-[18px] w-[18px] shrink-0" />
         {!collapsed && <span className="flex-1 truncate">{it.label}</span>}
-        {collapsed && badge && <span className="absolute -mt-6 ml-6 h-2 w-2 rounded-full bg-primary" />}
+        {collapsed && badge && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />}
         {!collapsed && badge && (
           <span className="rounded-full bg-primary px-1.5 text-[10px] font-bold leading-4 text-primary-foreground">
             {badge}
