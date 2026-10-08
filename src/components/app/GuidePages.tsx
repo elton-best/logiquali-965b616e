@@ -480,6 +480,13 @@ export function StandardActionBlock({ value, onChange, collaborators, disabled }
 // =====================================================================
 // 9.2 Revue de processus — 9 sections, verrouillage de clôture, rapport ; 9.3 consolidation
 // =====================================================================
+const Sec = ({ n, t, children }: { n: number; t: string; children: React.ReactNode }) => (
+    <section className={card}><h3 className="font-display font-bold"><span className="mr-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">{n}</span>{t}</h3><div className="mt-3">{children}</div></section>
+  );
+const Count = ({ label, v, to, tone }: { label: string; v: number; to: string; tone: string }) => (
+    <Link to="/app/$section" params={{ section: to }} className="rounded-xl border border-border p-3 hover:border-primary"><p className={`font-display text-xl font-extrabold ${tone}`}>{v}</p><p className="text-xs text-muted-foreground">{label}</p></Link>
+  );
+
 export function ProcessReviewView() {
   const { data: records = [] } = useRecords();
   const save = useSaveRecord();
@@ -528,12 +535,6 @@ export function ProcessReviewView() {
     ["9. Difficultés & suggestions", String(d["difficulties"] ?? "")],
   ];
   const ta = "h-24 w-full rounded-lg border border-input bg-background p-3 text-sm outline-none focus:border-primary disabled:opacity-60";
-  const Sec = ({ n, t, children }: { n: number; t: string; children: React.ReactNode }) => (
-    <section className={card}><h3 className="font-display font-bold"><span className="mr-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">{n}</span>{t}</h3><div className="mt-3">{children}</div></section>
-  );
-  const Count = ({ label, v, to, tone }: { label: string; v: number; to: string; tone: string }) => (
-    <Link to="/app/$section" params={{ section: to }} className="rounded-xl border border-border p-3 hover:border-primary"><p className={`font-display text-xl font-extrabold ${tone}`}>{v}</p><p className="text-xs text-muted-foreground">{label}</p></Link>
-  );
   return (
     <>
       <Head title="Revue de processus" desc="Les 9 sections obligatoires. La clôture est bloquée tant que des actions non réalisées n'ont pas été replanifiées.">
