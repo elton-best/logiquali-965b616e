@@ -5,6 +5,15 @@ import {
   CompanyPage, JournalPage, NormsPage, PreferencesPage, QueuePage, RolesPage, SubscriptionPage, TasksPage,
 } from "@/components/app/CustomPages";
 import { InboxPage, MyActionsPage } from "@/components/app/Extras";
+import { DuerpView, GuideSection, ManagementConsolidation, ObjectivesGrid, ProcessReviewView, RisksView } from "@/components/app/GuidePages";
+
+const GUIDE: Record<string, { id: string; label: string; render: () => React.ReactNode }[]> = {
+  risques: [{ id: "ro", label: "Risques & opportunités (grille, tableau, actions)", render: () => <RisksView /> }],
+  dangers: [{ id: "duerp", label: "DUERP par unité de travail", render: () => <DuerpView /> }],
+  objectifs: [{ id: "grid", label: "Grille mensuelle & taux d'atteinte", render: () => <ObjectivesGrid /> }],
+  "revue-processus": [{ id: "rvp", label: "Revue en 9 sections", render: () => <ProcessReviewView /> }],
+  "revue-direction": [{ id: "cons", label: "Consolidation des revues de processus", render: () => <ManagementConsolidation /> }],
+};
 
 const CUSTOM = ["entreprise", "roles", "abonnement", "taches", "verification", "approbation", "normes", "preferences", "journal", "mes-actions", "boite-reception"];
 
@@ -43,6 +52,7 @@ function SectionPage() {
     case "boite-reception": return <InboxPage />;
   }
   const section = SECTIONS[slug]!;
+  if (GUIDE[slug] && !search.open && !search.new) return <GuideSection key={slug} slug={slug} views={GUIDE[slug]!} />;
   return (
     <SectionView
       key={slug}
