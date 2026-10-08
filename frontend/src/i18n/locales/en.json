@@ -1,0 +1,107 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "status": "Status",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "sites": "Sites",
+    "documents": "Documents",
+    "nonconformities": "Non-Conformities",
+    "audits": "Audits",
+    "risks": "Risks",
+    "actions": "Actions"
+  },
+  "users": {
+    "title": "Users",
+    "create": "New User",
+    "noUsers": "No users found"
+  },
+  "documents": {
+    "title": "Documents",
+    "create": "New Document",
+    "status": {
+      "draft": "Draft",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    }
+  },
+  "operations": {
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "critical": "Critical"
+    },
+    "status": {
+      "planned": "Planned",
+      "in_progress": "In progress",
+      "on_hold": "On hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "todo": "To do",
+      "done": "Done",
+      "blocked": "Blocked"
+    }
+  },
+  "seo": {
+    "defaults": {
+      "title": "{appName} | Quality, Compliance and Governance",
+      "description": "{appName} centralizes quality, compliance, and governance to accelerate decisions with full traceability.",
+      "keywords": "{appName},quality management software,compliance platform,quality governance,workflow automation,access control"
+    },
+    "routes": {
+      "home": {
+        "title": "{appName} | Structure Compliance, Accelerate Decisions",
+        "description": "Manage quality requirements, responsibilities, and actions in one clear, secure, execution-focused environment.",
+        "keywords": "quality management software,compliance management platform,quality governance,action tracking,role permissions",
+        "ogTitle": "{appName} | Structure Compliance, Accelerate Decisions",
+        "ogDescription": "Manage quality requirements, responsibilities, and actions in one clear, secure, execution-focused environment."
+      },
+      "landing": {
+        "title": "Quality and Compliance Platform for Enterprises | {appName}",
+        "description": "Centralize data, roles, permissions, and workflows to give leaders reliable governance and faster decisions.",
+        "keywords": "quality and compliance platform,role-based access control,document approval workflow,governance traceability",
+        "ogTitle": "Quality and Compliance Platform for Enterprises | {appName}",
+        "ogDescription": "Centralize data, roles, permissions, and workflows to give leaders reliable governance and faster decisions."
+      },
+      "pricing": {
+        "title": "{appName} Pricing | Choose Your QHSE Plan",
+        "description": "Compare {appName} plans and choose the best option for your quality, safety, and compliance goals.",
+        "keywords": "{appName} pricing,QHSE software pricing,quality subscription,compliance plans",
+        "ogTitle": "{appName} Pricing | Choose Your QHSE Plan",
+        "ogDescription": "Compare {appName} plans and choose the best option for your QHSE goals."
+      },
+      "guideUtilisation": {
+        "title": "{appName} Guide | Build Quality and Compliance Structure",
+        "description": "Learn how to structure your organization, centralize actions, and manage gaps with {appName}.",
+        "keywords": "{appName} guide,compliance management,organization structure,quality operations",
+        "ogTitle": "{appName} Guide | Build Quality and Compliance Structure",
+        "ogDescription": "Structure teams, centralize workflows, and manage execution with reliable traceability."
+      },
+      "politiqueConfidentialite": {
+        "title": "Privacy Policy | {appName}",
+        "description": "Read the {appName} Privacy Policy and our commitments regarding personal data protection.",
+        "keywords": "{appName} privacy,data protection,GDPR,personal data",
+        "ogTitle": "Privacy Policy | {appName}",
+        "ogDescription": "Our commitments regarding user privacy and personal data protection."
+      }
+    }
+  }
+}

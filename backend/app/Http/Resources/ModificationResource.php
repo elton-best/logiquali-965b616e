@@ -33,3 +33,4 @@ class ModificationResource extends JsonApiResource
         ];
     }
 }
+
