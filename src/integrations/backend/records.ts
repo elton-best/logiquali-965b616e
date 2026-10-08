@@ -26,7 +26,7 @@ export type QRecord = {
 export const RECORDS_KEY = ["qhse-records"];
 
 /** Resource names exposed by the Laravel API. Unsupported UI kinds are kept out
- * of the request instead of silently writing to a second Supabase database. */
+ * of the request instead of silently writing to a second datastore. */
 export const BACKEND_RESOURCES: Record<string, string> = {
   site: "sites",
   collaborator: "users",

@@ -2,7 +2,7 @@
  * Thin client for the Laravel API.
  *
  * The frontend deliberately talks to the same contract as the Laravel backend
- * (`/api/v1`) instead of duplicating authentication and persistence in Supabase.
+ * (`/api/v1`) instead of duplicating authentication and persistence in the frontend.
  * In development Vite proxies `/api` to BACKEND_URL; in production the reverse
  * proxy should expose the Laravel API under the same origin.
  */
@@ -332,7 +332,12 @@ export const backendApi = {
       return result;
     },
     async resendMfa(token: string) {
-      return request<{ mfa_token: string; mfa_expires_at?: string; message?: string }>(
+      return request<{
+        mfa_token: string;
+        mfa_expires_at?: string;
+        mfa_code?: string;
+        message?: string;
+      }>(
         "auth/mfa/resend",
         {
           method: "POST",

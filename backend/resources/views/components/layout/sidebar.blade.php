@@ -209,7 +209,7 @@
                     <x-reicon name="settings" class="h-5 w-5" />
                 </a>
             </div>
-            {{-- Bouton déconnexion : POST + CSRF (remplace supabase.auth.signOut()). --}}
+            {{-- Bouton déconnexion : POST + CSRF via l'authentification Laravel. --}}
             <form method="POST" action="{{ \Illuminate\Support\Facades\Route::has('logout') ? route('logout') : url('/logout') }}" class="mt-3">
                 @csrf
                 <button

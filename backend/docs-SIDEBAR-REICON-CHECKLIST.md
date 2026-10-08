@@ -65,7 +65,7 @@ Choix justifié : SVG inline (pas `blade-ui-kit/blade-lucide-icons`) car Reicon 
 - [ ] **Mobile** : `< lg` → hamburger ouvre drawer 270 px + overlay flouté ; clic overlay ou lien ferme (`mobileOpen = false`) ; fermeture via `close-circle`.
 - [ ] **Highlight** : « Nouveau document » fond vert clair (`--color-green`/10), pas blanc plein.
 - [ ] **Badges** : `ISO` / `Pro` pastilles arrondies, fond blanc/20 si lien actif.
-- [ ] **Logout** : formulaire POST + `@csrf` vers `logout` (remplace `supabase.auth.signOut()` + redirect `/login`).
+- [ ] **Logout** : formulaire POST + `@csrf` vers `logout` (remplace l'ancien mécanisme d'authentification + redirect `/login`).
 - [ ] **Footer compte** : `?tab=compte` vers paramètres ; avatar initiale + dégradé vert + pastille en ligne ; mode réduit : avatar + logout empilés centrés.
 - [ ] **Dark mode** : toggle ☀️/🌙 → `.dark` + `localStorage theme`, vérifier `dark:` (fonds `--color-card` sombre).
 - [ ] **A11y** : `nav aria-label`, `aria-expanded`/`aria-controls` accordéon, `aria-current="page"`, `title`, `type="button"`, focus `outline green`.

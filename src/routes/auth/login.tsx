@@ -7,6 +7,9 @@ import { LqInput } from "@/components/auth/LqInput";
 import { LqButton } from "@/components/lq/LqButton";
 import { authErrorMessage } from "@/lib/auth-errors";
 
+const DEMO_EMAIL = import.meta.env["VITE_DEMO_EMAIL"] || "demo.entreprise@logiquali.test";
+const DEMO_PASSWORD = import.meta.env["VITE_DEMO_PASSWORD"] || "DemoLogiQuali2026!";
+
 export const Route = createFileRoute("/auth/login")({
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
     const value = search["redirect"];
@@ -194,6 +197,19 @@ function LoginPage() {
         <LqButton type="submit" className="w-full" size="lg" withArrow>
           {busy ? "Connexion…" : "Se connecter"}
         </LqButton>
+        {import.meta.env.DEV && (
+          <button
+            type="button"
+            onClick={() => {
+              setEmail(DEMO_EMAIL);
+              setPassword(DEMO_PASSWORD);
+              setError("");
+            }}
+            className="w-full rounded-xl border border-dashed border-primary/50 px-4 py-3 text-xs font-bold text-primary hover:bg-primary-soft"
+          >
+            Préremplir le compte démo entreprise
+          </button>
+        )}
       </form>
       <p className="mt-8 text-center text-sm text-muted-foreground">
         Pas encore de compte?{" "}
