@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { useState } from "react";
 import logoAsset from "@/assets/bestqhse-logo.png.asset.json";
-import { BOTTOM_ITEMS, DASHBOARD_ICON, NAV_GROUPS, type NavItem } from "./nav";
+import { BOTTOM_ITEMS, CONFIG_GROUP, DASHBOARD_ICON, NAV_GROUPS, TOP_ITEMS, type NavGroup, type NavItem } from "./nav";
 
 type Props = {
   collapsed: boolean;
@@ -12,19 +12,28 @@ type Props = {
   company: string;
   onSignOut: () => void;
   onNavigate?: () => void;
+  /** Active norm codes; items with `norms` are hidden unless one matches. */
+  activeNorms?: Set<string>;
+  /** Counters shown as badges, keyed by slug. */
+  counts?: Record<string, number>;
 };
 
-export function AppSidebar({ collapsed, onToggle, name, email, company, onSignOut, onNavigate }: Props) {
+export function AppSidebar({ collapsed, onToggle, name, email, company, onSignOut, onNavigate, activeNorms, counts = {} }: Props) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const activeSlug = pathname.startsWith("/app/") ? pathname.slice(5) : "";
   const [open, setOpen] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(NAV_GROUPS.map((g) => [g.id, true]))
+    Object.fromEntries([...NAV_GROUPS.map((g) => [g.id, true]), [CONFIG_GROUP.id, false]])
   );
+  const visible = (it: NavItem) => !it.norms || !activeNorms || it.norms.some((n) => activeNorms.has(n));
+  const groups: NavGroup[] = [...NAV_GROUPS, CONFIG_GROUP]
+    .map((g) => ({ ...g, items: g.items.filter(visible) }))
+    .filter((g) => g.items.length > 0);
   const Dash = DASHBOARD_ICON;
   const initials = (name || email).split(/\s+/).map((p) => p[0]).join("").slice(0, 2).toUpperCase();
 
   const itemLink = (it: NavItem, nested: boolean) => {
     const active = activeSlug === it.slug;
+    const badge = counts[it.slug] ? String(counts[it.slug]) : it.badge;
     return (
       <Link
         key={it.slug}
@@ -42,9 +51,10 @@ export function AppSidebar({ collapsed, onToggle, name, email, company, onSignOu
       >
         <it.icon className="h-[18px] w-[18px] shrink-0" />
         {!collapsed && <span className="flex-1 truncate">{it.label}</span>}
-        {!collapsed && it.badge && (
+        {collapsed && badge && <span className="absolute -mt-6 ml-6 h-2 w-2 rounded-full bg-primary" />}
+        {!collapsed && badge && (
           <span className="rounded-full bg-primary px-1.5 text-[10px] font-bold leading-4 text-primary-foreground">
-            {it.badge}
+            {badge}
           </span>
         )}
       </Link>
@@ -91,7 +101,10 @@ export function AppSidebar({ collapsed, onToggle, name, email, company, onSignOu
           {!collapsed && "Tableau de bord"}
         </Link>
 
-        {NAV_GROUPS.map((g) =>
+        <div className="space-y-0.5 pt-1">{TOP_ITEMS.map((it) => itemLink(it, false))}</div>
+        {!collapsed && <p className="px-3.5 pt-3 text-[10.5px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Normes & Système</p>}
+
+        {groups.map((g) =>
           collapsed ? (
             <div key={g.id} className="space-y-1 border-t border-border pt-2">
               {g.items.map((it) => itemLink(it, false))}
