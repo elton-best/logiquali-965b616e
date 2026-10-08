@@ -62,6 +62,42 @@ export type Database = {
         }
         Relationships: []
       }
+      qhse_records: {
+        Row: {
+          company_id: string
+          created_at: string
+          data: Json
+          id: string
+          kind: string
+          reference: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          company_id?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          kind: string
+          reference?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          data?: Json
+          id?: string
+          kind?: string
+          reference?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
