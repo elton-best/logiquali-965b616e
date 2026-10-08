@@ -41,6 +41,7 @@ export function useRecords() {
       const { data, error } = await supabase
         .from("qhse_records")
         .select("id, kind, reference, title, status, data, created_at, updated_at")
+        .is("target_company_id", null)
         .order("created_at", { ascending: false })
         .limit(5000);
       if (error) throw error;
