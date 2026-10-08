@@ -1,27 +1,5 @@
 {
   "version": "7",
   "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1791460701736,
-      "tag": "0000_create_profiles_and_roles",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1791461386740,
-      "tag": "0001_ensure_signup_trigger",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1791461867970,
-      "tag": "0002_qhse_records",
-      "breakpoints": true
-    }
-  ]
+  "entries": []
 }
