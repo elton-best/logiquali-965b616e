@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import logoAsset from "@/assets/bestqhse-logo.png.asset.json";
 import { LqButton } from "@/components/lq/LqButton";
+import { useSignedIn } from "@/hooks/use-session";
 
 const LINKS = [
   { id: "normes", label: "Normes" },
@@ -16,6 +17,7 @@ const LINKS = [
 export function Navbar() {
   const [active, setActive] = useState("");
   const [open, setOpen] = useState(false);
+  const signedIn = useSignedIn();
 
   useEffect(() => {
     const sections = LINKS.map((l) => document.getElementById(l.id)).filter(Boolean);
@@ -60,15 +62,23 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Link
-            to="/auth/login"
-            className="rounded-xl px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
-          >
-            Connexion
-          </Link>
-          <LqButton to="/auth/signup" size="sm" withArrow>
-            Essai gratuit
-          </LqButton>
+          {signedIn ? (
+            <LqButton to="/app" size="sm" withArrow>
+              Mon espace
+            </LqButton>
+          ) : (
+            <>
+              <Link
+                to="/auth/login"
+                className="rounded-xl px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+              >
+                Connexion
+              </Link>
+              <LqButton to="/auth/signup" size="sm" withArrow>
+                Essai gratuit
+              </LqButton>
+            </>
+          )}
         </div>
 
         <button
@@ -94,12 +104,20 @@ export function Navbar() {
               </a>
             ))}
             <div className="mt-3 flex gap-2">
-              <LqButton to="/auth/login" variant="ghost" size="sm" className="flex-1">
-                Connexion
-              </LqButton>
-              <LqButton to="/auth/signup" size="sm" className="flex-1">
-                Essai gratuit
-              </LqButton>
+              {signedIn ? (
+                <LqButton to="/app" size="sm" className="flex-1">
+                  Mon espace
+                </LqButton>
+              ) : (
+                <>
+                  <LqButton to="/auth/login" variant="ghost" size="sm" className="flex-1">
+                    Connexion
+                  </LqButton>
+                  <LqButton to="/auth/signup" size="sm" className="flex-1">
+                    Essai gratuit
+                  </LqButton>
+                </>
+              )}
             </div>
           </nav>
         </div>

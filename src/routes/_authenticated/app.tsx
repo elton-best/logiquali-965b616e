@@ -10,6 +10,7 @@ import {
   XCircle,
 } from "lucide-react";
 import logoAsset from "@/assets/bestqhse-logo.png.asset.json";
+import { supabase } from "@/integrations/supabase/client";
 import { LqButton } from "@/components/lq/LqButton";
 import { getMyProfile, type Profile } from "@/lib/profile.functions";
 
@@ -99,7 +100,7 @@ function SpaceHome() {
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabaseSignOut();
+    await supabase.auth.signOut();
     navigate({ to: "/auth/login", replace: true });
   };
 
@@ -182,10 +183,4 @@ function SpaceHome() {
       </main>
     </div>
   );
-}
-
-// Imported last to keep the helper below the component tree; simple alias.
-import { supabase as supabaseClient } from "@/integrations/supabase/client";
-function supabaseSignOut() {
-  return supabaseClient.auth.signOut();
 }
