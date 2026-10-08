@@ -4,7 +4,6 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   KINDS, TONE_CLASS, availableActions, sectionForKind, toneOf,
   type Field, type KindConfig, type SectionConfig, type Transition,
@@ -133,6 +132,33 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
     toast.success(`${list.length} ligne(s) exportée(s)`);
   };
 
+  if (editing) {
+    return (
+      <div className="p-4 md:p-8">
+        <RecordForm cfg={editing.cfg} record={editing.record} prefill={editing.prefill} records={records} onClose={() => { setEditing(null); if (!detail) clearSearch(); }} />
+      </div>
+    );
+  }
+
+  if (detail) {
+    return (
+      <div className="mx-auto max-w-4xl p-4 md:p-8">
+          <DetailSheet
+        record={detail}
+        records={records}
+        byId={byId}
+        onClose={() => { setDetailId(null); clearSearch(); }}
+        onEdit={(r) => { const c = KINDS[r.kind]; if (c) setEditing({ cfg: c, record: r }); }}
+        onOpen={(r) => {
+          const slug = sectionForKind(r.kind);
+          if (slug === section.slug) { setTab(r.kind); setDetailId(r.id); }
+          else if (slug) navigate({ to: "/app/$section", params: { section: slug }, search: { open: r.id } });
+        }}
+      />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-7xl p-4 md:p-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -155,19 +181,16 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
       </div>
 
       {section.kinds.length > 1 && (
-        <div className="mt-6 flex gap-1 overflow-x-auto rounded-2xl border border-border bg-card p-1">
+        <select
+          aria-label="Type d'élément"
+          value={tab}
+          onChange={(e) => { setTab(e.target.value); setStatusFilter(""); }}
+          className="mt-6 h-11 w-full rounded-xl border border-input bg-card px-4 text-sm font-semibold outline-none focus:border-primary sm:w-80"
+        >
           {section.kinds.map((k) => (
-            <button
-              key={k.kind}
-              onClick={() => { setTab(k.kind); setStatusFilter(""); }}
-              className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
-                tab === k.kind ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {k.label} <span className="ml-1 opacity-70">{records.filter((r) => r.kind === k.kind).length}</span>
-            </button>
+            <option key={k.kind} value={k.kind}>{k.label} ({records.filter((r) => r.kind === k.kind && r.status !== "Archivé").length})</option>
           ))}
-        </div>
+        </select>
       )}
 
       {hasSiteField && siteRecord && (
@@ -284,28 +307,7 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
         )}
       </div>
 
-      <DetailSheet
-        record={detail}
-        records={records}
-        byId={byId}
-        onClose={() => { setDetailId(null); clearSearch(); }}
-        onEdit={(r) => { const c = KINDS[r.kind]; if (c) setEditing({ cfg: c, record: r }); }}
-        onOpen={(r) => {
-          const slug = sectionForKind(r.kind);
-          if (slug === section.slug) { setTab(r.kind); setDetailId(r.id); }
-          else if (slug) navigate({ to: "/app/$section", params: { section: slug }, search: { open: r.id } });
-        }}
-      />
 
-      {editing && (
-        <RecordForm
-          cfg={editing.cfg}
-          record={editing.record}
-          prefill={editing.prefill}
-          records={records}
-          onClose={() => { setEditing(null); clearSearch(); }}
-        />
-      )}
     </div>
   );
 }
@@ -324,18 +326,24 @@ export function RecordActions({ record, compact }: { record: QRecord; compact?: 
     run.mutate({ record, t });
   };
 
-  const btn = (tone: Transition["tone"]) =>
-    `inline-flex items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold transition-colors disabled:opacity-50 ${compact ? "h-8" : "h-9"} ${
-      tone === "primary" ? "bg-primary text-primary-foreground hover:bg-primary-dark"
-        : tone === "danger" ? "border border-destructive/40 text-destructive hover:bg-destructive/10"
-        : "border border-border text-foreground hover:border-primary hover:text-primary"
-    }`;
+  const btn = (tone: Transition["tone"], label = "") => {
+    const l = label.toLowerCase();
+    const color =
+      tone === "danger" || /refus|rejet|annul|expir|suspend/.test(l) ? "bg-destructive/10 text-destructive border border-destructive/30 hover:bg-destructive hover:text-destructive-foreground"
+      : /approuv|valid|clôtur|publi|conforme|réalis|atteint|termin/.test(l) ? "bg-success text-success-foreground hover:opacity-90"
+      : /renouvel|réévalu|surveillance|corriger|à renouveler|remettre/.test(l) ? "bg-warning text-warning-foreground hover:opacity-90"
+      : /soumettre|vérifi|transmettre|démarrer|lancer|planifi|évaluer|saisir/.test(l) ? "bg-info text-info-foreground hover:opacity-90"
+      : /archiv/.test(l) ? "bg-secondary text-muted-foreground hover:text-foreground"
+      : tone === "primary" ? "bg-primary text-primary-foreground hover:bg-primary-dark"
+      : "border border-border text-foreground hover:border-primary hover:text-primary";
+    return `inline-flex items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold transition-colors disabled:opacity-50 ${compact ? "h-8" : "h-9"} ${color}`;
+  };
 
   return (
     <>
       <div className="flex flex-wrap gap-1.5">
         {actions.map((t) => (
-          <button key={t.label} disabled={run.isPending} onClick={() => click(t)} className={btn(t.tone)}>
+          <button key={t.label} disabled={run.isPending} onClick={() => click(t)} className={btn(t.tone, t.label)}>
             {t.label === "Archiver" && <Archive className="h-3.5 w-3.5" />}
             {t.label}
           </button>
@@ -463,21 +471,22 @@ function DetailSheet({
   const values = record && Array.isArray(record.data["_values"]) ? (record.data["_values"] as { at: string; key: string; value: number }[]) : [];
 
   return (
-    <Sheet open={!!record} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
+    <div className="rounded-2xl border border-border bg-card p-5 md:p-8">
+      <button onClick={onClose} className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">← Retour à la liste</button>
+      <div>
         {record && cfg && (
           <>
-            <SheetHeader>
+            <div>
               <p className="font-mono text-xs font-bold text-primary">{record.reference} · {cfg.singular}</p>
-              <SheetTitle className="font-display text-xl">{record.title}</SheetTitle>
-              <SheetDescription asChild>
+              <h1 className="mt-1 font-display text-2xl font-bold text-foreground">{record.title}</h1>
+              <div className="mt-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge kind={record.kind} status={record.status} />
                   {record.data["version"] ? <span className="text-xs font-semibold text-muted-foreground">v{String(record.data["version"])}</span> : null}
                   {isOverdue(record) && <span className="text-xs font-bold text-destructive">En retard</span>}
                 </div>
-              </SheetDescription>
-            </SheetHeader>
+              </div>
+            </div>
 
             <div className="mt-5 space-y-2">
               <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Actions</p>
@@ -626,8 +635,8 @@ function DetailSheet({
             </div>
           </>
         )}
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   );
 }
 
@@ -666,12 +675,13 @@ function RecordForm({
   const input = "h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm outline-none focus:border-primary";
 
   return (
-    <Sheet open onOpenChange={(o) => !o && onClose()}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
-        <SheetHeader>
-          <SheetTitle className="font-display text-xl">{record ? "Modifier" : "Ajouter"} : {cfg.singular}</SheetTitle>
-          <SheetDescription>{record ? `${record.reference} · statut « ${record.status} » (modifiable via les boutons d'action)` : `Créé au statut « ${status} ».`}</SheetDescription>
-        </SheetHeader>
+    <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 md:p-8">
+      <button type="button" onClick={onClose} className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">← Retour</button>
+      <div>
+        <div>
+          <h1 className="mt-1 font-display text-2xl font-bold text-foreground">{record ? "Modifier" : "Ajouter"} : {cfg.singular}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{record ? `${record.reference} · statut « ${record.status} » (modifiable via les boutons d'action)` : `Créé au statut « ${status} ».`}</p>
+        </div>
         <form onSubmit={submit} className="mt-6 space-y-4 pb-6">
           <label className="block">
             <span className="mb-1.5 block text-xs font-bold text-muted-foreground">{cfg.titleLabel} *</span>
@@ -725,7 +735,7 @@ function RecordForm({
             </button>
           </div>
         </form>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   );
 }

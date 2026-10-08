@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Bell, Clock, MapPin, Menu, Search, Stamp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -19,7 +19,11 @@ export const Route = createFileRoute("/_authenticated/app")({
       { name: "description", content: "Pilotez votre système de management QHSE." },
     ],
   }),
-  loader: () => getMyProfile(),
+  loader: async () => {
+    const p = await getMyProfile();
+    if (p.account_type === "individual") throw redirect({ to: "/client" });
+    return p;
+  },
   component: AppLayout,
   errorComponent: () => (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4 text-center">

@@ -86,7 +86,7 @@ function Dashboard() {
   // Governance maturity
   const docOf = (type: string) => of("document").find((d) => d.data["type"] === type);
   const governance = [
-    { label: "Politique QHSE", rec: docOf("Politique") },
+    { label: "Politique QHSE", rec: of("policy")[0] ?? docOf("Politique") },
     { label: "Manuel qualité", rec: docOf("Manuel") },
     { label: "Périmètre du système", rec: of("scope")[0] },
     { label: "Revue de direction", rec: of("review")[0] },
