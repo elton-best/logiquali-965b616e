@@ -174,19 +174,16 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
       </div>
 
       {section.kinds.length > 1 && (
-        <div className="mt-6 flex gap-1 overflow-x-auto rounded-2xl border border-border bg-card p-1">
+        <select
+          aria-label="Type d'élément"
+          value={tab}
+          onChange={(e) => { setTab(e.target.value); setStatusFilter(""); }}
+          className="mt-6 h-11 w-full rounded-xl border border-input bg-card px-4 text-sm font-semibold outline-none focus:border-primary sm:w-80"
+        >
           {section.kinds.map((k) => (
-            <button
-              key={k.kind}
-              onClick={() => { setTab(k.kind); setStatusFilter(""); }}
-              className={`whitespace-nowrap rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
-                tab === k.kind ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {k.label} <span className="ml-1 opacity-70">{records.filter((r) => r.kind === k.kind).length}</span>
-            </button>
+            <option key={k.kind} value={k.kind}>{k.label} ({records.filter((r) => r.kind === k.kind && r.status !== "Archivé").length})</option>
           ))}
-        </div>
+        </select>
       )}
 
       {hasSiteField && siteRecord && (
