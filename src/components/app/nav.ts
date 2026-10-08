@@ -12,6 +12,7 @@ export type NavItem = {
   icon: LucideIcon;
   /** Only visible when one of these norms is active. */
   norms?: string[];
+  badge?: string;
 };
 export type NavGroup = { id: string; label: string; icon: LucideIcon; items: NavItem[] };
 
