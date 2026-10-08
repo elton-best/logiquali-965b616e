@@ -19,6 +19,8 @@ export type NavGroup = { id: string; label: string; icon: LucideIcon; items: Nav
 /** Top-level shortcuts (Vue d'ensemble is /app). */
 export const TOP_ITEMS: NavItem[] = [
   { slug: "taches", label: "Mes tâches", icon: CheckSquare },
+  { slug: "mes-actions", label: "Mes actions", icon: ListChecks },
+  { slug: "boite-reception", label: "Plaintes clients", icon: MessageSquareWarning },
   { slug: "sites", label: "Sites", icon: MapPin },
   { slug: "verification", label: "Vérification", icon: BadgeCheck },
   { slug: "approbation", label: "Approbation", icon: Stamp },
@@ -133,4 +135,12 @@ export function findNavItem(slug: string): NavItem | undefined {
     if (it) return it;
   }
   return [...TOP_ITEMS, ...BOTTOM_ITEMS].find((i) => i.slug === slug);
+}
+
+/** REQ-5.1-01 — policy title depends on active norms. */
+export function policyTitle(norms?: Set<string>): string {
+  if (!norms) return "Politique QHSE";
+  const h = norms.has("ISO 22000"), sec = norms.has("ISO 45001"), e = norms.has("ISO 14001");
+  if (!h && !sec && !e) return "Politique Qualité";
+  return `Politique Q${h ? "H" : ""}${sec ? "S" : ""}${e ? "E" : ""}`;
 }

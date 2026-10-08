@@ -4,8 +4,9 @@ import { SectionView } from "@/components/app/SectionView";
 import {
   CompanyPage, JournalPage, NormsPage, PreferencesPage, QueuePage, RolesPage, SubscriptionPage, TasksPage,
 } from "@/components/app/CustomPages";
+import { InboxPage, MyActionsPage } from "@/components/app/Extras";
 
-const CUSTOM = ["entreprise", "roles", "abonnement", "taches", "verification", "approbation", "normes", "preferences", "journal"];
+const CUSTOM = ["entreprise", "roles", "abonnement", "taches", "verification", "approbation", "normes", "preferences", "journal", "mes-actions", "boite-reception"];
 
 type Search = { open?: string | undefined; new?: number | undefined; origin?: string | undefined; kind?: string | undefined };
 
@@ -38,6 +39,8 @@ function SectionPage() {
     case "normes": return <NormsPage />;
     case "preferences": return <PreferencesPage />;
     case "journal": return <JournalPage />;
+    case "mes-actions": return <MyActionsPage />;
+    case "boite-reception": return <InboxPage />;
   }
   const section = SECTIONS[slug]!;
   return (
