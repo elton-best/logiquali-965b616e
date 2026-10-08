@@ -2,20 +2,21 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Building2,
   Check,
-  FileText,
   Hash,
   Lock,
   Mail,
+  MailCheck,
   MapPin,
   Phone,
   Upload,
   User,
-  MailCheck,
 } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LqInput } from "@/components/auth/LqInput";
 import { LqButton } from "@/components/lq/LqButton";
+import { authErrorMessage } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth/signup/company")({
   head: () => ({
@@ -57,19 +58,54 @@ function FileDrop({ label }: { label: string }) {
 function CompanySignupPage() {
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
+  const [companyName, setCompanyName] = useState("");
+  const [rccm, setRccm] = useState("");
+  const [ifu, setIfu] = useState("");
+  const [companyAddress, setCompanyAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const next = (e: React.FormEvent) => {
+  const next = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step === 1 && password !== confirm) {
       setError("Les mots de passe ne correspondent pas.");
       return;
     }
     setError("");
-    if (step < 2) setStep(step + 1);
-    else setDone(true);
+    if (step < 2) {
+      setStep(step + 1);
+      return;
+    }
+    setBusy(true);
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/login`,
+        data: {
+          account_type: "company",
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+          company_name: companyName,
+          company_rccm: rccm,
+          company_ifu: ifu,
+          company_address: companyAddress,
+        },
+      },
+    });
+    setBusy(false);
+    if (authError) {
+      setError(authErrorMessage(authError));
+      return;
+    }
+    setDone(true);
   };
 
   if (done) {
@@ -131,22 +167,80 @@ function CompanySignupPage() {
       <form onSubmit={next} className="space-y-4">
         {step === 0 && (
           <>
-            <LqInput label="Raison sociale" icon={Building2} placeholder="Ma Société SARL" required />
+            <LqInput
+              label="Raison sociale"
+              icon={Building2}
+              placeholder="Ma Société SARL"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              required
+            />
             <div className="grid gap-4 sm:grid-cols-2">
-              <LqInput label="N° RCCM" icon={Hash} placeholder="RB/COT/24 B 0000" required />
-              <LqInput label="N° IFU" icon={Hash} placeholder="3202400000000" required />
+              <LqInput
+                label="N° RCCM"
+                icon={Hash}
+                placeholder="RB/COT/24 B 0000"
+                value={rccm}
+                onChange={(e) => setRccm(e.target.value)}
+                required
+              />
+              <LqInput
+                label="N° IFU"
+                icon={Hash}
+                placeholder="3202400000000"
+                value={ifu}
+                onChange={(e) => setIfu(e.target.value)}
+                required
+              />
             </div>
-            <LqInput label="Adresse du siège" icon={MapPin} placeholder="Cotonou, Bénin" required />
-            <LqInput label="Téléphone" icon={Phone} type="tel" placeholder="+229 00 00 00 00" required />
+            <LqInput
+              label="Adresse du siège"
+              icon={MapPin}
+              placeholder="Cotonou, Bénin"
+              value={companyAddress}
+              onChange={(e) => setCompanyAddress(e.target.value)}
+              required
+            />
+            <LqInput
+              label="Téléphone"
+              icon={Phone}
+              type="tel"
+              placeholder="+229 00 00 00 00"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+            />
           </>
         )}
         {step === 1 && (
           <>
             <div className="grid gap-4 sm:grid-cols-2">
-              <LqInput label="Prénom" icon={User} placeholder="Jean" required />
-              <LqInput label="Nom" icon={User} placeholder="Dupont" required />
+              <LqInput
+                label="Prénom"
+                icon={User}
+                placeholder="Jean"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+              <LqInput
+                label="Nom"
+                icon={User}
+                placeholder="Dupont"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
             </div>
-            <LqInput label="E-mail professionnel" icon={Mail} type="email" placeholder="admin@entreprise.com" required />
+            <LqInput
+              label="E-mail professionnel"
+              icon={Mail}
+              type="email"
+              placeholder="admin@entreprise.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
             <LqInput
               label="Mot de passe"
               icon={Lock}
@@ -174,6 +268,11 @@ function CompanySignupPage() {
             <FileDrop label="Pièce d'identité de l'administrateur" />
             <FileDrop label="Extrait RCCM" />
             <FileDrop label="Attestation IFU" />
+            {error && (
+              <p className="rounded-xl bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive">
+                {error}
+              </p>
+            )}
             <label className="flex items-start gap-3 pt-2 text-xs leading-relaxed text-muted-foreground">
               <input type="checkbox" required className="mt-0.5 h-4 w-4 accent-primary" />
               J'accepte les conditions générales d'utilisation et certifie l'exactitude des
@@ -189,7 +288,7 @@ function CompanySignupPage() {
             </LqButton>
           )}
           <LqButton type="submit" className="flex-1" withArrow>
-            {step < 2 ? "Continuer" : "Créer mon compte"}
+            {busy ? "Envoi…" : step < 2 ? "Continuer" : "Créer mon compte"}
           </LqButton>
         </div>
       </form>

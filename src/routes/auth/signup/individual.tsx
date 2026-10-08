@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Building2, Lock, Mail, MailCheck, MapPin, Phone, User } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LqInput } from "@/components/auth/LqInput";
 import { LqButton } from "@/components/lq/LqButton";
+import { authErrorMessage } from "@/lib/auth-errors";
 import { passwordStrength } from "@/lib/password-strength";
 
 export const Route = createFileRoute("/auth/signup/individual")({
@@ -21,9 +23,45 @@ export const Route = createFileRoute("/auth/signup/individual")({
 const STRENGTH_LABELS = ["Très faible", "Faible", "Moyen", "Bon", "Excellent"];
 
 function IndividualSignupPage() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+  const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const score = passwordStrength(password);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (score < 2) return;
+    setError("");
+    setBusy(true);
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/login`,
+        data: {
+          account_type: "individual",
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+          company_name: company || null,
+          company_address: address || null,
+        },
+      },
+    });
+    setBusy(false);
+    if (authError) {
+      setError(authErrorMessage(authError));
+      return;
+    }
+    setDone(true);
+  };
 
   if (done) {
     return (
@@ -49,22 +87,58 @@ function IndividualSignupPage() {
       title="Inscription particulier"
       subtitle="Activation instantanée après vérification de votre e-mail."
     >
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (score >= 2) setDone(true);
-        }}
-        className="space-y-4"
-      >
+      <form onSubmit={submit} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
-          <LqInput label="Prénom" icon={User} placeholder="Awa" required />
-          <LqInput label="Nom" icon={User} placeholder="Koné" required />
+          <LqInput
+            label="Prénom"
+            icon={User}
+            placeholder="Awa"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+          <LqInput
+            label="Nom"
+            icon={User}
+            placeholder="Koné"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
         </div>
-        <LqInput label="E-mail" icon={Mail} type="email" placeholder="vous@email.com" required />
-        <LqInput label="Téléphone" icon={Phone} type="tel" placeholder="+229 00 00 00 00" required />
+        <LqInput
+          label="E-mail"
+          icon={Mail}
+          type="email"
+          placeholder="vous@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <LqInput
+          label="Téléphone"
+          icon={Phone}
+          type="tel"
+          placeholder="+229 00 00 00 00"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          required
+        />
         <div className="grid gap-4 sm:grid-cols-2">
-          <LqInput label="Entreprise (optionnel)" icon={Building2} placeholder="—" />
-          <LqInput label="Adresse (optionnel)" icon={MapPin} placeholder="—" />
+          <LqInput
+            label="Entreprise (optionnel)"
+            icon={Building2}
+            placeholder="—"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+          />
+          <LqInput
+            label="Adresse (optionnel)"
+            icon={MapPin}
+            placeholder="—"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
         </div>
         <div>
           <LqInput
@@ -74,6 +148,7 @@ function IndividualSignupPage() {
             placeholder="8 caractères minimum"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
             required
           />
           {password && (
@@ -94,12 +169,17 @@ function IndividualSignupPage() {
             </div>
           )}
         </div>
+        {error && (
+          <p className="rounded-xl bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive">
+            {error}
+          </p>
+        )}
         <label className="flex items-start gap-3 pt-1 text-xs leading-relaxed text-muted-foreground">
           <input type="checkbox" required className="mt-0.5 h-4 w-4 accent-primary" />
           J'accepte les conditions générales d'utilisation et la politique de confidentialité.
         </label>
         <LqButton type="submit" className="w-full" size="lg" withArrow>
-          Créer mon compte
+          {busy ? "Création…" : "Créer mon compte"}
         </LqButton>
       </form>
       <p className="mt-8 text-center text-sm text-muted-foreground">
