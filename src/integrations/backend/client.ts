@@ -226,6 +226,37 @@ async function request<T>(path: string, init: RequestInit = {}, retry = true): P
   return payload as T;
 }
 
+async function requestBlob(path: string, init: RequestInit = {}, retry = true): Promise<Blob> {
+  const headers = new Headers(init.headers);
+  headers.set("Accept", "application/pdf, application/octet-stream, application/json");
+  if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+  const token = getStoredToken();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(path), { ...init, headers, credentials: "include" });
+  } catch {
+    throw new BackendApiError("Le serveur LOGIQUALI est momentanément indisponible.");
+  }
+
+  if (response.status === 401 && retry && token && path !== "auth/refresh-token") {
+    if (await refreshToken()) return requestBlob(path, init, false);
+    saveToken(null);
+  }
+  if (!response.ok) {
+    const payload = await readPayload(response);
+    throw new BackendApiError(
+      extractMessage(payload, `La requête a échoué (${response.status}).`),
+      response.status,
+      payload,
+    );
+  }
+  return response.blob();
+}
+
 function unwrap<T>(payload: T | { data: T }): T {
   if (payload && typeof payload === "object" && "data" in (payload as object)) {
     return (payload as { data: T }).data;
@@ -460,6 +491,7 @@ export const backendApi = {
     },
   },
   request,
+  blob: requestBlob,
   unwrap,
   profileFromUser,
 };
