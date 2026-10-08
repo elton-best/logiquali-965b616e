@@ -101,11 +101,12 @@ class PermissionAssignmentValidationTest extends TestCase
             'user_type' => 'company',
             'is_active' => true,
         ]);
-        
+
         // Assign admin role
-        $adminRole = Role::firstOrCreate(
-            ['name' => 'admin_entreprise', 'guard_name' => 'web', 'enterprise_id' => $this->enterprise->id]
-        );
+        $adminRole = Role::query()->where('name', 'admin_entreprise')->where('guard_name', 'web')->firstOrCreate([
+            'name' => 'admin_entreprise',
+            'guard_name' => 'web',
+        ]);
         $rolesUpdatePermission = Permission::firstOrCreate([
             'name' => 'roles.update',
             'guard_name' => 'web',

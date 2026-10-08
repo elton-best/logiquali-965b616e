@@ -1,0 +1,107 @@
+{
+  "common": {
+    "welcome": "Bienvenue",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "view": "Voir",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "actions": "Actions",
+    "status": "Statut",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "users": "Collaborateurs",
+    "sites": "Sites",
+    "documents": "Documents",
+    "nonconformities": "Non-Conformités",
+    "audits": "Audits",
+    "risks": "Risques",
+    "actions": "Actions"
+  },
+  "users": {
+    "title": "Collaborateurs",
+    "create": "Nouveau collaborateur",
+    "noUsers": "Aucun collaborateur trouvé"
+  },
+  "documents": {
+    "title": "Documents",
+    "create": "Nouveau document",
+    "status": {
+      "draft": "Brouillon",
+      "approved": "Approuvé",
+      "rejected": "Rejeté"
+    }
+  },
+  "operations": {
+    "priority": {
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée",
+      "critical": "Critique"
+    },
+    "status": {
+      "planned": "Planifié",
+      "in_progress": "En cours",
+      "on_hold": "En attente",
+      "completed": "Terminé",
+      "cancelled": "Annulé",
+      "todo": "À faire",
+      "done": "Terminée",
+      "blocked": "Bloquée"
+    }
+  },
+  "seo": {
+    "defaults": {
+      "title": "{appName} | Qualite, conformite et gouvernance",
+      "description": "{appName} centralise qualite, conformite et gouvernance pour accelerer les decisions avec tracabilite.",
+      "keywords": "{appName},logiciel gestion qualite,plateforme conformite,gouvernance qualite,workflow qualite,controle d'acces"
+    },
+    "routes": {
+      "home": {
+        "title": "{appName} | Structurez votre conformite et vos decisions",
+        "description": "Pilotez exigences qualite, responsabilites et actions dans un environnement clair, securise et oriente execution.",
+        "keywords": "logiciel gestion qualite,plateforme conformite entreprise,gouvernance qualite,suivi actions,permissions",
+        "ogTitle": "{appName} | Structurez votre conformite et vos decisions",
+        "ogDescription": "Pilotez exigences qualite, responsabilites et actions dans un environnement clair, securise et oriente execution."
+      },
+      "landing": {
+        "title": "Plateforme qualite et conformite pour entreprises | {appName}",
+        "description": "Centralisez donnees, roles, permissions et workflows pour une gouvernance fiable et des decisions plus rapides.",
+        "keywords": "plateforme qualite conformite,roles permissions,workflow validation documentaire,tracabilite gouvernance",
+        "ogTitle": "Plateforme qualite et conformite pour entreprises | {appName}",
+        "ogDescription": "Centralisez donnees, roles, permissions et workflows pour une gouvernance fiable et des decisions plus rapides."
+      },
+      "pricing": {
+        "title": "Tarifs {appName} | Choisissez votre plan QHSE",
+        "description": "Comparez les offres {appName} et choisissez le plan adapte a vos besoins en qualite, securite et conformite.",
+        "keywords": "tarifs {appName},prix logiciel QHSE,abonnement qualite,offres conformite",
+        "ogTitle": "Tarifs {appName} | Choisissez votre plan QHSE",
+        "ogDescription": "Comparez les offres {appName} et choisissez le plan adapte a vos besoins QHSE."
+      },
+      "guideUtilisation": {
+        "title": "Guide {appName} | Structurer qualite et conformite",
+        "description": "Decouvrez comment cadrer votre organisation, centraliser les actions et piloter vos ecarts avec {appName}.",
+        "keywords": "guide {appName},gestion conformite,structurer organisation,pilotage ecarts",
+        "ogTitle": "Guide {appName} | Structurer qualite et conformite",
+        "ogDescription": "Cadrage, centralisation et pilotage quotidien pour deployer durablement vos pratiques qualite."
+      },
+      "politiqueConfidentialite": {
+        "title": "Politique de confidentialite | {appName}",
+        "description": "Consultez la politique de confidentialite {appName} et nos engagements sur la protection des donnees.",
+        "keywords": "confidentialite {appName},protection donnees,RGPD,donnees personnelles",
+        "ogTitle": "Politique de confidentialite | {appName}",
+        "ogDescription": "Nos engagements sur la protection des donnees et la confidentialite des utilisateurs."
+      }
+    }
+  }
+}

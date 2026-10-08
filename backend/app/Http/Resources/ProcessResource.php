@@ -18,6 +18,7 @@ class ProcessResource extends JsonApiResource
             'type' => $this->type,
             'purpose' => $this->purpose,
             'finalite' => $this->finalite,
+            'observation' => $this->observation,
             'level' => $this->level,
             'order' => $this->order,
             'version' => $this->version,

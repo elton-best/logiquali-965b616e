@@ -30,7 +30,7 @@ class SyncEnterpriseAdminPermissionsTest extends TestCase
             Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => 'web']);
         }
 
-        $role = Role::create(['name' => 'admin_entreprise', 'guard_name' => 'web']);
+        $role = Role::firstOrCreate(['name' => 'admin_entreprise', 'guard_name' => 'web']);
 
         Permission::firstOrCreate(['name' => 'users.read', 'guard_name' => 'web']);
         Permission::firstOrCreate(['name' => 'documents.read', 'guard_name' => 'web']);

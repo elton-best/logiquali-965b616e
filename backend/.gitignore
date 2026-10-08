@@ -3,7 +3,6 @@
 .env
 .env.backup
 .env.production
-.local/
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -23,3 +22,4 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+.env.testing

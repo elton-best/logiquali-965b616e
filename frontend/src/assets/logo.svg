@@ -1,0 +1,33 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <g id="badge">
+    <path d="M30 10L35 5L40 10L45 7L48 12L53 13L52 18L56 22L52 26L53 31L48 32L45 37L40 34L35 39L30 34L25 37L22 32L17 31L18 26L14 22L18 18L17 13L22 12L25 7L30 10Z" 
+          fill="url(#primaryGradient)" 
+          stroke="url(#accentGradient)" 
+          stroke-width="1.5"/>
+    
+    <path d="M25 22L29 26L37 18" 
+          stroke="white" 
+          stroke-width="3" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+  </g>
+  
+  <text x="62" y="30" font-family="'Inter', 'Segoe UI', -apple-system, sans-serif" font-size="24" font-weight="700" fill="#1E293B">
+    Quali<tspan fill="url(#primaryGradient)">Best</tspan>
+  </text>
+  
+  <text x="62" y="42" font-family="'Inter', 'Segoe UI', -apple-system, sans-serif" font-size="9" font-weight="500" fill="#64748B" letter-spacing="0.5">
+    EXCELLENCE QHSE
+  </text>
+</svg>
