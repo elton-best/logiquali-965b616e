@@ -1,0 +1,191 @@
+/**
+ * BestQHSE 2.0 Design System - Premium Edition
+ * "Intelligent Clarity" - Next-Gen QHSE Platform
+ * 
+ * Philosophie : Subtilité premium, glassmorphism élégant, micro-interactions fluides
+ */
+
+:root {
+  /* ========================================
+     🔵 BLEU AUTORITÉ - "Trust Blue" (Optimisé)
+     Palette réduite et harmonieuse
+     ======================================== */
+  --primary-950: #0F1729;
+  --primary-900: #1E2A47;
+  --primary-800: #2D3F6B;
+  --primary-700: #4471C4; /* SIGNATURE - Votre bleu */
+  --primary-600: #5B8DD9;
+  --primary-500: #72A8ED;
+  --primary-400: #97C2F5;
+  --primary-300: #BDD9FB;
+  --primary-100: #E3EFFD;
+  --primary-50: #F4F8FF;
+  --primary-25: #FAFCFF;
+
+  /* ========================================
+     ⚪ SURFACES - "Premium Surfaces"
+     ======================================== */
+  --surface-base: #FAFBFC;
+  --surface-elevated: #FFFFFF;
+  --surface-overlay: rgba(255, 255, 255, 0.95);
+  --surface-glass: rgba(255, 255, 255, 0.7);
+  
+  /* Gradients Premium */
+  --gradient-primary: linear-gradient(135deg, #4471C4 0%, #5B8DD9 50%, #72A8ED 100%);
+  --gradient-subtle: linear-gradient(180deg, #FAFCFF 0%, #FFFFFF 100%);
+  --gradient-mesh: radial-gradient(at 0% 0%, rgba(68, 113, 196, 0.05) 0%, transparent 50%),
+                   radial-gradient(at 100% 100%, rgba(91, 141, 217, 0.05) 0%, transparent 50%);
+
+  /* ========================================
+     🟢 VERT EXCELLENCE - "Certified Green"
+     ======================================== */
+  --success-950: #0A3D1F;
+  --success-800: #166534;
+  --success-600: #16A34A;
+  --success-400: #4ADE80;
+  --success-100: #DCFCE7;
+  --success-25: #F0FDF4;
+
+  /* ========================================
+     🟠 ORANGE VIGILANCE - "Alert Amber"
+     ======================================== */
+  --warning-950: #431407;
+  --warning-700: #C2410C;
+  --warning-500: #F97316;
+  --warning-300: #FDBA74;
+  --warning-50: #FFF7ED;
+
+  /* ========================================
+     🔴 ROUGE URGENCE - "Critical Red"
+     ======================================== */
+  --error-950: #450A0A;
+  --error-700: #B91C1C;
+  --error-500: #EF4444;
+  --error-100: #FEE2E2;
+
+  /* ========================================
+     ⚫ GRIS INTELLIGENT - "Adaptive Neutrals"
+     Teinte bleue froide qui dialogue avec Primary
+     ======================================== */
+  --slate-950: #020617;
+  --slate-900: #0F172A;
+  --slate-800: #1E293B;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748B;
+  --slate-400: #94A3B8;
+  --slate-300: #CBD5E1;
+  --slate-200: #E2E8F0;
+  --slate-100: #F1F5F9;
+  --slate-50: #F8FAFC;
+
+  /* ========================================
+     🌈 COULEURS CONTEXTUELLES
+     ======================================== */
+  --purple-600: #7C3AED; /* Premium */
+  --purple-100: #EDE9FE;
+  --cyan-600: #0891B2; /* Analytics */
+  --cyan-100: #CFFAFE;
+
+  /* ========================================
+     📐 TYPOGRAPHIE FLUIDE - clamp()
+     S'adapte de mobile à 4K sans media queries
+     ======================================== */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem); /* 12-14px */
+  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem); /* 14-16px */
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem); /* 16-18px */
+  --text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem); /* 18-20px */
+  --text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem); /* 20-24px */
+  --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem); /* 24-32px */
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.875vw, 2.5rem); /* 30-40px */
+  --text-4xl: clamp(2.25rem, 1.8rem + 2.25vw, 3rem); /* 36-48px */
+  --text-5xl: clamp(3rem, 2.4rem + 3vw, 4rem); /* 48-64px */
+
+  /* ========================================
+     📏 ESPACEMENT ORGANIQUE
+     Adapté de Fibonacci pour harmonie naturelle
+     ======================================== */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem; /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-5: 1.5rem; /* 24px */
+  --space-6: 2rem; /* 32px */
+  --space-8: 3rem; /* 48px */
+  --space-10: 5rem; /* 80px */
+  --space-12: 8rem; /* 128px */
+  --space-16: 13rem; /* 208px */
+
+  /* ========================================
+     🎭 OMBRES PREMIUM - "Soft Depth"
+     Ombres subtiles et naturelles
+     ======================================== */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.1), 0 6px 16px rgba(0, 0, 0, 0.05);
+  --shadow-2xl: 0 20px 48px rgba(0, 0, 0, 0.12), 0 8px 20px rgba(0, 0, 0, 0.06);
+  
+  /* Ombres colorées subtiles */
+  --shadow-primary-sm: 0 4px 12px rgba(68, 113, 196, 0.12), 0 2px 6px rgba(68, 113, 196, 0.08);
+  --shadow-primary-md: 0 8px 20px rgba(68, 113, 196, 0.15), 0 4px 10px rgba(68, 113, 196, 0.1);
+  
+  /* Ombre glassmorphism */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08), 
+                  0 4px 16px rgba(0, 0, 0, 0.04),
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+
+  /* ========================================
+     🎬 ANIMATIONS - "Meaningful Motion"
+     Courbes d'accélération naturelles
+     ======================================== */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+  --ease-spring: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  --duration-instant: 100ms;
+  --duration-fast: 200ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 700ms;
+
+  /* ========================================
+     📝 TYPOGRAPHIE - Inter Variable Font
+     ======================================== */
+  --font-family: 'Inter var', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  --font-weight-thin: 200;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 1.75;
+
+  /* ========================================
+     🎨 BORDURES & RADIUS
+     ======================================== */
+  --radius-sm: 0.375rem; /* 6px */
+  --radius-md: 0.5rem; /* 8px */
+  --radius-lg: 0.75rem; /* 12px */
+  --radius-xl: 1rem; /* 16px */
+  --radius-2xl: 1.25rem; /* 20px */
+  --radius-full: 9999px;
+}
+
+/* ========================================
+   🌙 DARK MODE (Préparation)
+   ======================================== */
+.dark {
+  --background: var(--slate-950);
+  --surface: var(--slate-900);
+  --on-surface: var(--slate-50);
+}

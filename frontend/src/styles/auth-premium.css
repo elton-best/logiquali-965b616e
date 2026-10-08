@@ -1,0 +1,399 @@
+/**
+ * BestQHSE 2.0 - Premium Auth Pages
+ * Glassmorphism + Gradients subtils + Micro-interactions
+ */
+
+/* ========================================
+   🔐 AUTH LAYOUT - Premium Background
+   ======================================== */
+
+.auth-container {
+  min-height: 100vh;
+  background: var(--surface-base);
+  background-image:
+    radial-gradient(at 15% 15%, rgba(91, 141, 217, 0.02) 0%, transparent 50%),
+    radial-gradient(at 85% 85%, rgba(122, 159, 255, 0.025) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(168, 191, 255, 0.015) 0%, transparent 70%);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(91, 141, 217, 0.04) 0%, transparent 70%);
+  filter: blur(80px);
+  animation: float 20s ease-in-out infinite;
+}
+
+.auth-container::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(122, 159, 255, 0.035) 0%, transparent 70%);
+  filter: blur(60px);
+  animation: float 15s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -30px) scale(1.05);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+}
+
+/* ========================================
+   🎴 AUTH CARD - Glassmorphism Premium
+   ======================================== */
+
+.auth-card-glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 24px;
+  box-shadow:
+    0 6px 28px rgba(0, 0, 0, 0.04),
+    0 3px 14px rgba(0, 0, 0, 0.02),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+  padding: var(--space-8);
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-card-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.8) 50%,
+      transparent);
+}
+
+.auth-card-glass:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 36px rgba(0, 0, 0, 0.06),
+    0 5px 18px rgba(0, 0, 0, 0.03),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.95);
+}
+
+/* ========================================
+   🎨 AUTH BRANDING - Logo Area
+   ======================================== */
+
+.auth-brand {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.auth-logo-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: var(--gradient-primary);
+  border-radius: 20px;
+  box-shadow: var(--shadow-primary-md);
+  margin-bottom: var(--space-4);
+  position: relative;
+}
+
+.auth-logo-container::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.3),
+      transparent);
+  border-radius: 22px;
+  pointer-events: none;
+}
+
+.auth-title {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+  font-size: var(--text-base);
+  color: var(--slate-600);
+  font-weight: var(--font-weight-regular);
+}
+
+/* ========================================
+   📝 AUTH FORM - Premium Inputs
+   ======================================== */
+
+.auth-form {
+  margin-top: var(--space-6);
+}
+
+.auth-input-wrapper {
+  margin-bottom: var(--space-5);
+}
+
+.auth-input-label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--slate-700);
+  margin-bottom: var(--space-2);
+  letter-spacing: 0.01em;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: var(--text-base);
+  color: var(--slate-900);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(203, 213, 225, 0.5);
+  border-radius: 12px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.auth-input::placeholder {
+  color: var(--slate-400);
+}
+
+.auth-input:focus {
+  background: rgba(255, 255, 255, 1);
+  border-color: #5b8dd9;
+  box-shadow:
+    0 0 0 3px rgba(91, 141, 217, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.02);
+  transform: translateY(-0.5px);
+}
+
+.auth-input:hover:not(:focus) {
+  border-color: rgba(203, 213, 225, 0.8);
+}
+
+/* ========================================
+   🔘 AUTH BUTTON - Magnetic Effect
+   ======================================== */
+
+.auth-btn-primary {
+  width: 100%;
+  padding: 16px 32px;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 12px;
+  box-shadow: var(--shadow-primary-sm);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.02em;
+}
+
+.auth-btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent);
+  transition: left 0.6s;
+}
+
+.auth-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-primary-md);
+}
+
+.auth-btn-primary:hover::before {
+  left: 100%;
+}
+
+.auth-btn-primary:active {
+  transform: translateY(0);
+}
+
+.auth-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========================================
+   🔗 AUTH LINKS - Subtle
+   ======================================== */
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: var(--space-6) 0;
+  color: var(--slate-400);
+  font-size: var(--text-sm);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent,
+      var(--slate-200),
+      transparent);
+}
+
+.auth-divider::before {
+  margin-right: var(--space-4);
+}
+
+.auth-divider::after {
+  margin-left: var(--space-4);
+}
+
+.auth-link {
+  color: #5b8dd9;
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.auth-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #5b8dd9;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.auth-link:hover {
+  color: #4a7bc4;
+}
+
+.auth-link:hover::after {
+  width: 100%;
+}
+
+.auth-footer-text {
+  text-align: center;
+  margin-top: var(--space-6);
+  color: var(--slate-600);
+  font-size: var(--text-sm);
+}
+
+/* ========================================
+   ✨ LOADING STATE
+   ======================================== */
+
+.auth-loading {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   📱 RESPONSIVE
+   ======================================== */
+
+@media (max-width: 640px) {
+  .auth-card-glass {
+    padding: var(--space-6);
+    border-radius: 20px;
+  }
+
+  .auth-title {
+    font-size: var(--text-2xl);
+  }
+
+  .auth-logo-container {
+    width: 64px;
+    height: 64px;
+  }
+}
+
+/* ========================================
+   🎭 ANIMATIONS - Entrée
+   ======================================== */
+
+.auth-fade-in {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Désactiver animations si préférence */
+@media (prefers-reduced-motion: reduce) {
+
+  .auth-container::before,
+  .auth-container::after {
+    animation: none;
+  }
+
+  .auth-card-glass:hover,
+  .auth-btn-primary:hover,
+  .auth-input:focus {
+    transform: none;
+  }
+
+  .auth-fade-in {
+    animation: none;
+  }
+}

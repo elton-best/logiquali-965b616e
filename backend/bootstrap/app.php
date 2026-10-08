@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/autoload_modules.php';
+
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -63,7 +65,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // Supervision : remonter les exceptions à la plateforme de supervision
         $exceptions->report(function (\Throwable $e) {
-            \Beg\SupervisionClient\Exceptions\ReportsToSupervisionHelper::report($e);
+            if (class_exists(\Beg\SupervisionClient\Exceptions\ReportsToSupervisionHelper::class)) {
+                \Beg\SupervisionClient\Exceptions\ReportsToSupervisionHelper::report($e);
+            }
         });
 
         // Handle validation exceptions for API (must stay 422 in all envs, including testing)

@@ -33,8 +33,13 @@ class ProcessSheetGenerator
             'marginBottom' => 1134,
         ]);
 
-        $enterprise = $process->site?->enterprise
-            ?? Site::with('enterprise')->find($process->site_id)?->enterprise;
+        $enterprise = null;
+        try {
+            $enterprise = $process->site?->enterprise
+                ?? ($process->site_id ? Site::with('enterprise')->find($process->site_id)?->enterprise : null);
+        } catch (\Throwable) {
+            $enterprise = null;
+        }
         if ($enterprise) {
             $this->brandingService->applyDocxHeaderFooter($this->section, $enterprise, 'process', (int) $process->id, $documentMeta);
         }
@@ -78,9 +83,9 @@ class ProcessSheetGenerator
 
         $table = $this->section->addTable(['borderSize' => 6, 'borderColor' => '000000']);
 
-        $this->addTableRow($table, 'Nom du processus', $process->title ?? 'N/A');
-        $this->addTableRow($table, 'Catégorie', $this->getCategoryLabel($process->category));
-        $this->addTableRow($table, 'Pilote', $process->pilot->name ?? 'Non défini');
+        $this->addTableRow($table, 'Nom du processus', $process->title ?? $process->name ?? 'N/A');
+        $this->addTableRow($table, 'Catégorie', $this->getCategoryLabel($process->category ?? $process->type));
+        $this->addTableRow($table, 'Pilote', $process->pilot?->name ?? 'Non défini');
         $this->addTableRow($table, 'Co-pilote(s)', $this->formatCopilots($process));
         $this->addTableRow($table, 'Finalité', $process->purpose ?? $process->finalite ?? 'Non définie');
 
@@ -147,7 +152,7 @@ class ProcessSheetGenerator
         foreach ($objectives as $obj) {
             $table->addRow();
             $table->addCell(5000)->addText($obj->title ?? '');
-            $table->addCell(5000)->addText($obj->indicator->name ?? $obj->indicator_name ?? '');
+            $table->addCell(5000)->addText($obj->indicator?->name ?? $obj->indicator_name ?? 'Non défini');
         }
 
         $this->section->addTextBreak();
@@ -245,14 +250,15 @@ class ProcessSheetGenerator
         return !empty($copilotNames) ? implode(', ', array_unique($copilotNames)) : 'Non défini';
     }
 
-    private function getCategoryLabel(string $category): string
+    private function getCategoryLabel(?string $category): string
     {
-        return match($category) {
+        $cat = strtolower(trim((string) $category));
+        return match($cat) {
             'pilotage', 'management' => 'Management',
             'operationnel', 'realization' => 'Réalisation',
             'support' => 'Support',
             'mesure_amelioration' => 'Mesure et amélioration',
-            default => ucfirst($category),
+            default => !empty($category) ? ucfirst($category) : 'Non défini',
         };
     }
 }

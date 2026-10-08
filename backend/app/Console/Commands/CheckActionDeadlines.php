@@ -33,30 +33,30 @@ class CheckActionDeadlines extends Command
 
         $now = Carbon::now();
         
-        // Les rappels métier sont envoyés à J-7, J-3 et J-1.
-        $approachingActions = Action::whereNotIn('status', ['completed', 'verified', 'cancelled'])
-            ->whereNotNull('deadline')
-            ->whereDate('deadline', '>=', $now)
-            ->whereDate('deadline', '<=', $now->copy()->addDays(7))
+        // Actions avec échéance dans 3 jours (et pas encore complétées)
+        $approachingActions = Action::where('status', '!=', 'completed')
+            ->whereNotNull('deadline_date')
+            ->whereDate('deadline_date', '>=', $now)
+            ->whereDate('deadline_date', '<=', $now->copy()->addDays(3))
             ->get();
 
         foreach ($approachingActions as $action) {
             $daysRemaining = $now->diffInDays($action->deadline_date, false);
             
-            if (in_array($daysRemaining, [1, 3, 7], true)) {
+            if ($daysRemaining >= 0 && $daysRemaining <= 3) {
                 event(new ActionDeadlineApproaching($action, (int)$daysRemaining));
                 $this->line("⚠️  Deadline approaching: {$action->title} ({$daysRemaining} days)");
             }
         }
 
         // Actions en retard
-        $overdueActions = Action::whereNotIn('status', ['completed', 'verified', 'cancelled'])
-            ->whereNotNull('deadline')
-            ->whereDate('deadline', '<', $now)
+        $overdueActions = Action::where('status', '!=', 'completed')
+            ->whereNotNull('deadline_date')
+            ->whereDate('deadline_date', '<', $now)
             ->get();
 
         foreach ($overdueActions as $action) {
-            $daysOverdue = abs($now->diffInDays($action->deadline, false));
+            $daysOverdue = abs($now->diffInDays($action->deadline_date, false));
             
             event(new ActionOverdue($action, (int)$daysOverdue));
             $this->line("🔴 Overdue: {$action->title} ({$daysOverdue} days late)");

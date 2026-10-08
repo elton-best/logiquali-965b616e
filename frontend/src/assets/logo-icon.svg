@@ -1,0 +1,25 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E40AF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Badge Shape -->
+  <path d="M24 8L28 4L32 8L36 6L38 10L42 11L41 15L44 18L41 21L42 25L38 26L36 30L32 28L28 32L24 28L20 30L18 26L14 25L15 21L12 18L15 15L14 11L18 10L20 6L24 8Z" 
+        fill="url(#primaryGradient)" 
+        stroke="url(#accentGradient)" 
+        stroke-width="2"/>
+  
+  <!-- Check Mark -->
+  <path d="M18 18L22 22L30 14" 
+        stroke="white" 
+        stroke-width="3.5" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+</svg>

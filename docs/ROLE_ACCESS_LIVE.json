@@ -1,0 +1,4952 @@
+{
+    "generated_at": "2026-03-14T13:18:53.064740Z",
+    "enterprise_id": 1,
+    "site_id": 1,
+    "offer_id": 1,
+    "credentials": {
+        "password": "Password123!",
+        "users": [
+            {
+                "role": "super_admin",
+                "email": "super_admin@example.com"
+            },
+            {
+                "role": "admin_entreprise",
+                "email": "admin_entreprise@example.com"
+            },
+            {
+                "role": "site_manager",
+                "email": "site_manager@example.com"
+            },
+            {
+                "role": "quality_manager",
+                "email": "quality_manager@example.com"
+            },
+            {
+                "role": "hse_manager",
+                "email": "hse_manager@example.com"
+            },
+            {
+                "role": "environment_manager",
+                "email": "environment_manager@example.com"
+            },
+            {
+                "role": "process_owner",
+                "email": "process_owner@example.com"
+            },
+            {
+                "role": "auditor",
+                "email": "auditor@example.com"
+            },
+            {
+                "role": "team_leader",
+                "email": "team_leader@example.com"
+            },
+            {
+                "role": "operator",
+                "email": "operator@example.com"
+            },
+            {
+                "role": "lecteur",
+                "email": "lecteur@example.com"
+            }
+        ]
+    },
+    "roles": {
+        "super_admin": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:18:55.218925Z"
+            }
+        },
+        "admin_entreprise": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:18:55.244358Z"
+            }
+        },
+        "site_manager": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "validate": true
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:18:55.278882Z"
+            }
+        },
+        "quality_manager": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": true,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:18:57.349067Z"
+            }
+        },
+        "hse_manager": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:18:59.356578Z"
+            }
+        },
+        "environment_manager": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:19:01.431308Z"
+            }
+        },
+        "process_owner": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": false,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:19:03.509973Z"
+            }
+        },
+        "auditor": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": false,
+                        "manage": true
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:19:05.588835Z"
+            }
+        },
+        "team_leader": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": true,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:19:07.624705Z"
+            }
+        },
+        "operator": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": true,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:19:09.690534Z"
+            }
+        },
+        "lecteur": {
+            "modules": [
+                {
+                    "code": "contexte",
+                    "name": "Contexte de l'organisme",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "leadership",
+                    "name": "Leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "planification",
+                    "name": "Planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "support",
+                    "name": "Support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "realisation",
+                    "name": "Réalisation des activités opérationnelles",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "evaluation",
+                    "name": "Évaluation des performances",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                },
+                {
+                    "code": "amelioration",
+                    "name": "Amélioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "validate": false
+                    }
+                }
+            ],
+            "sub_modules": [
+                {
+                    "code": "satisfaction_client",
+                    "name": "Fiches de Satisfaction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "comprehension_organisme",
+                    "name": "Compréhension de l'organisme",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "politique",
+                    "name": "Politique QHSE",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "risques_opportunites",
+                    "name": "Risques et opportunités",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "non_conformites",
+                    "name": "Non-conformités",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "ressources",
+                    "name": "Ressources",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "audits_internes",
+                    "name": "Audits internes",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "objectifs_qualite",
+                    "name": "Objectifs qualité",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "parties_interessees",
+                    "name": "Parties intéressées",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "actions_correctives",
+                    "name": "Actions correctives",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "competences",
+                    "name": "Compétences",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "roles_responsabilites",
+                    "name": "Rôles et responsabilités",
+                    "module_code": "leadership",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "amelioration_continue",
+                    "name": "Amélioration continue",
+                    "module_code": "amelioration",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "domaine_application",
+                    "name": "Domaine d'application",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "plans_action",
+                    "name": "Plans du SM",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "sensibilisation",
+                    "name": "Sensibilisation",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_direction",
+                    "name": "Revue de direction",
+                    "module_code": "evaluation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "communication",
+                    "name": "Communication",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "systeme_management",
+                    "name": "Système de management",
+                    "module_code": "contexte",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "documents",
+                    "name": "Information documentée",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "maitrise_operationnelle_env",
+                    "name": "Maîtrise opérationnelle environnementale",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "urgences_environnementales",
+                    "name": "Préparation et réponse aux urgences",
+                    "module_code": "realisation",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "revue_environnementale",
+                    "name": "Revue environnementale",
+                    "module_code": "planification",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "aspects_environnementaux",
+                    "name": "Aspects Environnementaux",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "obligations_conformite_env",
+                    "name": "Obligations de Conformité",
+                    "module_code": "support",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "sections": [
+                {
+                    "code": "organigramme",
+                    "name": "Organigramme",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "liste_personnel",
+                    "name": "Liste du personnel",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_poste",
+                    "name": "Fiches de poste",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                },
+                {
+                    "code": "fiche_responsabilite",
+                    "name": "Fiches de responsabilité",
+                    "module_code": "leadership",
+                    "sub_module_code": "roles_responsabilites",
+                    "permissions": {
+                        "read": true,
+                        "create": false,
+                        "update": false,
+                        "delete": false,
+                        "manage": false
+                    }
+                }
+            ],
+            "meta": {
+                "site_id": 1,
+                "active_subscriptions_count": 1,
+                "active_norms_count": 1,
+                "is_trial": false,
+                "days_remaining": 29,
+                "generated_at": "2026-03-14T13:19:11.972335Z"
+            }
+        }
+    }
+}

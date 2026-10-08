@@ -62,7 +62,7 @@ class ActionNotification extends Notification
             ->line("")
             ->line("**Action :** {$this->action->title}")
             ->line("**Description :** " . substr($this->action->description, 0, 200))
-            ->line("**Échéance :** " . $this->action->deadline?->format('d/m/Y'))
+            ->line("**Échéance :** " . $this->action->deadline_date?->format('d/m/Y'))
             ->line("**Priorité :** " . ucfirst($this->action->priority ?? 'normale'))
             ->line("")
             ->action('Consulter l\'action', $this->buildActionUrl('/company/actions'))
@@ -83,7 +83,7 @@ class ActionNotification extends Notification
             ->line("L'échéance d'une de vos actions approche.")
             ->line("")
             ->line("**Action :** {$this->action->title}")
-            ->line("**Échéance :** " . $this->action->deadline?->format('d/m/Y'))
+            ->line("**Échéance :** " . $this->action->deadline_date?->format('d/m/Y'))
             ->line("**Jours restants :** {$daysRemaining}")
             ->line("**Statut actuel :** " . ucfirst($this->action->status))
             ->line("")
@@ -106,7 +106,7 @@ class ActionNotification extends Notification
             ->line("")
             ->line("**Action :** {$this->action->title}")
             ->line("**Échéance dépassée de :** {$daysOverdue} jour(s)")
-            ->line("**Échéance initiale :** " . $this->action->deadline?->format('d/m/Y'))
+            ->line("**Échéance initiale :** " . $this->action->deadline_date?->format('d/m/Y'))
             ->line("**Statut actuel :** " . ucfirst($this->action->status))
             ->line("")
             ->action('Traiter l\'action', $this->buildActionUrl('/company/actions'))
@@ -130,7 +130,7 @@ class ActionNotification extends Notification
             ->line("**Action :** {$this->action->title}")
             ->line("**Pilote :** {$pilotName}")
             ->line("**Retard :** {$daysOverdue} jour(s)")
-            ->line("**Échéance initiale :** " . $this->action->deadline?->format('d/m/Y'))
+            ->line("**Échéance initiale :** " . $this->action->deadline_date?->format('d/m/Y'))
             ->line("**Statut :** " . ucfirst($this->action->status))
             ->line("")
             ->action('Voir les détails', $this->buildActionUrl('/company/actions'))
@@ -159,7 +159,7 @@ class ActionNotification extends Notification
                 'event_type' => $this->eventType,
                 'action_title' => $this->action->title,
                 'action_status' => $this->action->status,
-                'deadline_date' => $this->action->deadline?->toISOString(),
+                'deadline_date' => $this->action->deadline_date?->toISOString(),
                 'message' => $messages[$this->eventType] ?? 'Notification action',
             ], $this->additionalData)
         );
