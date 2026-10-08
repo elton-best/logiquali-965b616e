@@ -121,7 +121,7 @@ function Dashboard() {
           <p className="font-display font-bold text-foreground">Bienvenue dans votre espace</p>
           <p className="mt-1 text-sm text-muted-foreground">Commencez par créer vos sites, vos collaborateurs puis vos processus : tout le tableau de bord se remplira automatiquement.</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {[["1. Sites", "sites"], ["2. Collaborateurs", "collaborateurs"], ["3. Processus", "processus"]].map(([l, s]) => (
+            {([["1. Sites", "sites"], ["2. Collaborateurs", "collaborateurs"], ["3. Processus", "processus"]] as const).map(([l, s]) => (
               <Link key={s} to="/app/$section" params={{ section: s }} search={{ new: 1 }} className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">{l}</Link>
             ))}
           </div>
