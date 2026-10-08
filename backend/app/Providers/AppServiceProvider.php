@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\View;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
@@ -80,12 +79,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Sidebar LOGIQUALI : source unique config/navigation.php (sections réelles).
-        View::composer(
-            ['components.layout.sidebar', 'components.layout.sidebar-link', 'layouts.app'],
-            \App\View\Composers\SidebarComposer::class
-        );
-
         // Register Observers
         Process::observe(ProcessObserver::class);
 

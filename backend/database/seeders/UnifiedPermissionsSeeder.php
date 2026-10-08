@@ -183,14 +183,6 @@ class UnifiedPermissionsSeeder extends Seeder
             'verify_documents',
             'approve_documents',
 
-            // Circuit de validation transversal C2 (Dev B)
-            'validations.read',
-            'validations.create',
-            'validations.update',
-            'validations.verify',
-            'validations.approve',
-            'validations.manage',
-
             // Super admin specific
             'norms.read',
             'norms.manage',

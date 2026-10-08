@@ -77,10 +77,10 @@ class RbacPermissionsTest extends TestCase
             ['permissions' => ['verify_documents']],
         );
 
-        $response->assertOk();
-        $response->assertJsonPath('success', true);
+        $response->assertStatus(410)
+            ->assertJsonPath('code', 'RBAC_DIRECT_PERMISSIONS_ENDPOINT_DISABLED');
 
-        $this->assertTrue($user->fresh()->hasDirectPermission('verify_documents'));
+        $this->assertFalse($user->fresh()->hasDirectPermission('verify_documents'));
     }
 
     public function test_cannot_assign_direct_permissions_to_admin_entreprise(): void
@@ -94,7 +94,8 @@ class RbacPermissionsTest extends TestCase
             ['permissions' => ['verify_documents']],
         );
 
-        $response->assertStatus(422);
+        $response->assertStatus(410)
+            ->assertJsonPath('code', 'RBAC_DIRECT_PERMISSIONS_ENDPOINT_DISABLED');
     }
 
     private function makeBaseUser(): User

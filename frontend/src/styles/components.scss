@@ -1,0 +1,497 @@
+/**
+ * BestQHSE 2.0 - Composants Custom
+ * Styles adaptés pour Vuetify 3
+ */
+
+/* ========================================
+   🔘 BOUTONS NEXT-GEN
+   ======================================== */
+
+/* Bouton Primaire - "Magnetic Button" */
+.btn-primary-custom {
+  background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-600) 100%) !important;
+  color: white !important;
+  padding: 14px 32px !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  font-size: 15px !important;
+  letter-spacing: 0.3px !important;
+  box-shadow: var(--shadow-primary) !important;
+  transition: all var(--duration-base) var(--ease-out-expo) !important;
+  position: relative;
+  overflow: hidden;
+  text-transform: none !important;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  &:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-primary-hover) !important;
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  &:active {
+    transform: translateY(0) !important;
+  }
+
+  /* Désactiver pour accessibilité */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none !important;
+    &::before {
+      display: none;
+    }
+    &:hover {
+      transform: none !important;
+    }
+  }
+}
+
+/* Bouton Ghost - "Glassmorphic Button" */
+.btn-ghost-custom {
+  background: rgba(68, 113, 196, 0.05) !important;
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(68, 113, 196, 0.2) !important;
+  color: var(--primary-700) !important;
+  padding: 12px 28px !important;
+  border-radius: var(--radius-lg) !important;
+  transition: all var(--duration-fast) ease !important;
+  text-transform: none !important;
+
+  &:hover {
+    background: rgba(68, 113, 196, 0.12) !important;
+    border-color: rgba(68, 113, 196, 0.4) !important;
+    transform: translateY(-1px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+/* Bouton Secondaire - Subtle */
+.btn-secondary-custom {
+  background: var(--slate-100) !important;
+  color: var(--slate-700) !important;
+  padding: 12px 28px !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: var(--font-weight-medium) !important;
+  transition: all var(--duration-fast) ease !important;
+  text-transform: none !important;
+
+  &:hover {
+    background: var(--slate-200) !important;
+  }
+}
+
+/* Bouton Success - Validation */
+.btn-success-custom {
+  background: linear-gradient(135deg, var(--success-600) 0%, var(--success-800) 100%) !important;
+  color: white !important;
+  padding: 12px 28px !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.25) !important;
+  transition: all var(--duration-base) var(--ease-out-expo) !important;
+  text-transform: none !important;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px 0 rgba(22, 163, 74, 0.35) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+/* Bouton Warning - Attention */
+.btn-warning-custom {
+  background: var(--warning-500) !important;
+  color: white !important;
+  padding: 12px 28px !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  transition: all var(--duration-fast) ease !important;
+  text-transform: none !important;
+
+  &:hover {
+    background: var(--warning-700) !important;
+  }
+}
+
+/* Bouton Danger - Suppression */
+.btn-danger-custom {
+  background: var(--error-500) !important;
+  color: white !important;
+  padding: 12px 28px !important;
+  border-radius: var(--radius-lg) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  transition: all var(--duration-fast) ease !important;
+  text-transform: none !important;
+
+  &:hover {
+    background: var(--error-700) !important;
+  }
+}
+
+/* ========================================
+   📇 CARDS NEUROMORPHIQUES
+   ======================================== */
+
+.card-elevated {
+  background: var(--white-pure) !important;
+  border-radius: var(--radius-2xl) !important;
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid rgba(148, 163, 184, 0.1) !important;
+  transition: all 0.4s var(--ease-out-expo) !important;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+.card-flat {
+  background: var(--white-pure) !important;
+  border-radius: var(--radius-xl) !important;
+  border: 1px solid var(--slate-200) !important;
+  transition: all var(--duration-fast) ease !important;
+
+  &:hover {
+    border-color: var(--slate-300);
+    box-shadow: var(--shadow-xs);
+  }
+}
+
+.card-glass {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-xl) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* ========================================
+   📊 WIDGETS & STATS
+   ======================================== */
+
+.stat-card {
+  background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-800) 100%);
+  color: white;
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .stat-value {
+    font-size: var(--text-4xl);
+    font-weight: var(--font-weight-extrabold);
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--space-2);
+  }
+
+  .stat-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    opacity: 0.9;
+  }
+}
+
+.stat-card-success {
+  background: linear-gradient(135deg, var(--success-600) 0%, var(--success-800) 100%);
+}
+
+.stat-card-warning {
+  background: linear-gradient(135deg, var(--warning-500) 0%, var(--warning-700) 100%);
+}
+
+.stat-card-purple {
+  background: linear-gradient(135deg, var(--purple-600) 0%, #6D28D9 100%);
+}
+
+/* ========================================
+   🏷️ BADGES
+   ======================================== */
+
+.badge-custom {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.3px;
+  transition: all var(--duration-fast) ease;
+}
+
+.badge-primary {
+  background: var(--primary-100);
+  color: var(--primary-800);
+  border: 1px solid var(--primary-300);
+}
+
+.badge-success {
+  background: var(--success-100);
+  color: var(--success-800);
+  border: 1px solid var(--success-400);
+}
+
+.badge-warning {
+  background: var(--warning-50);
+  color: var(--warning-700);
+  border: 1px solid var(--warning-300);
+}
+
+.badge-error {
+  background: var(--error-100);
+  color: var(--error-700);
+  border: 1px solid var(--error-500);
+}
+
+.badge-slate {
+  background: var(--slate-100);
+  color: var(--slate-700);
+  border: 1px solid var(--slate-300);
+}
+
+.badge-purple {
+  background: var(--purple-100);
+  color: var(--purple-600);
+  border: 1px solid var(--purple-600);
+}
+
+/* ========================================
+   📝 FORMULAIRES
+   ======================================== */
+
+.input-custom {
+  border-radius: var(--radius-lg) !important;
+  transition: all var(--duration-fast) ease !important;
+
+  &:focus-within {
+    box-shadow: 0 0 0 3px rgba(68, 113, 196, 0.1) !important;
+  }
+}
+
+/* ========================================
+   🎯 SECTIONS & LAYOUTS
+   ======================================== */
+
+.section-header {
+  margin-bottom: var(--space-6);
+
+  .section-title {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--slate-900);
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--space-2);
+  }
+
+  .section-subtitle {
+    font-size: var(--text-base);
+    color: var(--slate-600);
+    line-height: var(--line-height-relaxed);
+  }
+}
+
+.page-container {
+  padding: var(--space-6);
+  background: var(--white-soft);
+  min-height: 100vh;
+}
+
+/* ========================================
+   🔔 NOTIFICATIONS & ALERTS
+   ======================================== */
+
+.alert-custom {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid;
+  font-size: var(--text-sm);
+
+  &.alert-info {
+    background: var(--primary-25);
+    border-color: var(--primary-700);
+    color: var(--primary-950);
+  }
+
+  &.alert-success {
+    background: var(--success-25);
+    border-color: var(--success-600);
+    color: var(--success-950);
+  }
+
+  &.alert-warning {
+    background: var(--warning-50);
+    border-color: var(--warning-500);
+    color: var(--warning-950);
+  }
+
+  &.alert-error {
+    background: var(--error-100);
+    border-color: var(--error-500);
+    color: var(--error-950);
+  }
+}
+
+/* ========================================
+   ✨ ANIMATIONS UTILITAIRES
+   ======================================== */
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(to right, 
+    var(--slate-100) 0%, 
+    var(--slate-200) 50%, 
+    var(--slate-100) 100%);
+  background-size: 1000px 100%;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up var(--duration-slow) var(--ease-out-expo);
+}
+
+/* Désactiver les animations si demandé */
+@media (prefers-reduced-motion: reduce) {
+  .animate-shimmer,
+  .animate-pulse-soft,
+  .animate-slide-up {
+    animation: none !important;
+  }
+}
+
+/* ========================================
+   📊 TABLEAUX
+   ======================================== */
+
+.table-custom {
+  .v-table__wrapper {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xs);
+  }
+
+  thead {
+    background: var(--slate-50);
+    
+    th {
+      font-weight: var(--font-weight-semibold) !important;
+      color: var(--slate-700) !important;
+      font-size: var(--text-sm) !important;
+      letter-spacing: 0.3px;
+      text-transform: none !important;
+    }
+  }
+
+  tbody tr {
+    transition: all var(--duration-fast) ease;
+
+    &:hover {
+      background: var(--primary-25) !important;
+    }
+
+    td {
+      font-size: var(--text-sm);
+      color: var(--slate-700);
+    }
+  }
+}
+
+/* ========================================
+   🎨 SKELETON SCREENS
+   ======================================== */
+
+.skeleton {
+  background: linear-gradient(90deg, 
+    var(--slate-100) 25%, 
+    var(--slate-200) 50%, 
+    var(--slate-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton-card {
+  height: 200px;
+  border-radius: var(--radius-xl);
+}

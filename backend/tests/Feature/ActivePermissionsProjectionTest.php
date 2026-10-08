@@ -96,7 +96,6 @@ class ActivePermissionsProjectionTest extends TestCase
         $adminRole = Role::firstOrCreate([
             'name' => 'admin_entreprise',
             'guard_name' => 'web',
-            'enterprise_id' => $enterprise->id,
         ]);
         $user->assignRole($adminRole);
 
@@ -240,7 +239,6 @@ class ActivePermissionsProjectionTest extends TestCase
         $adminRole = Role::firstOrCreate([
             'name' => 'admin_entreprise',
             'guard_name' => 'web',
-            'enterprise_id' => $enterprise->id,
         ]);
         $user->assignRole($adminRole);
 
@@ -340,7 +338,6 @@ class ActivePermissionsProjectionTest extends TestCase
         $adminRole = Role::firstOrCreate([
             'name' => 'admin_entreprise',
             'guard_name' => 'web',
-            'enterprise_id' => $enterprise->id,
         ]);
         $user->assignRole($adminRole);
 
@@ -438,7 +435,6 @@ class ActivePermissionsProjectionTest extends TestCase
         $adminRole = Role::firstOrCreate([
             'name' => 'admin_entreprise',
             'guard_name' => 'web',
-            'enterprise_id' => $enterprise->id,
         ]);
         $user->assignRole($adminRole);
 

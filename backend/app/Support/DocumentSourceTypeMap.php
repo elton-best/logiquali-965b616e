@@ -32,6 +32,7 @@ class DocumentSourceTypeMap
         // Processus
         'process_sheet'         => ['module' => 'processes', 'submodule' => 'process_detail',      'section' => ''],
         'process_review'        => ['module' => 'processes', 'submodule' => 'process_review',      'section' => ''],
+        'process_cartography'   => ['module' => 'processes', 'submodule' => 'cartography',         'section' => ''],
 
         // Amélioration
         'audit_report'          => ['module' => 'improvement', 'submodule' => 'audits',            'section' => 'reports'],
