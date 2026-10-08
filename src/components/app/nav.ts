@@ -54,6 +54,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { slug: "risques", label: "Risques & opportunités", icon: ShieldAlert },
       { slug: "objectifs", label: "Objectifs qualité", icon: Target },
       { slug: "actions", label: "Plans d'actions", icon: ListChecks },
+      { slug: "plan-sm", label: "Plan du SM & modifications", icon: ClipboardCheck },
       { slug: "aspects-environnementaux", label: "Aspects environnementaux", icon: Leaf, norms: ["ISO 14001"] },
       { slug: "dangers", label: "Dangers & DUER", icon: HardHat, norms: ["ISO 45001"] },
       { slug: "energie", label: "Revue énergétique", icon: Zap, norms: ["ISO 50001"] },

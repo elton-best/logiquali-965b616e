@@ -185,6 +185,7 @@ const K = {
       PILOT,
       { key: "review_date", label: "Prochaine révision", type: "date", column: true },
       { key: "content", label: "Engagements de la direction", type: "textarea", required: true },
+      { key: "axes", label: "Axes stratégiques (un par ligne)", type: "textarea" },
     ],
   }),
   orgunit: {
@@ -204,7 +205,14 @@ const K = {
       { key: "reports_to", label: "Supérieur hiérarchique", type: "relation", kinds: ["job"] },
       { key: "missions", label: "Missions", type: "textarea", required: true },
       { key: "responsibilities", label: "Responsabilités", type: "textarea" },
-      { key: "skills", label: "Compétences requises", type: "textarea" },
+      { key: "general_skills", label: "Compétences générales", type: "textarea" },
+      { key: "skills", label: "Compétences techniques", type: "textarea" },
+      { key: "indicators", label: "Indicateurs du poste", type: "textarea" },
+      { key: "holder_id", label: "Titulaire du poste", type: "relation", kinds: ["collaborator"], column: true },
+    ],
+    extra: [
+      { label: "Signer — collaborateur", reason: "Nom du collaborateur signataire" },
+      { label: "Valider — CEO", reason: "Nom du CEO signataire" },
     ],
   }),
   responsibility: validated({
@@ -253,6 +261,7 @@ const K = {
       PROCESS_REL,
       { key: "target", label: "Cible", type: "text", required: true, column: true },
       { key: "current", label: "Valeur actuelle", type: "text" },
+      { key: "axis", label: "Axe stratégique", type: "text", column: true },
       { key: "indicator_id", label: "Indicateur de mesure", type: "relation", kinds: ["indicator"] },
       { key: "progress", label: "Avancement (%)", type: "number", column: true },
       DUE,
@@ -268,6 +277,7 @@ const K = {
       { label: "Signaler un blocage", to: "Bloquée", from: ["À faire", "En cours"], tone: "danger", reason: "Raison du blocage" },
       { label: "Débloquer", to: "En cours", from: ["Bloquée"], tone: "primary" },
       { label: "Ajouter un jalon", from: ["À faire", "En cours"], reason: "Jalon (étape et date)" },
+      { label: "Replanifier", from: ["À faire", "En cours", "Bloquée"], date: { key: "due_date", label: "Nouvelle échéance" } },
       { label: "Terminer", to: "Terminée", from: ["En cours"], tone: "primary", reason: "Preuve de réalisation" },
       { label: "Vérifier l'efficacité", to: "Vérifiée", from: ["Terminée"], tone: "primary" },
       { label: "Réouvrir", to: "En cours", from: ["Terminée", "Vérifiée"], reason: "Raison de la réouverture" },
@@ -299,6 +309,7 @@ const K = {
       { key: "inputs", label: "Éléments d'entrée", type: "textarea" },
       { key: "outputs", label: "Éléments de sortie", type: "textarea" },
       { key: "resources", label: "Ressources", type: "textarea" },
+      { key: "sequences", label: "Séquences opérationnelles (une étape par ligne, dans l'ordre)", type: "textarea" },
       { key: "upstream_id", label: "Processus amont", type: "relation", kinds: ["process"] },
       { key: "downstream_id", label: "Processus aval", type: "relation", kinds: ["process"] },
     ],
@@ -355,6 +366,7 @@ const K = {
     actions: [
       { label: "Planifier", to: "Planifiée", from: ["Brouillon"], tone: "primary", date: { key: "date", label: "Date de diffusion" } },
       { label: "Marquer diffusée", to: "Diffusée", from: ["Planifiée", "Brouillon"], tone: "primary", reason: "Preuve de diffusion" },
+      { label: "Replanifier", from: ["Planifiée"], date: { key: "date", label: "Nouvelle date" } },
     ],
     fields: [
       { key: "audience", label: "Public", type: "select", options: ["Interne", "Externe", "Clients", "Autorités", "Tout le personnel"], column: true },
@@ -411,7 +423,7 @@ const K = {
       { label: "Valider", to: "Validé", from: ["Vérification"], tone: "primary" },
       { label: "Enregistrer une modification", reason: "Description de la modification" },
     ],
-    fields: [PILOT, DUE, { key: "needs", label: "Besoins", type: "textarea" }, { key: "outputs", label: "Éléments de sortie", type: "textarea" }, { key: "risks", label: "Risques", type: "textarea" }],
+    fields: [{ ...PILOT, label: "Responsable de projet" }, { key: "team", label: "Équipe projet (noms séparés par des virgules)", type: "text", column: true }, PROCESS_REL, DUE, { key: "needs", label: "Besoins", type: "textarea" }, { key: "outputs", label: "Éléments de sortie", type: "textarea" }, { key: "risks", label: "Risques", type: "textarea" }],
   },
   operation: {
     kind: "operation", label: "Production & prestation", singular: "opération", prefix: "OPE", titleLabel: "Produit / service",
@@ -472,7 +484,7 @@ const K = {
   },
   nc: {
     kind: "nc", label: "Non-conformités", singular: "non-conformité", prefix: "NC", titleLabel: "Écart constaté",
-    owner: "pilot_id", done: ["Clôturée"],
+    owner: "pilot_id", due: "due_date", done: ["Clôturée"],
     statuses: [{ value: "Ouverte", tone: "danger" }, { value: "En analyse", tone: "warn" }, { value: "En traitement", tone: "info" }, { value: "Vérification", tone: "info" }, { value: "Clôturée", tone: "success" }],
     actions: [
       { label: "Analyser la cause", to: "En analyse", from: ["Ouverte"], tone: "primary", reason: "Cause immédiate et cause racine" },
@@ -487,8 +499,11 @@ const K = {
       PROCESS_REL, SITE_REL, PILOT,
       { key: "source_id", label: "Lié à", type: "relation", kinds: ["audit", "complaint", "supplier", "operation", "nonconforming", "opcontrol"] },
       { key: "description", label: "Description", type: "textarea" },
-      { key: "root_cause", label: "Analyse des causes", type: "textarea" },
+      { key: "root_cause", label: "Analyse des causes (5 Pourquoi / Ishikawa)", type: "textarea" },
       { key: "correction", label: "Correction immédiate", type: "textarea" },
+      { key: "corrective_action", label: "Action corrective pérenne", type: "textarea" },
+      DUE,
+      { key: "proof", label: "Preuve de clôture (lien ou référence du fichier)", type: "text" },
     ],
   },
   complaint: {
@@ -527,7 +542,7 @@ const K = {
       { label: "Mettre à jour la progression", from: ["En cours"], number: { key: "progress", label: "Progression (%)" } },
       { label: "Terminer", to: "Terminé", from: ["En cours"], tone: "primary", reason: "Résultat obtenu" },
     ],
-    fields: [{ key: "suggestion_id", label: "Suggestion d'origine", type: "relation", kinds: ["suggestion"], column: true }, PILOT, DUE, { key: "progress", label: "Progression (%)", type: "number", column: true }, { key: "gain", label: "Gains attendus", type: "textarea" }],
+    fields: [{ key: "suggestion_id", label: "Suggestion d'origine", type: "relation", kinds: ["suggestion"], column: true }, { ...PILOT, label: "Responsable de projet" }, { key: "team", label: "Équipe projet", type: "text" }, PROCESS_REL, DUE, { key: "progress", label: "Progression (%)", type: "number", column: true }, { key: "gain", label: "Gains attendus", type: "textarea" }],
   },
   audit: {
     kind: "audit", label: "Audits internes", singular: "audit", prefix: "AUD", titleLabel: "Intitulé de l'audit",
@@ -700,14 +715,15 @@ const K = {
     due: "next_drill",
     statuses: [{ value: "Identifiée", tone: "warn" }, { value: "Plan prêt", tone: "info" }, { value: "Exercice réalisé", tone: "success" }],
     actions: [{ label: "Valider le plan", to: "Plan prêt", from: ["Identifiée"], tone: "primary" }, { label: "Enregistrer un exercice", to: "Exercice réalisé", tone: "primary", reason: "Bilan de l'exercice" }],
-    fields: [SITE_REL, { key: "next_drill", label: "Prochain exercice", type: "date", column: true }, { key: "plan", label: "Plan de réponse", type: "textarea" }],
+    owner: "pilot_id",
+    fields: [{ key: "measures", label: "Mesures de préparation & réponse", type: "textarea", required: true, column: true }, PILOT, { key: "next_drill", label: "Délai / prochain exercice", type: "date", column: true }, SITE_REL, { key: "plan", label: "Plan de réponse détaillé", type: "textarea" }],
   },
   hazard: {
     kind: "hazard", label: "Dangers & DUER", singular: "danger", prefix: "DGR", titleLabel: "Danger / situation dangereuse",
     owner: "pilot_id",
     statuses: [{ value: "Identifié", tone: "warn" }, { value: "Évalué", tone: "info" }, { value: "Maîtrisé", tone: "success" }],
     actions: [{ label: "Évaluer", to: "Évalué", tone: "primary", number: { key: "score", label: "Cotation du risque" } }, { label: "Marquer maîtrisé", to: "Maîtrisé", tone: "primary", reason: "Mesures de prévention" }],
-    fields: [SITE_REL, { key: "unit", label: "Unité de travail", type: "text", column: true }, { key: "score", label: "Cotation", type: "number", column: true }, PILOT, { key: "measures", label: "Mesures de prévention", type: "textarea" }],
+    fields: [{ key: "ut_id", label: "Unité de travail", type: "relation", kinds: ["work_unit"], required: true, column: true }, { key: "family", label: "Famille de risque", type: "text", column: true }, { key: "gravity", label: "Gravité", type: "number" }, { key: "frequency", label: "Fréquence", type: "number" }, SITE_REL, { key: "score", label: "Cotation", type: "number", column: true }, PILOT, { key: "measures", label: "Mesures de prévention", type: "textarea" }],
   },
   incident: {
     kind: "incident", label: "Accidents & incidents", singular: "accident / incident", prefix: "INC", titleLabel: "Événement",
@@ -747,6 +763,31 @@ const K = {
     statuses: [{ value: "En attente", tone: "warn" }, { value: "Payée", tone: "success" }, { value: "Échouée", tone: "danger" }],
     fields: [{ key: "offer", label: "Offre", type: "text" }, { key: "amount", label: "Montant", type: "text" }],
   },
+  work_unit: {
+    kind: "work_unit", label: "Unités de travail", singular: "unité de travail", prefix: "UT", titleLabel: "Nom de l'unité de travail",
+    statuses: [{ value: "Active", tone: "success" }, { value: "Archivé", tone: "neutral" }],
+    actions: archive(["Active"], "Active"),
+    fields: [{ key: "basis", label: "Découpage", type: "select", options: ["Par processus", "Par site", "Par atelier", "Par poste"], column: true }, PROCESS_REL, SITE_REL, { key: "headcount", label: "Effectif exposé", type: "number", column: true }],
+  },
+  duerp: validated({
+    kind: "duerp", label: "Versions du DUERP", singular: "version du DUERP", prefix: "DUE", titleLabel: "Version",
+    fields: [{ key: "year", label: "Année", type: "text", column: true }, { key: "summary", label: "Synthèse", type: "textarea" }],
+  }),
+  sm_change: validated({
+    kind: "sm_change", label: "Demandes de modification du système", singular: "demande de modification", prefix: "DMS", titleLabel: "Objet de la modification",
+    fields: [{ key: "reason", label: "Motif", type: "textarea", required: true }, { key: "scope", label: "Périmètre", type: "text", column: true }, DOC_REL, { key: "initiator_id", label: "Initiateur", type: "relation", kinds: ["collaborator"], column: true }],
+  }),
+  sm_plan: {
+    kind: "sm_plan", label: "Plan du système de management", singular: "action du plan SM", prefix: "PSM", titleLabel: "Libellé de l'action",
+    owner: "pilot_id", due: "due_date", done: ["Réalisé"],
+    statuses: [{ value: "À planifier", tone: "neutral" }, { value: "En cours", tone: "info" }, { value: "Réalisé", tone: "success" }],
+    actions: [
+      { label: "Démarrer", to: "En cours", from: ["À planifier"], tone: "primary" },
+      { label: "Marquer réalisé", to: "Réalisé", from: ["En cours", "À planifier"], tone: "primary" },
+      { label: "Replanifier", from: ["À planifier", "En cours"], date: { key: "due_date", label: "Nouvelle échéance" }, reason: "Motif de la replanification" },
+    ],
+    fields: [{ key: "activity", label: "Activité", type: "text", required: true, column: true }, { key: "sub_activity", label: "Sous-activité", type: "text", required: true, column: true }, PILOT, DUE],
+  },
 } satisfies Record<string, KindConfig>;
 
 export const KINDS: Record<string, KindConfig> = K;
@@ -770,7 +811,8 @@ export const SECTIONS: Record<string, SectionConfig> = {
   objectifs: S("objectifs", "Objectifs qualité", "Cibles mesurables, indicateurs et progression.", K.objective),
   actions: S("actions", "Plans d'actions", "Actions issues des NC, risques, audits, objectifs et revues.", K.action),
   "aspects-environnementaux": S("aspects-environnementaux", "Aspects environnementaux", "ISO 14001 — aspects, impacts et significativité.", K.env_aspect),
-  dangers: S("dangers", "Dangers & DUER", "ISO 45001 — évaluation des risques professionnels.", K.hazard),
+  dangers: S("dangers", "Dangers & DUERP", "ISO 45001 — unités de travail, risques professionnels et versions du DUERP.", K.hazard, K.work_unit, K.duerp),
+  "plan-sm": S("plan-sm", "Plan du système de management", "Activités, sous-activités, actions et demandes de modification du système.", K.sm_plan, K.sm_change),
   energie: S("energie", "Revue énergétique", "ISO 50001 — usages énergétiques significatifs et consommations.", K.energy_use),
   "securite-information": S("securite-information", "Actifs & risques SI", "ISO 27001 — actifs informationnels et traitement des risques.", K.infosec),
   // Support
