@@ -1,17 +1,20 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { SECTIONS } from "@/components/app/sections";
 import { SectionView } from "@/components/app/SectionView";
-import { CompanyPage, RolesPage, SubscriptionPage } from "@/components/app/CustomPages";
+import {
+  CompanyPage, JournalPage, NormsPage, PreferencesPage, QueuePage, RolesPage, SubscriptionPage, TasksPage,
+} from "@/components/app/CustomPages";
 
-const CUSTOM = ["entreprise", "roles", "abonnement"];
+const CUSTOM = ["entreprise", "roles", "abonnement", "taches", "verification", "approbation", "normes", "preferences", "journal"];
 
-type Search = { open?: string | undefined; new?: number | undefined; origin?: string | undefined };
+type Search = { open?: string | undefined; new?: number | undefined; origin?: string | undefined; kind?: string | undefined };
 
 export const Route = createFileRoute("/_authenticated/app/$section")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     open: typeof s["open"] === "string" ? (s["open"] as string) : undefined,
     new: s["new"] ? 1 : undefined,
     origin: typeof s["origin"] === "string" ? (s["origin"] as string) : undefined,
+    kind: typeof s["kind"] === "string" ? (s["kind"] as string) : undefined,
   }),
   loader: ({ params }) => {
     if (!SECTIONS[params.section] && !CUSTOM.includes(params.section)) throw notFound();
@@ -25,18 +28,26 @@ export const Route = createFileRoute("/_authenticated/app/$section")({
 function SectionPage() {
   const { slug } = Route.useLoaderData();
   const search = Route.useSearch();
-  if (slug === "entreprise") return <CompanyPage />;
-  if (slug === "roles") return <RolesPage />;
-  if (slug === "abonnement") return <SubscriptionPage />;
+  switch (slug) {
+    case "entreprise": return <CompanyPage />;
+    case "roles": return <RolesPage />;
+    case "abonnement": return <SubscriptionPage />;
+    case "taches": return <TasksPage />;
+    case "verification": return <QueuePage mode="verification" />;
+    case "approbation": return <QueuePage mode="approbation" />;
+    case "normes": return <NormsPage />;
+    case "preferences": return <PreferencesPage />;
+    case "journal": return <JournalPage />;
+  }
   const section = SECTIONS[slug]!;
-  const originKey = slug === "non-conformites" ? "source_id" : "origin_id";
   return (
     <SectionView
       key={slug}
       section={section}
       openId={search.open}
       createNew={!!search.new}
-      prefill={search.origin ? { [originKey]: search.origin, ...(slug === "non-conformites" ? { origin: "Audit" } : {}) } : undefined}
+      newKind={search.kind}
+      originId={search.origin}
     />
   );
 }
