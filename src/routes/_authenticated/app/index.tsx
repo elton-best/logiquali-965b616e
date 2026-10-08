@@ -57,7 +57,7 @@ function Dashboard() {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Tableau de bord</p>
           <h1 className="mt-1 font-display text-2xl font-extrabold text-foreground md:text-3xl">
-            Bonjour {profile.first_name || "et bienvenue"} 👋
+            Bonjour {profile.first_name || "et bienvenue"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {profile.company_name ?? "Votre entreprise"} · Vue d'ensemble de votre système de management
