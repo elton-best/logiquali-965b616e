@@ -9,6 +9,7 @@ import { downloadCsv, useWorkspace, type Task } from "@/hooks/use-workspace";
 import { KINDS, NORM_CATALOG, sectionForKind } from "./sections";
 import { HistoryList, RecordActions, StatusBadge } from "./SectionView";
 import { NAV_GROUPS } from "./nav";
+import { ListLoading } from "./LoadingState";
 
 const appRoute = getRouteApi("/_authenticated/app");
 
@@ -76,7 +77,7 @@ export function TasksPage() {
         <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher une tâche par titre ou référence…" className="h-11 w-full rounded-xl border border-input bg-card pl-11 pr-4 text-sm outline-none focus:border-primary" />
       </div>
-      {isLoading ? <p className="text-sm text-muted-foreground">Chargement…</p> : list.length === 0 ? (
+      {isLoading ? <ListLoading rows={5} /> : list.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center">
           <p className="font-display font-bold text-foreground">Rien à traiter</p>
           <p className="mt-1 text-sm text-muted-foreground">Aucune tâche ne correspond. Les éléments attribués, à valider ou en retard apparaîtront ici.</p>
@@ -117,7 +118,7 @@ export function QueuePage({ mode }: { mode: "verification" | "approbation" }) {
         title={mode === "verification" ? "Vérification" : "Approbation"}
         desc={mode === "verification" ? "Documents et informations soumis au contrôle. Vérifiez, demandez une correction ou transmettez à l'approbation." : "Éléments vérifiés prêts à décision. Approuvez (avec date d'effet), rejetez ou renvoyez en correction."}
       />
-      {isLoading ? <p className="text-sm text-muted-foreground">Chargement…</p> : list.length === 0 ? (
+      {isLoading ? <ListLoading rows={5} /> : list.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center">
           <p className="font-display font-bold text-foreground">File vide</p>
           <p className="mt-1 text-sm text-muted-foreground">Aucun élément « {status} » pour le moment.</p>
@@ -174,7 +175,7 @@ export function QueuePage({ mode }: { mode: "verification" | "approbation" }) {
 
 // ---------- Bibliothèque des normes ----------
 export function NormsPage() {
-  const { records, ws } = useWs();
+  const { records, isLoading, ws } = useWs();
   const save = useSaveRecord();
   const run = useTransition();
   const [openCode, setOpenCode] = useState<string | null>(null);
@@ -196,8 +197,9 @@ export function NormsPage() {
       <Header title="Bibliothèque des normes" desc="Activez les référentiels de votre système : chaque norme rend visibles ses sous-sections dans le menu.">
         <button onClick={exportCsv} className={ghostBtn}><Download className="h-4 w-4" /> Exporter</button>
       </Header>
-      <div className="grid gap-4 md:grid-cols-2">
-        {NORM_CATALOG.map((info) => {
+      {isLoading ? <ListLoading rows={6} /> : (
+        <div className="grid gap-4 md:grid-cols-2">
+          {NORM_CATALOG.map((info) => {
           const st = ws.norms.find((n) => n.code === info.code)!;
           const doneKinds = info.kinds.filter((k) => records.some((r) => r.kind === k));
           const pct = Math.round((doneKinds.length / info.kinds.length) * 100);
@@ -251,8 +253,9 @@ export function NormsPage() {
               </div>
             </div>
           );
-        })}
-      </div>
+          })}
+        </div>
+      )}
     </div>
   );
 }

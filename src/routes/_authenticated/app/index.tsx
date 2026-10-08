@@ -97,6 +97,8 @@ function Dashboard() {
   const recent = [...records].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 7);
   const name = profile.first_name || "et bienvenue";
 
+  if (isLoading) return <DashboardSkeleton />;
+
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -312,6 +314,80 @@ function Dashboard() {
           </ul>
         )}
       </section>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div
+      className="mx-auto max-w-7xl space-y-6 p-4 md:p-8"
+      aria-busy="true"
+      aria-label="Chargement du tableau de bord"
+    >
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-3">
+          <div className="h-3 w-28 animate-pulse rounded-full bg-primary/15" />
+          <div className="h-9 w-64 animate-pulse rounded-xl bg-secondary" />
+          <div className="h-4 w-80 max-w-full animate-pulse rounded-full bg-secondary" />
+        </div>
+        <div className="h-10 w-36 animate-pulse rounded-xl bg-secondary" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {Array.from({ length: 6 }, (_, index) => (
+          <div key={index} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="h-9 w-9 animate-pulse rounded-xl bg-primary/10" />
+              <div className="h-4 w-4 animate-pulse rounded-full bg-secondary" />
+            </div>
+            <div className="mt-4 h-8 w-14 animate-pulse rounded-lg bg-secondary" />
+            <div className="mt-2 h-3 w-24 animate-pulse rounded-full bg-secondary" />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="min-h-[280px] rounded-2xl border border-border bg-card p-6 shadow-sm lg:col-span-2">
+          <div className="h-5 w-28 animate-pulse rounded-full bg-secondary" />
+          <div className="mt-2 h-3 w-56 animate-pulse rounded-full bg-secondary" />
+          <div className="mt-8 flex h-40 items-end gap-3 sm:gap-5">
+            {[42, 70, 54, 86, 62, 78, 48, 92].map((height, index) => (
+              <div key={index} className="flex h-full flex-1 items-end">
+                <div className="w-full animate-pulse rounded-t-xl bg-primary/20" style={{ height: `${height}%` }} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="min-h-[280px] rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="h-5 w-44 animate-pulse rounded-full bg-secondary" />
+          <div className="mt-6 space-y-5">
+            {["w-full", "w-4/5", "w-11/12", "w-2/3"].map((width, index) => (
+              <div key={index} className="space-y-2">
+                <div className={`h-3 ${width} animate-pulse rounded-full bg-secondary`} />
+                <div className="h-2 w-full animate-pulse rounded-full bg-primary/15" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {[0, 1].map((panel) => (
+          <div key={panel} className="min-h-[190px] rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="h-5 w-44 animate-pulse rounded-full bg-secondary" />
+            <div className="mt-6 space-y-4">
+              {[0, 1, 2].map((row) => (
+                <div key={row} className="flex items-center gap-3">
+                  <div className="h-9 w-9 animate-pulse rounded-xl bg-primary/10" />
+                  <div className="flex-1 space-y-2"><div className="h-3 w-3/4 animate-pulse rounded-full bg-secondary" /><div className="h-2 w-1/2 animate-pulse rounded-full bg-secondary" /></div>
+                  <div className="h-5 w-14 animate-pulse rounded-full bg-primary/10" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

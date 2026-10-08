@@ -14,6 +14,7 @@ import {
 import { computeWorkspace, useCurrentSite } from "@/hooks/use-workspace";
 import { DoubleScroll } from "./DoubleScroll";
 import { ColumnPicker, ExportPreview, useColumns } from "./Extras";
+import { ListLoading } from "./LoadingState";
 
 /** Which kinds can spawn which follow-up records from the detail sheet. */
 const FOLLOW_UPS: Record<string, { label: string; section: string; kind?: string }[]> = {
@@ -247,7 +248,7 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
         {isLoading ? (
-          <p className="p-8 text-center text-sm text-muted-foreground">Chargement…</p>
+          <div className="p-3 sm:p-4"><ListLoading rows={6} /></div>
         ) : list.length === 0 ? (
           <div className="flex flex-col items-center px-6 py-14 text-center">
             <p className="font-display text-base font-bold text-foreground">

@@ -285,7 +285,7 @@ function Process() {
           desc="Une méthode éprouvée pour passer d'un système dispersé à un pilotage continu de la conformité."
         />
 
-        <div className="relative mx-auto mt-16 max-w-5xl md:mt-20">
+        <div className="relative mx-auto mt-20 max-w-6xl md:mt-24">
           <svg
             className="pointer-events-none absolute inset-0 hidden h-full w-full md:block"
             viewBox="0 0 1000 650"
@@ -302,26 +302,26 @@ function Process() {
             <path d="M390 482 C540 482 520 548 650 548" fill="none" stroke="currentColor" strokeDasharray="5 7" strokeWidth="1.5" markerEnd="url(#process-arrow)" className="text-primary/35" />
           </svg>
 
-          <div className="relative grid gap-8 md:grid-cols-2 md:gap-x-24 md:gap-y-10">
+          <div className="relative grid gap-10 md:grid-cols-2 md:gap-x-32 md:gap-y-16">
             {PROCESS_STEPS.map((step, i) => {
               const Icon = step.icon;
               const highlighted = i === 0 || i === 3;
               return (
                 <Reveal key={step.n} delay={i * 120} className={i % 2 === 1 ? "md:translate-y-16" : ""}>
-                  <article className={`group relative min-h-[190px] overflow-hidden rounded-[1.65rem] border p-6 pl-20 shadow-[0_18px_40px_-30px_rgba(15,23,42,.38)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${highlighted ? "border-success/20 bg-success/10" : "border-border/70 bg-white"}`}>
-                    <div className={`absolute bottom-4 left-4 top-4 flex w-9 items-center justify-center rounded-full ${highlighted ? "bg-[#087653]" : "bg-[#242424]"}`}>
+                  <article className={`group relative min-h-[230px] overflow-hidden rounded-[1.65rem] border p-8 pl-28 shadow-[0_18px_40px_-30px_rgba(15,23,42,.38)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${highlighted ? "border-success/20 bg-success/10" : "border-border/70 bg-white"}`}>
+                    <div className={`absolute bottom-5 left-5 top-5 flex w-11 items-center justify-center rounded-full ${highlighted ? "bg-[#087653]" : "bg-[#242424]"}`}>
                       <span className="[writing-mode:vertical-rl] rotate-180 text-[10px] font-extrabold tracking-wide text-white">{step.duration}</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`grid h-10 w-10 place-items-center rounded-full ${highlighted ? "bg-success/20 text-[#087653]" : "bg-secondary text-foreground"}`}>
-                        <Icon className="h-[18px] w-[18px]" />
+                    <div className="flex items-center gap-4">
+                      <span className={`grid h-12 w-12 place-items-center rounded-full ${highlighted ? "bg-success/20 text-[#087653]" : "bg-secondary text-foreground"}`}>
+                        <Icon className="h-5 w-5" />
                       </span>
                       <div>
                         <p className={`text-[10px] font-extrabold uppercase tracking-[0.16em] ${highlighted ? "text-[#087653]" : "text-muted-foreground"}`}>Étape {step.n}</p>
-                        <h3 className="font-display text-xl font-extrabold text-foreground">{step.title}</h3>
+                        <h3 className="font-display text-2xl font-extrabold text-foreground">{step.title}</h3>
                       </div>
                     </div>
-                    <p className="mt-5 max-w-sm text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
+                    <p className="mt-7 max-w-lg text-base leading-relaxed text-muted-foreground">{step.desc}</p>
                   </article>
                 </Reveal>
               );
