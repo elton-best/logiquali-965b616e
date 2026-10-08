@@ -8,9 +8,12 @@ import { LqButton } from "@/components/lq/LqButton";
 import { authErrorMessage } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth/login")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    redirect: typeof search.redirect === "string" ? search.redirect : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
+    const value = search["redirect"];
+    return typeof value === "string" && value.startsWith("/") && !value.startsWith("//")
+      ? { redirect: value }
+      : {};
+  },
   head: () => ({
     meta: [
       { title: "Connexion — LOGIQUALI" },
@@ -44,12 +47,7 @@ function LoginPage() {
       setError(authErrorMessage(authError));
       return;
     }
-    const target =
-      typeof search.redirect === "string" &&
-      search.redirect.startsWith("/") &&
-      !search.redirect.startsWith("//")
-        ? search.redirect
-        : "/app";
+    const target = search.redirect ?? "/app";
     navigate({ to: target, replace: true });
   };
 
