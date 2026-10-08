@@ -3,8 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Columns3, Download, Eye, Inbox, Plus, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import type { Json } from "@/integrations/supabase/types";
+import { backendApi } from "@/integrations/backend/client";
 import { dueOf, isDone, isOverdue, useRecords, type QRecord } from "@/hooks/use-records";
 import { downloadCsv } from "@/hooks/use-workspace";
 import { KINDS, sectionForKind } from "./sections";
@@ -156,15 +155,33 @@ const TONE: Record<string, string> = {
   "Résolue": "bg-success/15 text-success", "Rejetée": "bg-destructive/10 text-destructive",
 };
 
+function inboxStatus(value: unknown): string {
+  return ({ pending: "En attente", in_progress: "En cours", resolved: "Résolue", closed: "Résolue" } as Record<string, string>)[String(value)] ?? String(value ?? "En attente");
+}
+
+function backendInboxStatus(value: string): string {
+  return ({ "En attente": "pending", "En cours": "in_progress", "Résolue": "resolved", "Rejetée": "closed" } as Record<string, string>)[value] ?? "pending";
+}
+
 export function useInbox() {
   return useQuery({
     queryKey: INBOX_KEY,
     queryFn: async () => {
-      const { data: u } = await supabase.auth.getUser();
-      const { data, error } = await supabase.from("qhse_records").select("id, reference, title, status, data, created_at")
-        .eq("kind", "client_complaint").eq("target_company_id", u.user!.id).order("created_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as Complaint[];
+      const payload = await backendApi.request<unknown>("complaints?per_page=100");
+      const root = payload && typeof payload === "object" ? payload as Record<string, unknown> : {};
+      const items = Array.isArray(root.data) ? root.data : Array.isArray(payload) ? payload : [];
+      return items.map((item) => {
+        const source = item && typeof item === "object" ? item as Record<string, unknown> : {};
+        const attrs = source.attributes && typeof source.attributes === "object" ? source.attributes as Record<string, unknown> : source;
+        return {
+          id: String(source.id ?? attrs.id),
+          reference: String(attrs.reference ?? attrs.ref ?? `PLT-${source.id ?? ""}`),
+          title: String(attrs.title ?? "Plainte client"),
+          status: inboxStatus(attrs.status),
+          created_at: String(attrs.created_at ?? new Date().toISOString()),
+          data: { ...attrs, company: (attrs.site as Record<string, unknown> | undefined)?.name ?? attrs.client_company },
+        } as Complaint;
+      });
     },
   });
 }
@@ -177,10 +194,10 @@ export function InboxPage() {
   const [msg, setMsg] = useState("");
   const upd = useMutation({
     mutationFn: async (v: { c: Complaint; status: string; text: string }) => {
-      const hist = Array.isArray(v.c.data["history"]) ? (v.c.data["history"] as unknown[]) : [];
-      const data = { ...v.c.data, unread: true, seen_by_company: true, history: [...hist, { at: new Date().toISOString(), text: v.text }] };
-      const { error } = await supabase.from("qhse_records").update({ status: v.status, data: data as Json }).eq("id", v.c.id);
-      if (error) throw error;
+      await backendApi.request(`complaints/${v.c.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ status: backendInboxStatus(v.status), immediate_response: v.text || undefined }),
+      });
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: INBOX_KEY }); setMsg(""); toast.success("Le client a été notifié"); },
     onError: () => toast.error("Mise à jour impossible."),

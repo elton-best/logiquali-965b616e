@@ -1,22 +1,29 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { backendApi } from "@/integrations/backend/client";
 
 /** Lightweight session flag for UI affordances (navbar, CTAs). */
 export function useSignedIn() {
-  const [signedIn, setSignedIn] = useState(false);
+  const [signedIn, setSignedIn] = useState(() => Boolean(backendApi.auth.hasToken()));
 
   useEffect(() => {
     let alive = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (alive) setSignedIn(!!data.user);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") setSignedIn(true);
-      if (event === "SIGNED_OUT") setSignedIn(false);
-    });
+    const check = async () => {
+      if (!backendApi.auth.hasToken()) {
+        if (alive) setSignedIn(false);
+        return;
+      }
+      try {
+        await backendApi.auth.me();
+        if (alive) setSignedIn(true);
+      } catch {
+        if (alive) setSignedIn(false);
+      }
+    };
+    check();
+    window.addEventListener("lq-auth-changed", check);
     return () => {
       alive = false;
-      sub.subscription.unsubscribe();
+      window.removeEventListener("lq-auth-changed", check);
     };
   }, []);
 

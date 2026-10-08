@@ -634,7 +634,7 @@ function DetailSheet({
                     toast.error(`Suppression impossible : ${incoming.length} élément(s) y sont liés. Archivez-le plutôt pour conserver l'historique.`);
                     return;
                   }
-                  if (confirm(`Supprimer définitivement « ${record.title} » ?`)) { del.mutate(record.id); onClose(); }
+                  if (confirm(`Supprimer définitivement « ${record.title} » ?`)) { del.mutate({ id: record.id, kind: record.kind }); onClose(); }
                 }}
                 aria-label="Supprimer"
                 className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-semibold text-destructive hover:border-destructive"

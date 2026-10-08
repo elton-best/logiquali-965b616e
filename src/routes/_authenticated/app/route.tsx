@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-
 import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, Bell, Clock, MapPin, Menu, Search, Stamp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { backendApi } from "@/integrations/backend/client";
 import { AppSidebar } from "@/components/app/AppSidebar";
 import { LqButton } from "@/components/lq/LqButton";
 import { getMyProfile } from "@/lib/profile.functions";
@@ -88,7 +88,7 @@ function AppLayout() {
   const signOut = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
+    await backendApi.auth.logout();
     navigate({ to: "/auth/login", replace: true });
   };
 

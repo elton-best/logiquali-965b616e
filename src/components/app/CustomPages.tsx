@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Building2, Check, Plus, CreditCard, Download, ExternalLink, Minus, RotateCcw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { updateMyProfile } from "@/lib/profile.functions";
 import { historyOf, RECORDS_KEY, useRecords, useSaveRecord, useTransition, type QRecord } from "@/hooks/use-records";
 import { downloadCsv, useWorkspace, type Task } from "@/hooks/use-workspace";
 import { KINDS, NORM_CATALOG, sectionForKind } from "./sections";
@@ -277,10 +277,13 @@ export function CompanyPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.from("profiles").update(form).eq("id", profile.id);
+    try {
+      await updateMyProfile(form);
+      toast.success("Paramètres de l'organisation enregistrés");
+    } catch {
+      toast.error("Enregistrement impossible. Vos saisies sont conservées.");
+    }
     setBusy(false);
-    if (error) { toast.error("Enregistrement impossible. Vos saisies sont conservées."); return; }
-    toast.success("Paramètres de l'organisation enregistrés");
     router.invalidate();
   };
 
