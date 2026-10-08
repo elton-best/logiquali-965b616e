@@ -156,13 +156,13 @@ function AppLayout() {
             <kbd className="hidden rounded border border-border px-1.5 text-[10px] font-bold sm:inline">Ctrl K</kbd>
           </button>
           <div className="ml-auto flex items-center gap-2">
-            <label className="relative hidden items-center sm:flex">
+            <label className="relative flex items-center">
               <MapPin className="pointer-events-none absolute left-3 h-4 w-4 text-primary" />
               <select
                 aria-label="Site actif"
                 value={site}
                 onChange={(e) => setSite(e.target.value)}
-                className="h-10 max-w-[200px] rounded-xl border border-input bg-background pl-9 pr-3 text-sm font-semibold outline-none focus:border-primary"
+                className="h-10 max-w-[130px] rounded-xl sm:max-w-[200px] border border-input bg-background pl-9 pr-3 text-sm font-semibold outline-none focus:border-primary"
               >
                 <option value="">Tous les sites</option>
                 {sites.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
