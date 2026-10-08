@@ -74,7 +74,10 @@ const UI_STATUS: Record<string, Record<string, string>> = {
   process: { draft: "Brouillon", active: "Actif", inactive: "Inactif" },
   document: {
     draft: "Brouillon",
+    pending_verification: "En vérification",
     pending_approval: "En approbation",
+    awaiting_submitter_confirmation: "À corriger",
+    rejected: "À corriger",
     approved: "Publié",
     obsolete: "Archivé",
   },
@@ -119,7 +122,10 @@ const BACKEND_STATUS: Record<string, Record<string, string>> = {
   process: { Brouillon: "draft", Actif: "active", Inactif: "inactive" },
   document: {
     Brouillon: "draft",
+    "En vérification": "pending_verification",
     "En approbation": "pending_approval",
+    "À corriger": "rejected",
+    Rejeté: "rejected",
     Publié: "approved",
     Archivé: "obsolete",
   },
@@ -180,7 +186,11 @@ function collection(payload: unknown): unknown[] {
 function uiStatus(kind: string, source: Record<string, unknown>): string {
   if (kind === "site" && typeof source.is_active === "boolean")
     return source.is_active ? "Actif" : "Suspendu";
-  const value = String(source.status ?? source.state ?? "");
+  const value = String(
+    kind === "document"
+      ? source.workflow_status ?? source.status ?? source.state ?? ""
+      : source.status ?? source.state ?? "",
+  );
   return UI_STATUS[kind]?.[value] ?? value;
 }
 
@@ -332,6 +342,29 @@ async function transitionRecord(id: string, kind: string, status: string, commen
     throw new Error(
       `Le module « ${KINDS[kind]?.label ?? kind} » n'est pas encore exposé par le backend.`,
     );
+  if (kind === "document") {
+    if (value === "pending_verification") {
+      return backendApi.request(`${endpoint}/${id}/submit-for-approval`, { method: "POST" });
+    }
+    if (value === "pending_approval") {
+      return backendApi.request(`${endpoint}/${id}/verify`, {
+        method: "POST",
+        body: JSON.stringify({ comment }),
+      });
+    }
+    if (value === "approved") {
+      return backendApi.request(`${endpoint}/${id}/approve`, {
+        method: "POST",
+        body: JSON.stringify({ comment }),
+      });
+    }
+    if (value === "rejected") {
+      return backendApi.request(`${endpoint}/${id}/reject`, {
+        method: "POST",
+        body: JSON.stringify({ rejection_reason: comment || "Correction demandée" }),
+      });
+    }
+  }
   if (kind === "action") {
     return backendApi.request(`${endpoint}/${id}/status`, {
       method: "POST",

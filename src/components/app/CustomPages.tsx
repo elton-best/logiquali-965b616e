@@ -1,14 +1,15 @@
 import { getRouteApi, Link, useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Building2, Check, Plus, CreditCard, Download, ExternalLink, Minus, RotateCcw, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { updateMyProfile } from "@/lib/profile.functions";
 import { historyOf, RECORDS_KEY, useRecords, useSaveRecord, useTransition, type QRecord } from "@/hooks/use-records";
-import { downloadCsv, useWorkspace, type Task } from "@/hooks/use-workspace";
-import { KINDS, NORM_CATALOG, sectionForKind } from "./sections";
-import { HistoryList, RecordActions, StatusBadge } from "./SectionView";
-import { NAV_GROUPS } from "./nav";
+import { useEnterpriseNorms, useNorm, fetchNormChapters, flattenNormSections, type NormSection } from "@/integrations/backend/norms";
+import { useDocumentWorkflow, usePendingDocuments } from "@/integrations/backend/documents";
+import { downloadCsv, useCurrentSite, useWorkspace, type Task } from "@/hooks/use-workspace";
+import { KINDS, sectionForKind } from "./sections";
+import { RecordActions, StatusBadge } from "./SectionView";
 import { ListLoading } from "./LoadingState";
 
 const appRoute = getRouteApi("/_authenticated/app");
@@ -105,68 +106,109 @@ export function TasksPage() {
 
 // ---------- Vérification / Approbation ----------
 export function QueuePage({ mode }: { mode: "verification" | "approbation" }) {
-  const { records, isLoading } = useWs();
+  const workflowStatus = mode === "verification" ? "pending_verification" : "pending_approval";
+  const { data: documents = [], isLoading, isError } = usePendingDocuments(workflowStatus);
+  const workflow = useDocumentWorkflow();
   const [open, setOpen] = useState<string | null>(null);
-  const status = mode === "verification" ? "En vérification" : "En approbation";
-  const returned = mode === "verification" ? records.filter((r) => r.status === "À corriger") : [];
-  const list = records.filter((r) => r.status === status);
-  const byId = new Map(records.map((r) => [r.id, r]));
-  const submittedAt = (r: QRecord) => [...historyOf(r)].reverse().find((h) => h.to === status);
+  const [rejecting, setRejecting] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const busy = workflow.verify.isPending || workflow.approve.isPending || workflow.reject.isPending;
+
+  const verify = async (id: string) => {
+    try {
+      await workflow.verify.mutateAsync(id);
+      toast.success("Document vérifié et transmis à l'approbation");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "La vérification a échoué.");
+    }
+  };
+  const approve = async (id: string) => {
+    try {
+      await workflow.approve.mutateAsync({ id });
+      toast.success("Document approuvé");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "L'approbation a échoué.");
+    }
+  };
+  const reject = async () => {
+    if (!rejecting || !rejectionReason.trim()) return;
+    try {
+      await workflow.reject.mutateAsync({ id: rejecting, rejection_reason: rejectionReason.trim() });
+      toast.success("Document rejeté avec un motif");
+      setRejecting(null);
+      setRejectionReason("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Le rejet a échoué.");
+    }
+  };
+
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
+    <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
       <Header
         title={mode === "verification" ? "Vérification" : "Approbation"}
-        desc={mode === "verification" ? "Documents et informations soumis au contrôle. Vérifiez, demandez une correction ou transmettez à l'approbation." : "Éléments vérifiés prêts à décision. Approuvez (avec date d'effet), rejetez ou renvoyez en correction."}
+        desc={mode === "verification" ? "File Laravel des documents soumis au contrôle. Vérifiez, rejetez avec un motif ou transmettez à l'approbation." : "File Laravel des documents vérifiés prêts à décision. Approuvez ou rejetez avec traçabilité."}
       />
-      {isLoading ? <ListLoading rows={5} /> : list.length === 0 ? (
+      {isError && <p className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">Impossible de charger la file documentaire. Votre permission et la connexion au backend sont nécessaires.</p>}
+      {isLoading ? <ListLoading rows={5} /> : documents.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center">
           <p className="font-display font-bold text-foreground">File vide</p>
-          <p className="mt-1 text-sm text-muted-foreground">Aucun élément « {status} » pour le moment.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Aucun document en attente de {mode === "verification" ? "vérification" : "approbation"}.</p>
         </div>
       ) : (
-        <ul className="space-y-3">
-          {list.map((r) => {
-            const sub = submittedAt(r);
-            const creator = historyOf(r)[0]?.by;
-            const verifier = mode === "approbation" ? sub?.by : undefined;
-            const pid = r.data["process_id"] ? byId.get(String(r.data["process_id"])) : undefined;
-            const comments = historyOf(r).filter((h) => h.comment).length;
-            return (
-              <li key={r.id} className="rounded-2xl border border-border bg-card p-4">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-primary">{r.reference} · {KINDS[r.kind]?.singular}{r.data["version"] ? ` · v${String(r.data["version"])}` : ""}</p>
-                    <p className="mt-0.5 font-semibold text-foreground">{r.title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Créé par {creator || "—"}{verifier ? ` · vérifié par ${verifier}` : ""}
-                      {sub ? ` · soumis le ${new Date(sub.at).toLocaleDateString("fr-FR")}` : ""}
-                      {pid ? ` · ${pid.title}` : ""}
-                      {r.data["norm"] ? ` · ${String(r.data["norm"])}` : ""} · {comments} commentaire(s)
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => setOpen(open === r.id ? null : r.id)} className="inline-flex h-8 items-center rounded-xl border border-border px-3 text-xs font-semibold hover:border-primary hover:text-primary">{open === r.id ? "Masquer" : "Historique"}</button>
-                    <OpenLink r={r} />
-                  </div>
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="hidden overflow-x-auto md:block">
+            <table className="w-full min-w-[980px] text-sm">
+              <thead className="border-b border-border bg-background text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <tr><th className="px-4 py-3">Code</th><th className="px-4 py-3">Titre</th><th className="px-4 py-3">Processus</th><th className="px-4 py-3">Source</th><th className="px-4 py-3">Auteur</th><th className="px-4 py-3">Statut</th><th className="px-4 py-3 text-right">Actions</th></tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {documents.map((document) => (
+                  <tr key={document.id} className="align-top hover:bg-primary-soft/30">
+                    <td className="whitespace-nowrap px-4 py-3 font-mono text-xs font-bold text-primary">{document.code}<span className="ml-1 text-muted-foreground">v{document.version}</span></td>
+                    <td className="max-w-[230px] px-4 py-3 font-semibold text-foreground">{document.title}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{document.process_label}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{document.source_label}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{document.author_name}</td>
+                    <td className="px-4 py-3"><span className="rounded-full bg-primary-soft px-2.5 py-1 text-xs font-bold text-primary">{mode === "verification" ? "À vérifier" : "À approuver"}</span></td>
+                    <td className="px-4 py-3"><div className="flex justify-end gap-2">
+                      <button disabled={busy} onClick={() => mode === "verification" ? void verify(document.id) : void approve(document.id)} className="h-8 rounded-xl bg-success px-3 text-xs font-semibold text-success-foreground disabled:opacity-50">{mode === "verification" ? "Valider" : "Approuver"}</button>
+                      <button disabled={busy} onClick={() => { setRejecting(document.id); setRejectionReason(""); }} className="h-8 rounded-xl border border-destructive/30 px-3 text-xs font-semibold text-destructive disabled:opacity-50">Rejeter</button>
+                      <button onClick={() => setOpen(open === document.id ? null : document.id)} className="h-8 rounded-xl border border-border px-3 text-xs font-semibold hover:border-primary">{open === document.id ? "Masquer" : "Détails"}</button>
+                    </div></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <ul className="divide-y divide-border md:hidden">
+            {documents.map((document) => (
+              <li key={document.id} className="p-4">
+                <p className="font-mono text-xs font-bold text-primary">{document.code} · v{document.version}</p>
+                <p className="mt-1 font-semibold text-foreground">{document.title}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{document.process_label} · {document.source_label} · {document.author_name}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button disabled={busy} onClick={() => mode === "verification" ? void verify(document.id) : void approve(document.id)} className="h-9 rounded-xl bg-success px-3 text-xs font-semibold text-success-foreground disabled:opacity-50">{mode === "verification" ? "Valider" : "Approuver"}</button>
+                  <button disabled={busy} onClick={() => { setRejecting(document.id); setRejectionReason(""); }} className="h-9 rounded-xl border border-destructive/30 px-3 text-xs font-semibold text-destructive disabled:opacity-50">Rejeter</button>
                 </div>
-                <div className="mt-3"><RecordActions record={r} compact /></div>
-                {open === r.id && <div className="mt-4 rounded-xl bg-background p-4"><HistoryList record={r} /></div>}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-      {returned.length > 0 && (
-        <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">Retournés pour correction ({returned.length})</p>
-          <ul className="space-y-2">
-            {returned.map((r) => (
-              <li key={r.id} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card px-4 py-3 text-sm">
-                <span><span className="font-mono text-xs font-bold text-primary">{r.reference}</span> {r.title}</span>
-                <OpenLink r={r} />
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {open && (() => {
+        const document = documents.find((item) => item.id === open);
+        return document ? <div className="rounded-2xl border border-border bg-card p-5"><div className="flex items-start justify-between gap-3"><div><p className="font-mono text-xs font-bold text-primary">{document.code}</p><h2 className="mt-1 font-display text-lg font-bold text-foreground">{document.title}</h2></div><button onClick={() => setOpen(null)} className="text-sm font-semibold text-primary">Fermer</button></div><dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2"><div><dt className="text-muted-foreground">Auteur</dt><dd className="font-semibold">{document.author_name}</dd></div><div><dt className="text-muted-foreground">Approbateur</dt><dd className="font-semibold">{document.approver_name}</dd></div><div><dt className="text-muted-foreground">Processus</dt><dd className="font-semibold">{document.process_label}</dd></div><div><dt className="text-muted-foreground">Source</dt><dd className="font-semibold">{document.source_label}</dd></div></dl></div> : null;
+      })()}
+
+      {rejecting && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4" role="dialog" aria-modal="true">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-5 shadow-xl">
+            <h2 className="font-display text-lg font-bold text-foreground">Motif du rejet</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Le motif est enregistré dans l'historique du workflow Laravel.</p>
+            <textarea value={rejectionReason} onChange={(event) => setRejectionReason(event.target.value)} className="mt-4 h-28 w-full rounded-xl border border-input bg-background p-3 text-sm outline-none focus:border-primary" placeholder="Expliquez la correction attendue…" autoFocus />
+            <div className="mt-4 flex justify-end gap-2"><button onClick={() => setRejecting(null)} className="h-10 rounded-xl border border-border px-4 text-sm font-semibold">Annuler</button><button disabled={!rejectionReason.trim() || busy} onClick={() => void reject()} className="h-10 rounded-xl bg-destructive px-4 text-sm font-semibold text-destructive-foreground disabled:opacity-50">Confirmer le rejet</button></div>
+          </div>
         </div>
       )}
     </div>
@@ -175,85 +217,169 @@ export function QueuePage({ mode }: { mode: "verification" | "approbation" }) {
 
 // ---------- Bibliothèque des normes ----------
 export function NormsPage() {
-  const { records, isLoading, ws } = useWs();
-  const save = useSaveRecord();
-  const run = useTransition();
-  const [openCode, setOpenCode] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [sectionSearch, setSectionSearch] = useState("");
+  const [selectedId, setSelectedId] = useState<string | number | null>(null);
+  const [sections, setSections] = useState<NormSection[]>([]);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [sectionsLoading, setSectionsLoading] = useState(false);
+  const [sectionsError, setSectionsError] = useState<string | null>(null);
+  const [currentSite] = useCurrentSite();
+  const { data: catalog, isLoading, isError } = useEnterpriseNorms({
+    site_id: currentSite || undefined,
+    search: search.trim() || undefined,
+  });
+  const norms = catalog?.norms ?? [];
+  const { data: selectedNorm, isLoading: detailLoading } = useNorm(selectedId);
 
-  const activate = async (code: string, rec?: QRecord) => {
-    const end = ws.trialEnd > new Date() ? ws.trialEnd : new Date(Date.now() + 365 * 86_400_000);
-    const data = { activated_at: new Date().toISOString().slice(0, 10), expires_at: end.toISOString().slice(0, 10) };
-    if (rec) await run.mutateAsync({ record: rec, t: { label: "Activer la norme", to: "Active", date: { key: "expires_at", label: "Expire le" } }, date: data.expires_at });
-    else await save.mutateAsync({ kind: "norm", title: code, status: "Active", data });
+  useEffect(() => {
+    if (norms.length === 0) {
+      setSelectedId(null);
+      return;
+    }
+    if (selectedId === null || !norms.some((norm) => String(norm.id) === String(selectedId))) {
+      setSelectedId(norms[0].id);
+    }
+  }, [norms, selectedId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadSections() {
+      if (!selectedNorm) {
+        setSections([]);
+        return;
+      }
+      setSectionsError(null);
+      const inline = selectedNorm.currentVersion?.sections
+        ?? selectedNorm.current_version?.sections
+        ?? selectedNorm.versions?.[0]?.sections
+        ?? [];
+      if (inline.length > 0) {
+        setSections(inline);
+        setExpanded(new Set(flattenNormSections(inline).slice(0, 8).map((section) => String(section.id))));
+        return;
+      }
+      setSectionsLoading(true);
+      try {
+        const chapters = await fetchNormChapters(selectedNorm.id);
+        if (!cancelled) {
+          setSections(chapters);
+          setExpanded(new Set(flattenNormSections(chapters).slice(0, 8).map((section) => String(section.id))));
+        }
+      } catch {
+        if (!cancelled) {
+          setSections([]);
+          setSectionsError("La structure détaillée de cette norme n’est pas disponible.");
+        }
+      } finally {
+        if (!cancelled) setSectionsLoading(false);
+      }
+    }
+    void loadSections();
+    return () => { cancelled = true; };
+  }, [selectedNorm]);
+
+  const filteredSections = useMemo(() => {
+    const query = sectionSearch.trim().toLowerCase();
+    if (!query) return sections;
+    const filter = (items: NormSection[]): NormSection[] => items.flatMap((section) => {
+      const text = `${section.number ?? ""} ${section.title ?? ""} ${section.content ?? ""}`.toLowerCase();
+      const children = Array.isArray(section.children) ? filter(section.children) : [];
+      return text.includes(query) || children.length > 0 ? [{ ...section, children }] : [];
+    });
+    return filter(sections);
+  }, [sections, sectionSearch]);
+
+  const toggleSection = (id: string | number) => {
+    setExpanded((current) => {
+      const next = new Set(current);
+      const key = String(id);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
   };
-  const exportCsv = () => downloadCsv("normes.csv", [["Norme", "Nom", "État", "Expiration", "Progression"], ...ws.norms.map((n) => {
-    const info = NORM_CATALOG.find((c) => c.code === n.code)!;
-    const done = info.kinds.filter((k) => records.some((r) => r.kind === k)).length;
-    return [n.code, info.name, n.status, n.expiresAt?.toLocaleDateString("fr-FR") ?? "", `${Math.round((done / info.kinds.length) * 100)} %`];
-  })]);
+
+  const exportCsv = () => {
+    const rows = [
+      ["Code", "Nom", "Domaine", "Statut"],
+      ...norms.map((norm) => [norm.code, norm.name, norm.domain ?? "—", norm.status ?? "—"]),
+    ];
+    downloadCsv("bibliotheque-normes.csv", rows);
+    toast.success("Export téléchargé");
+  };
+
+  const renderSections = (items: NormSection[], depth = 0): React.ReactNode => items.map((section) => {
+    const key = String(section.id);
+    const hasChildren = Array.isArray(section.children) && section.children.length > 0;
+    const isOpen = expanded.has(key);
+    return (
+      <li key={key} className="border-l border-border pl-3" style={{ marginLeft: depth * 8 }}>
+        <button onClick={() => toggleSection(key)} className="flex w-full items-start gap-2 py-2 text-left hover:text-primary">
+          <span className="mt-0.5 w-4 shrink-0 text-xs text-muted-foreground">{hasChildren ? (isOpen ? "−" : "+") : "·"}</span>
+          <span className="text-sm font-semibold text-foreground">{section.number ? `${section.number} ` : ""}{section.title ?? "Section"}</span>
+        </button>
+        {isOpen && (
+          <div className="pb-2 pl-6 text-sm text-muted-foreground">
+            {section.content && <p className="whitespace-pre-wrap">{section.content}</p>}
+            {hasChildren && <ul>{renderSections(section.children!, depth + 1)}</ul>}
+          </div>
+        )}
+      </li>
+    );
+  });
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-      <Header title="Bibliothèque des normes" desc="Activez les référentiels de votre système : chaque norme rend visibles ses sous-sections dans le menu.">
-        <button onClick={exportCsv} className={ghostBtn}><Download className="h-4 w-4" /> Exporter</button>
+    <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
+      <Header title="Bibliothèque des normes" desc="Consultez les référentiels accessibles au site courant et leur structure issue du backend Laravel.">
+        <button onClick={exportCsv} disabled={norms.length === 0} className={`${ghostBtn} disabled:opacity-50`}><Download className="h-4 w-4" /> Exporter</button>
       </Header>
-      {isLoading ? <ListLoading rows={6} /> : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {NORM_CATALOG.map((info) => {
-          const st = ws.norms.find((n) => n.code === info.code)!;
-          const doneKinds = info.kinds.filter((k) => records.some((r) => r.kind === k));
-          const pct = Math.round((doneKinds.length / info.kinds.length) * 100);
-          const subs = NAV_GROUPS.flatMap((g) => g.items).filter((i) => i.norms?.includes(info.code));
-          const busy = save.isPending || run.isPending;
-          return (
-            <div key={info.code} className={`rounded-2xl border bg-card p-5 ${st.status === "Active" ? "border-primary" : "border-border"}`}>
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-display text-lg font-extrabold text-foreground">{info.code}</p>
-                  <p className="text-sm text-muted-foreground">{info.name} · {info.domain}</p>
+
+      {catalog?.trialPeriod && <p className="rounded-xl border border-primary/30 bg-primary-soft/60 p-4 text-sm text-foreground">Période d’essai active{catalog.trialDaysRemaining > 0 ? ` · ${catalog.trialDaysRemaining} jour(s) restant(s)` : ""}. Les normes accessibles sont celles calculées par le backend.</p>}
+      {isError && <p className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">Impossible de charger la bibliothèque des normes depuis le backend Laravel.</p>}
+
+      <div className="flex flex-wrap gap-3">
+        <div className="relative min-w-[240px] flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Rechercher une norme par code ou nom…" className="h-11 w-full rounded-xl border border-input bg-card pl-10 pr-4 text-sm outline-none focus:border-primary" />
+        </div>
+        <input value={sectionSearch} onChange={(event) => setSectionSearch(event.target.value)} placeholder="Rechercher dans les chapitres…" className="h-11 min-w-[240px] flex-1 rounded-xl border border-input bg-card px-4 text-sm outline-none focus:border-primary" />
+      </div>
+
+      {isLoading ? <ListLoading rows={6} /> : norms.length === 0 ? (
+        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+          <p className="font-display font-bold text-foreground">Aucune norme accessible</p>
+          <p className="mt-1 text-sm text-muted-foreground">Le backend ne retourne aucune norme liée à votre entreprise ou à votre site courant. Vérifiez l’offre et les abonnements.</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-[minmax(260px,360px)_1fr]">
+          <section className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Normes accessibles ({norms.length})</p>
+            <ul className="mt-3 space-y-2">
+              {norms.map((norm) => (
+                <li key={String(norm.id)}>
+                  <button onClick={() => setSelectedId(norm.id)} className={`w-full rounded-xl border p-4 text-left transition-colors ${String(selectedId) === String(norm.id) ? "border-primary bg-primary-soft/60" : "border-border hover:border-primary/50"}`}>
+                    <div className="flex items-start justify-between gap-2"><span className="font-display font-extrabold text-foreground">{norm.code}</span><span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground">{norm.status ?? "Accessible"}</span></div>
+                    <p className="mt-1 text-sm text-muted-foreground">{norm.name}</p>
+                    {norm.domain && <p className="mt-1 text-xs text-muted-foreground">{norm.domain}</p>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="min-h-[420px] rounded-2xl border border-border bg-card p-5">
+            {detailLoading || sectionsLoading ? <ListLoading rows={5} /> : selectedNorm ? (
+              <>
+                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
+                  <div><p className="font-display text-xl font-extrabold text-foreground">{selectedNorm.code}</p><h2 className="mt-1 text-lg font-bold text-foreground">{selectedNorm.name}</h2><p className="mt-1 text-sm text-muted-foreground">{selectedNorm.domain ?? "Référentiel QHSE"}</p></div>
+                  <div className="text-right text-xs text-muted-foreground"><p>{selectedNorm.status ?? "Accessible"}</p><p className="mt-1">Version {selectedNorm.currentVersion?.version_code ?? selectedNorm.current_version?.version_code ?? selectedNorm.versions?.[0]?.version_code ?? "—"}</p></div>
                 </div>
-                <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${st.status === "Active" ? "bg-primary text-primary-foreground" : st.status === "Expirée" ? "bg-destructive/10 text-destructive" : "bg-secondary text-muted-foreground"}`}>{st.status}</span>
-              </div>
-              {st.expiresAt && st.status !== "Inactive" && <p className="mt-2 text-xs text-muted-foreground">Expire le {st.expiresAt.toLocaleDateString("fr-FR")}{st.implicit ? " (incluse dans l'essai)" : ""}</p>}
-              <div className="mt-3">
-                <div className="flex justify-between text-xs"><span className="font-semibold text-foreground">Progression de mise en œuvre</span><span className="text-muted-foreground">{pct} %</span></div>
-                <div className="mt-1 h-2 rounded-full bg-secondary"><div className="h-2 rounded-full bg-primary" style={{ width: `${pct}%` }} /></div>
-              </div>
-              {openCode === info.code && (
-                <div className="mt-4 space-y-3 text-sm">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Exigences principales</p>
-                    <ul className="mt-1 list-disc pl-5 text-foreground">{info.requirements.map((r) => <li key={r}>{r}</li>)}</ul>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Éléments en place / manquants</p>
-                    <ul className="mt-1 space-y-1">
-                      {info.kinds.map((k) => {
-                        const ok = doneKinds.includes(k);
-                        const slug = sectionForKind(k);
-                        return (
-                          <li key={k} className="flex items-center gap-2">
-                            {ok ? <Check className="h-4 w-4 text-primary" /> : <Minus className="h-4 w-4 text-destructive" />}
-                            {slug ? <Link to="/app/$section" params={{ section: slug }} className="hover:text-primary">{KINDS[k]?.label}</Link> : KINDS[k]?.label}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                  {subs.length > 0 && <p className="text-xs text-muted-foreground">Sous-sections ajoutées au menu : {subs.map((s) => s.label).join(", ")}</p>}
-                </div>
-              )}
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button onClick={() => setOpenCode(openCode === info.code ? null : info.code)} className="h-9 rounded-xl border border-border px-3 text-xs font-semibold hover:border-primary hover:text-primary">{openCode === info.code ? "Masquer" : "Consulter / progression"}</button>
-                {(st.status === "Inactive" || st.status === "Désactivée") && <button disabled={busy} onClick={() => activate(info.code, st.record)} className="h-9 rounded-xl bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-60">Activer</button>}
-                {st.status === "Expirée" && <Link to="/app/$section" params={{ section: "abonnement" }} className="inline-flex h-9 items-center rounded-xl bg-primary px-3 text-xs font-semibold text-primary-foreground">Renouveler</Link>}
-                {st.status === "Active" && st.record && (
-                  <button disabled={busy} onClick={() => { if (confirm(`Désactiver ${info.code} ? Les données restent conservées.`)) run.mutate({ record: st.record!, t: { label: "Désactiver la norme", to: "Désactivée" } }); }} className="h-9 rounded-xl border border-destructive/40 px-3 text-xs font-semibold text-destructive">Désactiver</button>
-                )}
-              </div>
-            </div>
-          );
-          })}
+                {sectionsError && <p className="mt-4 rounded-xl bg-warning/15 p-3 text-sm text-warning-foreground">{sectionsError}</p>}
+                {!sectionsError && filteredSections.length === 0 && <p className="mt-5 text-sm text-muted-foreground">Aucun chapitre disponible pour cette norme.</p>}
+                {filteredSections.length > 0 && <ul className="mt-4 space-y-1">{renderSections(filteredSections)}</ul>}
+              </>
+            ) : <p className="text-sm text-muted-foreground">Sélectionnez une norme.</p>}
+          </section>
         </div>
       )}
     </div>

@@ -1,17 +1,12 @@
-import { getRouteApi, Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Columns3, Download, Eye, Inbox, Plus, X } from "lucide-react";
+import { AlertTriangle, Columns3, Download, Eye, Inbox, Plus, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { backendApi } from "@/integrations/backend/client";
-import { dueOf, isDone, isOverdue, useRecords, type QRecord } from "@/hooks/use-records";
-import { downloadCsv } from "@/hooks/use-workspace";
-import { KINDS, sectionForKind } from "./sections";
-import { StatusBadge } from "./SectionView";
-
-const appRoute = getRouteApi("/_authenticated/app");
+import { useCollaboratorActions } from "@/integrations/backend/dashboard";
+import { downloadCsv, useCurrentSite } from "@/hooks/use-workspace";
 const fmt = (d: string) => new Date(d).toLocaleDateString("fr-FR");
-const inputCls = "h-11 rounded-xl border border-input bg-card px-4 text-sm font-semibold outline-none focus:border-primary";
 
 function Title({ title, desc, children }: { title: string; desc: string; children?: React.ReactNode }) {
   return (
@@ -97,50 +92,148 @@ export function ColumnPicker({ cols, labels, state }: { cols: string[]; labels: 
 
 // ---------- RT-13 : Mes actions ----------
 export function MyActionsPage() {
-  const profile = appRoute.useLoaderData();
-  const { data: records = [], isLoading } = useRecords();
-  const [status, setStatus] = useState("");
-  const email = (profile.email ?? "").toLowerCase();
-  const mine = useMemo(() => new Set(records.filter((r) => r.kind === "collaborator" && String(r.data["email"] ?? "").toLowerCase() === email).map((r) => r.id)), [records, email]);
-  const all = records
-    .filter((r) => { const o = KINDS[r.kind]?.owner; return o && mine.has(String(r.data[o] ?? "")) && r.status !== "Archivé"; })
-    .sort((a, b) => (dueOf(a) ?? "9999").localeCompare(dueOf(b) ?? "9999"));
-  const label = (r: QRecord) => (isOverdue(r) ? "En retard" : isDone(r) ? "Réalisé" : r.status || "À planifier");
-  const statuses = ["En retard", "Réalisé", ...new Set(all.filter((r) => !isOverdue(r) && !isDone(r)).map((r) => r.status || "À planifier"))];
-  const list = all.filter((r) => !status || label(r) === status);
-  const late = all.filter(isOverdue).length;
+  const [currentSite] = useCurrentSite();
+  const { data: summary, isLoading, isError } = useCollaboratorActions({
+    site_id: currentSite || undefined,
+    scope: currentSite ? "site" : "enterprise",
+    include_closed: true,
+    per_page: 100,
+  });
+  const [status, setStatus] = useState<"" | "assigned" | "in_progress" | "overdue" | "completed">("");
+  const [query, setQuery] = useState("");
+  const columns = ["reference", "title", "process", "site", "deadline", "status"];
+  const columnLabels = {
+    reference: "Référence",
+    title: "Action",
+    process: "Processus",
+    site: "Site",
+    deadline: "Échéance",
+    status: "Statut",
+  };
+  const columnState = useColumns("my-actions", columns);
+  const stats = summary?.stats;
+  const actions = summary?.actions ?? [];
+
+  const isClosed = (value: string) => ["completed", "verified", "closed", "cancelled"].includes(value);
+  const isOverdueAction = (deadline: string | null | undefined, actionStatus: string) => {
+    if (!deadline || isClosed(actionStatus)) return false;
+    const date = new Date(deadline);
+    return !Number.isNaN(date.getTime()) && date < new Date(new Date().toDateString());
+  };
+  const statusLabel = (value: string, deadline?: string | null) => {
+    if (isOverdueAction(deadline, value)) return "En retard";
+    return ({ assigned: "À faire", in_progress: "En cours", completed: "Réalisée", verified: "Réalisée", closed: "Réalisée", cancelled: "Annulée" } as Record<string, string>)[value] ?? value;
+  };
+  const filtered = useMemo(() => {
+    return [...actions]
+      .filter((action) => {
+        const overdue = isOverdueAction(action.deadline, action.status);
+        const matchesStatus = !status
+          || (status === "overdue" ? overdue : status === "completed" ? isClosed(action.status) : action.status === status);
+        const haystack = [action.title, action.process?.title, action.process?.code, action.site?.name]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        return matchesStatus && (!query || haystack.includes(query.toLowerCase()));
+      })
+      .sort((a, b) => (a.deadline ?? "9999").localeCompare(b.deadline ?? "9999"));
+  }, [actions, query, status]);
+
+  const cards = [
+    { key: "", label: "Total de mes actions", value: stats?.total_assigned ?? 0, tone: "text-primary" },
+    { key: "assigned", label: "À faire", value: stats?.open_count ?? 0, tone: "text-info" },
+    { key: "in_progress", label: "En cours", value: stats?.in_progress_count ?? 0, tone: "text-warning" },
+    { key: "overdue", label: "En retard", value: stats?.overdue_count ?? 0, tone: "text-destructive" },
+    { key: "completed", label: "Réalisées", value: stats?.completed_count ?? 0, tone: "text-success" },
+  ] as const;
+
   return (
     <div className="mx-auto max-w-6xl space-y-6 p-4 md:p-8">
-      <Title title="Mes actions" desc="Toutes les actions qui vous sont assignées, tous modules confondus, triées par échéance.">
-        <Link to="/app/$section" params={{ section: "actions" }} search={{ new: 1 }} className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"><Plus className="h-4 w-4" /> Nouvelle action</Link>
+      <Title title="Mes actions" desc="Toutes les actions dont vous êtes responsable, tous modules confondus, depuis le backend Laravel.">
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => {
+            const rows = [
+              ["Référence", "Action", "Processus", "Site", "Échéance", "Statut"],
+              ...filtered.map((action) => [
+                `ACT-${action.id}`,
+                action.title,
+                action.process?.title ?? action.process?.code ?? "—",
+                action.site?.name ?? "—",
+                action.deadline ? fmt(action.deadline) : "—",
+                statusLabel(action.status, action.deadline),
+              ]),
+            ];
+            downloadCsv("mes-actions.csv", rows);
+            toast.success("Export téléchargé");
+          }} className="inline-flex h-11 items-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold hover:border-primary">
+            <Download className="h-4 w-4" /> Exporter
+          </button>
+          <Link to="/app/$section" params={{ section: "actions" }} search={{ new: 1 }} className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground"><Plus className="h-4 w-4" /> Nouvelle action</Link>
+        </div>
       </Title>
-      {mine.size === 0 && <p className="rounded-xl bg-warning/15 p-3 text-sm text-warning-foreground">Aucune fiche collaborateur ne porte votre adresse e-mail ({profile.email}). Créez-la dans « Liste du personnel » pour recevoir vos actions.</p>}
-      {late > 0 && <p className="flex items-center gap-2 rounded-xl bg-destructive/10 p-3 text-sm font-semibold text-destructive"><AlertTriangle className="h-4 w-4" /> {late} action(s) en retard</p>}
-      <select value={status} onChange={(e) => setStatus(e.target.value)} className={`${inputCls} w-full sm:w-72`} aria-label="Filtrer par statut">
-        <option value="">Tous les statuts ({all.length})</option>
-        {statuses.map((s) => <option key={s} value={s}>{s} ({all.filter((r) => label(r) === s).length})</option>)}
-      </select>
-      {isLoading ? <p className="text-sm text-muted-foreground">Chargement…</p> : (
-        <ul className="space-y-2">
-          {list.map((r) => {
-            const slug = sectionForKind(r.kind);
-            const due = dueOf(r);
-            return (
-              <li key={r.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4">
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-primary">{r.reference} · {KINDS[r.kind]?.singular}</p>
-                  <p className="font-semibold text-foreground">{r.title}</p>
-                  <p className={`text-xs ${isOverdue(r) ? "font-bold text-destructive" : "text-muted-foreground"}`}>Échéance : {due ? fmt(due) : "—"}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setStatus(label(r))}><StatusBadge kind={r.kind} status={r.status} /></button>
-                  {slug && <Link to="/app/$section" params={{ section: slug }} search={{ open: r.id }} className="inline-flex h-8 items-center gap-1 rounded-xl border border-border px-3 text-xs font-semibold hover:border-primary"><Eye className="h-3.5 w-3.5" /> Ouvrir</Link>}
-                </div>
-              </li>
-            );
-          })}
-          {list.length === 0 && <li className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">Aucune action.</li>}
-        </ul>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        {cards.map((card) => (
+          <button key={card.key} onClick={() => setStatus(card.key)} className={`rounded-2xl border bg-card p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/50 ${status === card.key ? "border-primary shadow-md" : "border-border"}`}>
+            <div className="flex items-center justify-between gap-2"><span className="text-xs font-semibold text-muted-foreground">{card.label}</span><span className={`text-2xl font-extrabold ${card.tone}`}>{card.value}</span></div>
+          </button>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card p-4">
+        <div className="relative min-w-[240px] flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary" />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher par titre, processus ou site…" className="h-11 w-full rounded-xl border border-input bg-background pl-10 pr-4 text-sm outline-none focus:border-primary" />
+        </div>
+        <ColumnPicker cols={columns} labels={columnLabels} state={columnState} />
+      </div>
+
+      {isError && <p className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">Impossible de charger vos actions depuis le backend Laravel.</p>}
+      {isLoading ? <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground" aria-busy="true">Chargement de vos actions…</div> : filtered.length === 0 ? (
+        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+          <p className="font-display font-bold text-foreground">Aucune action correspondante</p>
+          <p className="mt-1 text-sm text-muted-foreground">Les actions attribuées à votre compte et leurs échéances apparaîtront ici.</p>
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="hidden overflow-x-auto md:block">
+            <table className="w-full min-w-[850px] text-sm">
+              <thead className="border-b border-border bg-background text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  {columnState.isVisible("reference") && <th className="px-4 py-3">Référence</th>}
+                  {columnState.isVisible("title") && <th className="px-4 py-3">Action</th>}
+                  {columnState.isVisible("process") && <th className="px-4 py-3">Processus</th>}
+                  {columnState.isVisible("site") && <th className="px-4 py-3">Site</th>}
+                  {columnState.isVisible("deadline") && <th className="px-4 py-3">Échéance</th>}
+                  {columnState.isVisible("status") && <th className="px-4 py-3">Statut</th>}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filtered.map((action) => {
+                  const overdue = isOverdueAction(action.deadline, action.status);
+                  return <tr key={String(action.id)} className="hover:bg-primary-soft/40">
+                    {columnState.isVisible("reference") && <td className="px-4 py-3 font-mono text-xs font-bold text-primary">ACT-{action.id}</td>}
+                    {columnState.isVisible("title") && <td className="px-4 py-3 font-semibold text-foreground">{action.title}</td>}
+                    {columnState.isVisible("process") && <td className="px-4 py-3 text-muted-foreground">{action.process?.title ?? action.process?.code ?? "—"}</td>}
+                    {columnState.isVisible("site") && <td className="px-4 py-3 text-muted-foreground">{action.site?.name ?? "—"}</td>}
+                    {columnState.isVisible("deadline") && <td className={`px-4 py-3 ${overdue ? "font-bold text-destructive" : "text-muted-foreground"}`}>{action.deadline ? fmt(action.deadline) : "—"}</td>}
+                    {columnState.isVisible("status") && <td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${overdue ? "bg-destructive/10 text-destructive" : "bg-primary-soft text-primary"}`}>{statusLabel(action.status, action.deadline)}</span></td>}
+                  </tr>;
+                })}
+              </tbody>
+            </table>
+          </div>
+          <ul className="divide-y divide-border md:hidden">
+            {filtered.map((action) => {
+              const overdue = isOverdueAction(action.deadline, action.status);
+              return <li key={String(action.id)} className="p-4">
+                <div className="flex items-start justify-between gap-3"><div><p className="font-mono text-xs font-bold text-primary">ACT-{action.id}</p><p className="mt-1 font-semibold text-foreground">{action.title}</p></div><span className={`rounded-full px-2 py-1 text-[11px] font-bold ${overdue ? "bg-destructive/10 text-destructive" : "bg-primary-soft text-primary"}`}>{statusLabel(action.status, action.deadline)}</span></div>
+                <p className="mt-2 text-xs text-muted-foreground">{action.process?.title ?? "Sans processus"} · {action.site?.name ?? "Tous sites"} · {action.deadline ? fmt(action.deadline) : "Sans échéance"}</p>
+                <Link to="/app/$section" params={{ section: "actions" }} search={{ open: String(action.id) }} className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary"><Eye className="h-3.5 w-3.5" /> Ouvrir l'action</Link>
+              </li>;
+            })}
+          </ul>
+        </div>
       )}
     </div>
   );
