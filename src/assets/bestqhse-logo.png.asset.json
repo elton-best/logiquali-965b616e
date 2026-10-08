@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "13d1620e-9e37-427e-9a04-e9ff0db3177f",
-  "project_id": "31dc496c-5080-460d-8448-2e36d4d771c1",
-  "url": "/__l5e/assets-v1/13d1620e-9e37-427e-9a04-e9ff0db3177f/bestqhse-logo.png",
-  "r2_key": "a/v1/31dc496c-5080-460d-8448-2e36d4d771c1/13d1620e-9e37-427e-9a04-e9ff0db3177f/bestqhse-logo.png",
-  "original_filename": "bestqhse-logo.png",
-  "size": 68406,
   "content_type": "image/webp",
-  "created_at": "2026-10-08T12:57:14Z"
+  "created_at": "2026-10-08T12:57:14Z",
+  "original_filename": "bestqhse-logo.png",
+  "project_id": "86066861-50a0-4646-8f36-30eff54cae80",
+  "r2_key": "a/v1/86066861-50a0-4646-8f36-30eff54cae80/13d1620e-9e37-427e-9a04-e9ff0db3177f/bestqhse-logo.png",
+  "size": 68406,
+  "url": "/__l5e/assets-v1/13d1620e-9e37-427e-9a04-e9ff0db3177f/bestqhse-logo.png",
+  "version": 1
 }
