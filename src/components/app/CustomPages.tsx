@@ -37,7 +37,7 @@ export function CompanyPage() {
     setBusy(true);
     const { error } = await supabase.from("profiles").update(form).eq("id", profile.id);
     setBusy(false);
-    if (error) return toast.error("Enregistrement impossible.");
+    if (error) { toast.error("Enregistrement impossible."); return; }
     toast.success("Fiche entreprise mise à jour");
     router.invalidate();
   };
@@ -111,7 +111,7 @@ export function RolesPage() {
               <tr key={r.name}>
                 <td className="px-4 py-3">
                   <p className="font-semibold text-foreground">{r.name}</p>
-                  <p className="text-xs text-muted-foreground">{records.filter((c) => c.kind === "collaborator" && c.data.role === r.name).length} collaborateur(s)</p>
+                  <p className="text-xs text-muted-foreground">{records.filter((c) => c.kind === "collaborator" && c.data["role"] === r.name).length} collaborateur(s)</p>
                 </td>
                 {r.rights.map((v, i) => (
                   <td key={i} className="px-3 py-3 text-center">
@@ -142,7 +142,7 @@ export function RolesPage() {
 
 export function SubscriptionPage() {
   const { data: records = [] } = useRecords();
-  const norms = Array.from(new Set(records.filter((r) => r.kind === "certification").map((r) => String(r.data.norm || "")).filter(Boolean)));
+  const norms = Array.from(new Set(records.filter((r) => r.kind === "certification").map((r) => String(r.data["norm"] || "")).filter(Boolean)));
   const users = records.filter((r) => r.kind === "collaborator").length;
   const sites = records.filter((r) => r.kind === "site").length;
   return (

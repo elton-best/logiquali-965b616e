@@ -99,7 +99,7 @@ export function useDeleteRecord() {
 }
 
 export function isOverdue(r: QRecord): boolean {
-  const due = (r.data.due_date ?? r.data.review_date ?? r.data.next_maintenance) as string | undefined;
+  const due = (r.data["due_date"] ?? r.data["review_date"] ?? r.data["next_maintenance"]) as string | undefined;
   if (!due) return false;
   const done = ["Terminée", "Vérifiée", "Clôturée", "Atteint", "Archivé"].includes(r.status);
   return !done && new Date(due) < new Date(new Date().toDateString());

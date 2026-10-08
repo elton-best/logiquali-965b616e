@@ -323,7 +323,7 @@ function DetailSheet({
               {record.kind === "risk" && (
                 <div className="grid grid-cols-[40%_1fr] gap-3 px-4 py-2.5 text-sm">
                   <dt className="font-semibold text-muted-foreground">Criticité</dt>
-                  <dd className="font-bold text-primary">{Number(record.data.probability || 0) * Number(record.data.gravity || 0)} / 25</dd>
+                  <dd className="font-bold text-primary">{Number(record.data["probability"] || 0) * Number(record.data["gravity"] || 0)} / 25</dd>
                 </div>
               )}
             </dl>

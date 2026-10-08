@@ -32,7 +32,7 @@ export type SectionConfig = {
   slug: string;
   title: string;
   description: string;
-  kinds: KindConfig[];
+  kinds: [KindConfig, ...KindConfig[]];
 };
 
 const PROCESS_REL: Field = { key: "process_id", label: "Processus", type: "relation", kinds: ["process"], column: true };
@@ -40,7 +40,7 @@ const SITE_REL: Field = { key: "site_id", label: "Site", type: "relation", kinds
 const PILOT: Field = { key: "pilot_id", label: "Responsable", type: "relation", kinds: ["collaborator"], column: true };
 const NORMS = ["ISO 9001", "ISO 14001", "ISO 45001", "ISO 27001", "ISO 22000", "ISO 50001"];
 
-export const KINDS: Record<string, KindConfig> = {
+const K = {
   site: {
     kind: "site", label: "Sites", singular: "site", prefix: "SIT", titleLabel: "Nom du site",
     statuses: [{ value: "Actif", tone: "success" }, { value: "Inactif", tone: "neutral" }],
@@ -275,26 +275,28 @@ export const KINDS: Record<string, KindConfig> = {
       { key: "expiry", label: "Date d'expiration", type: "date", column: true },
     ],
   },
-};
+} satisfies Record<string, KindConfig>;
+
+export const KINDS: Record<string, KindConfig> = K;
 
 export const SECTIONS: Record<string, SectionConfig> = {
-  sites: { slug: "sites", title: "Sites", description: "Établissements, usines et agences de l'entreprise.", kinds: [KINDS.site] },
-  collaborateurs: { slug: "collaborateurs", title: "Collaborateurs", description: "Utilisateurs, fonctions et rattachement aux sites.", kinds: [KINDS.collaborator] },
-  contexte: { slug: "contexte", title: "Contexte de l'organisation", description: "SWOT, PESTEL, parties intéressées et périmètre du système.", kinds: [KINDS.context, KINDS.party, KINDS.scope] },
-  risques: { slug: "risques", title: "Risques & objectifs", description: "Risques, opportunités et objectifs mesurables.", kinds: [KINDS.risk, KINDS.objective] },
-  actions: { slug: "actions", title: "Plans d'actions", description: "Toutes les actions issues des NC, risques, audits, objectifs et revues.", kinds: [KINDS.action] },
-  processus: { slug: "processus", title: "Processus", description: "Cartographie, pilotes et interactions des processus.", kinds: [KINDS.process] },
-  documents: { slug: "documents", title: "Documents", description: "Bibliothèque documentaire et circuit de validation.", kinds: [KINDS.document] },
-  realisation: { slug: "realisation", title: "Réalisation", description: "Planification, réalisation et libération des produits et services.", kinds: [KINDS.operation] },
-  fournisseurs: { slug: "fournisseurs", title: "Fournisseurs", description: "Évaluation et suivi des fournisseurs et prestataires.", kinds: [KINDS.supplier] },
-  "non-conformites": { slug: "non-conformites", title: "Non-conformités", description: "Déclaration, analyse, traitement et clôture des écarts.", kinds: [KINDS.nc] },
-  reclamations: { slug: "reclamations", title: "Réclamations & suggestions", description: "Réclamations clients et idées d'amélioration.", kinds: [KINDS.complaint, KINDS.suggestion] },
-  audits: { slug: "audits", title: "Audits", description: "Programme, préparation, réalisation et rapport d'audit.", kinds: [KINDS.audit] },
-  indicateurs: { slug: "indicateurs", title: "Indicateurs", description: "Mesure de la performance par processus.", kinds: [KINDS.indicator] },
-  "revue-direction": { slug: "revue-direction", title: "Revue de direction", description: "Préparation, décisions et rapport des revues.", kinds: [KINDS.review] },
-  competences: { slug: "competences", title: "Compétences & formations", description: "Compétences requises et plan de formation.", kinds: [KINDS.competence, KINDS.training] },
-  equipements: { slug: "equipements", title: "Équipements", description: "Parc d'équipements et maintenance.", kinds: [KINDS.equipment] },
-  certifications: { slug: "certifications", title: "Certifications", description: "Certifications obtenues et échéances.", kinds: [KINDS.certification] },
+  sites: { slug: "sites", title: "Sites", description: "Établissements, usines et agences de l'entreprise.", kinds: [K.site] },
+  collaborateurs: { slug: "collaborateurs", title: "Collaborateurs", description: "Utilisateurs, fonctions et rattachement aux sites.", kinds: [K.collaborator] },
+  contexte: { slug: "contexte", title: "Contexte de l'organisation", description: "SWOT, PESTEL, parties intéressées et périmètre du système.", kinds: [K.context, K.party, K.scope] },
+  risques: { slug: "risques", title: "Risques & objectifs", description: "Risques, opportunités et objectifs mesurables.", kinds: [K.risk, K.objective] },
+  actions: { slug: "actions", title: "Plans d'actions", description: "Toutes les actions issues des NC, risques, audits, objectifs et revues.", kinds: [K.action] },
+  processus: { slug: "processus", title: "Processus", description: "Cartographie, pilotes et interactions des processus.", kinds: [K.process] },
+  documents: { slug: "documents", title: "Documents", description: "Bibliothèque documentaire et circuit de validation.", kinds: [K.document] },
+  realisation: { slug: "realisation", title: "Réalisation", description: "Planification, réalisation et libération des produits et services.", kinds: [K.operation] },
+  fournisseurs: { slug: "fournisseurs", title: "Fournisseurs", description: "Évaluation et suivi des fournisseurs et prestataires.", kinds: [K.supplier] },
+  "non-conformites": { slug: "non-conformites", title: "Non-conformités", description: "Déclaration, analyse, traitement et clôture des écarts.", kinds: [K.nc] },
+  reclamations: { slug: "reclamations", title: "Réclamations & suggestions", description: "Réclamations clients et idées d'amélioration.", kinds: [K.complaint, K.suggestion] },
+  audits: { slug: "audits", title: "Audits", description: "Programme, préparation, réalisation et rapport d'audit.", kinds: [K.audit] },
+  indicateurs: { slug: "indicateurs", title: "Indicateurs", description: "Mesure de la performance par processus.", kinds: [K.indicator] },
+  "revue-direction": { slug: "revue-direction", title: "Revue de direction", description: "Préparation, décisions et rapport des revues.", kinds: [K.review] },
+  competences: { slug: "competences", title: "Compétences & formations", description: "Compétences requises et plan de formation.", kinds: [K.competence, K.training] },
+  equipements: { slug: "equipements", title: "Équipements", description: "Parc d'équipements et maintenance.", kinds: [K.equipment] },
+  certifications: { slug: "certifications", title: "Certifications", description: "Certifications obtenues et échéances.", kinds: [K.certification] },
 };
 
 /** Which section hosts a kind (for "open" links). */

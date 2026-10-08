@@ -36,16 +36,16 @@ function Dashboard() {
     { label: "Collaborateurs actifs", value: of("collaborator").filter((r) => r.status === "Actif").length, icon: Users, section: "collaborateurs" },
     { label: "Actions en retard", value: of("action").filter(isOverdue).length, icon: Target, section: "actions", alert: true },
     { label: "NC ouvertes", value: of("nc").filter((r) => r.status !== "Clôturée").length, icon: ShieldAlert, section: "non-conformites", alert: true },
-    { label: "Audits à venir", value: of("audit").filter((r) => r.data.date && new Date(String(r.data.date)) >= today && r.status !== "Clôturé").length, icon: ClipboardCheck, section: "audits" },
+    { label: "Audits à venir", value: of("audit").filter((r) => r.data["date"] && new Date(String(r.data["date"])) >= today && r.status !== "Clôturé").length, icon: ClipboardCheck, section: "audits" },
     { label: "Processus actifs", value: of("process").filter((r) => r.status === "Actif").length, icon: GitBranch, section: "processus" },
   ];
 
   const priorities: QRecord[] = [
     ...of("action").filter(isOverdue),
-    ...of("nc").filter((r) => r.data.severity === "Critique" && r.status !== "Clôturée"),
-    ...of("audit").filter((r) => r.data.date && new Date(String(r.data.date)) >= today && new Date(String(r.data.date)) <= in30 && r.status !== "Clôturé"),
+    ...of("nc").filter((r) => r.data["severity"] === "Critique" && r.status !== "Clôturée"),
+    ...of("audit").filter((r) => r.data["date"] && new Date(String(r.data["date"])) >= today && new Date(String(r.data["date"])) <= in30 && r.status !== "Clôturé"),
     ...of("document").filter((r) => r.status === "En approbation" || r.status === "En vérification" || isOverdue(r)),
-    ...of("objective").filter((r) => r.status === "En cours" && Number(r.data.progress ?? 0) < 50),
+    ...of("objective").filter((r) => r.status === "En cours" && Number(r.data["progress"] ?? 0) < 50),
   ].slice(0, 8);
 
   // Activity evolution: last 6 months — created vs closed (actions + NC)
@@ -78,13 +78,13 @@ function Dashboard() {
 
   // Actions by process
   const byProcess = of("process").map((p) => {
-    const acts = of("action").filter((a) => a.data.process_id === p.id);
+    const acts = of("action").filter((a) => a.data["process_id"] === p.id);
     const done = acts.filter((a) => CLOSED.includes(a.status)).length;
     return { p, total: acts.length, done, late: acts.filter(isOverdue).length, rate: acts.length ? Math.round((done / acts.length) * 100) : 0 };
   });
 
   // Governance maturity
-  const docOf = (type: string) => of("document").find((d) => d.data.type === type);
+  const docOf = (type: string) => of("document").find((d) => d.data["type"] === type);
   const governance = [
     { label: "Politique QHSE", rec: docOf("Politique") },
     { label: "Manuel qualité", rec: docOf("Manuel") },
@@ -93,7 +93,7 @@ function Dashboard() {
     { label: "Objectifs stratégiques", rec: of("objective")[0] },
   ];
 
-  const indicators = of("indicator").filter((i) => i.data.target);
+  const indicators = of("indicator").filter((i) => i.data["target"]);
   const recent = [...records].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 7);
   const name = profile.first_name || "et bienvenue";
 
@@ -167,12 +167,12 @@ function Dashboard() {
               {priorities.map((p) => (
                 <li key={p.id}>
                   <Link to="/app/$section" params={{ section: sectionForKind(p.kind)! }} search={{ open: p.id }} className="flex items-center gap-3 rounded-xl border border-border p-3 hover:border-primary">
-                    {isOverdue(p) || p.data.severity === "Critique" ? <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" /> : <Clock3 className="h-4 w-4 shrink-0 text-primary" />}
+                    {isOverdue(p) || p.data["severity"] === "Critique" ? <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" /> : <Clock3 className="h-4 w-4 shrink-0 text-primary" />}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-foreground">{p.reference} · {p.title}</p>
                       <p className="text-xs text-muted-foreground">
                         {KINDS[p.kind]?.singular}
-                        {(p.data.due_date || p.data.date) ? ` · échéance ${new Date(String(p.data.due_date || p.data.date)).toLocaleDateString("fr-FR")}` : ""}
+                        {(p.data["due_date"] || p.data["date"]) ? ` · échéance ${new Date(String(p.data["due_date"] || p.data["date"])).toLocaleDateString("fr-FR")}` : ""}
                       </p>
                     </div>
                     <StatusBadge kind={p.kind} status={p.status} />
@@ -245,7 +245,7 @@ function Dashboard() {
             <Link to="/app/$section" params={{ section: "processus" }} className="text-xs font-bold text-primary">Cartographie</Link>
           </div>
           <p className="text-xs text-muted-foreground">
-            {of("process").length} processus · {["Management", "Réalisation", "Support"].map((t) => `${of("process").filter((p) => p.data.type === t).length} ${t.toLowerCase()}`).join(" · ")}
+            {of("process").length} processus · {["Management", "Réalisation", "Support"].map((t) => `${of("process").filter((p) => p.data["type"] === t).length} ${t.toLowerCase()}`).join(" · ")}
           </p>
           {byProcess.length === 0 ? (
             <p className="mt-4 rounded-xl bg-background p-4 text-sm text-muted-foreground">Aucun processus créé.</p>
@@ -274,12 +274,12 @@ function Dashboard() {
           ) : (
             <ul className="mt-4 space-y-4">
               {indicators.slice(0, 6).map((i) => {
-                const rate = Math.round((Number(i.data.value ?? 0) / Number(i.data.target)) * 100);
+                const rate = Math.round((Number(i.data["value"] ?? 0) / Number(i.data["target"])) * 100);
                 return (
                   <li key={i.id}>
                     <div className="flex justify-between text-sm">
                       <span className="font-semibold text-foreground">{i.title}</span>
-                      <span className={`font-bold ${rate >= 100 ? "text-primary" : "text-destructive"}`}>{i.data.value ?? 0} / {i.data.target} {i.data.unit ?? ""}</span>
+                      <span className={`font-bold ${rate >= 100 ? "text-primary" : "text-destructive"}`}>{i.data["value"] ?? 0} / {i.data["target"]} {i.data["unit"] ?? ""}</span>
                     </div>
                     <div className="mt-1.5 h-2 rounded-full bg-secondary"><div className={`h-2 rounded-full ${rate >= 100 ? "bg-primary" : "bg-destructive/70"}`} style={{ width: `${Math.min(100, rate)}%` }} /></div>
                   </li>
