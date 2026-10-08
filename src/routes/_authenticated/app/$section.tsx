@@ -6,7 +6,8 @@ import {
 } from "@/components/app/CustomPages";
 import { InboxPage, MyActionsPage } from "@/components/app/Extras";
 import { DuerpView, GuideSection, ManagementConsolidation, ObjectivesGrid, ProcessReviewView, RisksView } from "@/components/app/GuidePages";
-import { ApplicationScopePage, ContextOrganisationPage, ManagementSystemPage, StakeholdersPage } from "@/components/app/OrganisationContextPages";
+import { ApplicationScopePage, ContextOrganisationPage, StakeholdersPage } from "@/components/app/OrganisationContextPages";
+import { ProcessDetailsPage, ProcessEditorPage, ProcessManagementPage } from "@/components/app/ProcessPages";
 import { CollaboratorsPage, JobDescriptionsPage, OrgChartPage, PolicyPage, ResponsibilitiesPage } from "@/components/app/LeadershipPages";
 
 const GUIDE: Record<string, { id: string; label: string; render: () => React.ReactNode }[]> = {
@@ -55,7 +56,7 @@ function SectionPage() {
     case "contexte": return <ContextOrganisationPage />;
     case "parties-interessees": return <StakeholdersPage />;
     case "perimetre": return <ApplicationScopePage />;
-    case "processus": return search.open || search.new ? <SectionView key="processus-editor" section={SECTIONS.processus!} openId={search.open} createNew={!!search.new} newKind={search.kind} originId={search.origin} /> : <ManagementSystemPage />;
+    case "processus": return search.new ? <ProcessEditorPage /> : search.open ? <ProcessDetailsPage processId={search.open} /> : <ProcessManagementPage />;
     case "politique": return <PolicyPage />;
     case "organigramme": return <OrgChartPage />;
     case "collaborateurs": return <CollaboratorsPage />;
