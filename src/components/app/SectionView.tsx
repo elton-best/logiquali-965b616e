@@ -308,15 +308,6 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
       </div>
 
 
-      {editing && (
-        <RecordForm
-          cfg={editing.cfg}
-          record={editing.record}
-          prefill={editing.prefill}
-          records={records}
-          onClose={() => { setEditing(null); clearSearch(); }}
-        />
-      )}
     </div>
   );
 }
