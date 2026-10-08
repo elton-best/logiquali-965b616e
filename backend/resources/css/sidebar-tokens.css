@@ -1,0 +1,70 @@
+/* ------------------------------------------------------------------
+ * Tokens sidebar LOGIQUALI — clair + sombre (darkMode: 'class').
+ * Vert principal #1A6B3C (charte QHSE), déclinaisons pour hover/actif.
+ * Utilisés via var(--color-*) dans sidebar.blade.php + layouts/app.blade.php.
+ * ------------------------------------------------------------------ */
+
+:root {
+  /* Vert marque (fond actif = bg-green texte blanc, highlight = bg-green/10). */
+  --color-green: #1a6b3c;
+  --color-green-dark: #14532d;
+  --color-green-light: #e6f2eb;
+
+  /* Accents. */
+  --color-gold: #c9a227;
+  --color-danger: #dc2626;
+
+  /* Surfaces clair. */
+  --color-card: #ffffff;
+  --color-border: #e5e7eb;
+  --color-surface-muted: #f3f4f6;
+  --color-foreground: #111827;
+  --color-muted-foreground: #6b7280;
+}
+
+/* Sombre : correspond aux variantes dark: de la sidebar. */
+.dark {
+  --color-green: #22a35a;
+  --color-green-dark: #166534;
+  --color-green-light: #052e16;
+
+  --color-gold: #e3c15d;
+  --color-danger: #f87171;
+
+  --color-card: #0f172a;
+  --color-border: #1e293b;
+  --color-surface-muted: #1e293b;
+  --color-foreground: #f8fafc;
+  --color-muted-foreground: #94a3b8;
+}
+
+/* États sidebar (complètent Tailwind, focus visibles pour a11y). */
+.sb-link-active {
+  background-color: var(--color-green) !important;
+  color: #fff !important;
+}
+
+.sb-link-highlight {
+  background-color: color-mix(in srgb, var(--color-green) 10%, transparent);
+  color: var(--color-green);
+}
+
+/* Tooltip mode réduit : caché par défaut, affiché au survol/focus. */
+.sb-tooltip {
+  white-space: nowrap;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-green);
+  outline-offset: 2px;
+}
+
+/* Scrollbar discrète de la nav. */
+#app-sidebar nav::-webkit-scrollbar {
+  width: 6px;
+}
+#app-sidebar nav::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-green) 25%, transparent);
+  border-radius: 9999px;
+}

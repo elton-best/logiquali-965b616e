@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table): void {
+            if (!Schema::hasColumn('users', 'signature_path')) {
+                $table->string('signature_path', 500)->nullable()->after('photo_path');
+            }
+
+            if (!Schema::hasColumn('users', 'signature_uploaded_at')) {
+                $table->timestamp('signature_uploaded_at')->nullable()->after('signature_path');
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table): void {
+            if (Schema::hasColumn('users', 'signature_uploaded_at')) {
+                $table->dropColumn('signature_uploaded_at');
+            }
+
+            if (Schema::hasColumn('users', 'signature_path')) {
+                $table->dropColumn('signature_path');
+            }
+        });
+    }
+};
+

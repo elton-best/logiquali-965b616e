@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Décision de Rejet Requise</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .actor-info {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .actor-info strong {
+            color: #c62828;
+        }
+
+        .document-card {
+            background-color: #fafafa;
+            border: 2px solid #f44336;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .document-card h3 {
+            color: #c62828;
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .document-info {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #efefef;
+            font-size: 14px;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .info-value {
+            color: #333;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .rejection-reason {
+            background-color: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .rejection-reason-title {
+            font-weight: 600;
+            color: #e65100;
+            margin-bottom: 8px;
+        }
+
+        .alert-box {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .alert-box strong {
+            color: #c62828;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+            color: white;
+            padding: 14px 40px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: opacity 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            opacity: 0.9;
+        }
+
+        .footer-text {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.8;
+            margin: 20px 0;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #efefef;
+            margin: 20px 0;
+        }
+
+        .footer {
+            background-color: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #efefef;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">❌</div>
+            <h1>Décision de Rejet Requise</h1>
+            <p>Votre action est requise</p>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="greeting">
+                <strong>Bonjour {{ $userName }},</strong>
+            </div>
+
+            <div class="actor-info">
+                👤 Le document <strong>{{ $documentTitle }}</strong> a été rejeté par <strong>{{ $actorName }}</strong>.
+            </div>
+
+            <!-- Document Card -->
+            <div class="document-card">
+                <h3>📄 Document Rejeté</h3>
+                <div class="document-info">
+                    <div class="info-row">
+                        <span class="info-label">Titre</span>
+                        <span class="info-value"><strong>{{ $documentTitle }}</strong></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Code</span>
+                        <span class="info-value">{{ $documentCode }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Version</span>
+                        <span class="info-value">{{ $documentVersion }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Rejeté le</span>
+                        <span class="info-value">{{ $rejectedAt }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rejection Reason -->
+            <div class="rejection-reason">
+                <div class="rejection-reason-title">💬 Motif du Rejet</div>
+                <p>{{ $rejectionReason }}</p>
+            </div>
+
+            <!-- Alert -->
+            <div class="alert-box">
+                🔴 Vous devez <strong>confirmer une action</strong> concernant le code de ce document :
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li><strong>Garder le code</strong> si vous souhaitez le réutiliser</li>
+                    <li><strong>Libérer le code</strong> si vous n'en avez plus besoin</li>
+                </ul>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="cta-section">
+                <a href="{{ $documentUrl }}" class="cta-button">🔄 Prendre une Décision</a>
+            </div>
+
+            <!-- Help Text -->
+            <div class="footer-text">
+                <strong>À l'accès du document, vous pourrez :</strong>
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Consulter les raisons du rejet en détail</li>
+                    <li>Créer une nouvelle version du document</li>
+                    <li>Décider si le code doit être gardé ou libéré</li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="footer-text">
+                Si vous avez besoin d'assistance ou de précisions sur ce rejet, contactez l'équipe qualité.
+            </div>
+
+            <p style="margin-top: 15px;">
+                Cordialement,<br>
+                <span class="logo-text">L'équipe LOGIQUALI</span>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+            <p>&copy; {{ date('Y') }} LOGIQUALI - Système de Gestion Documentaire. Tous droits réservés.</p>
+        </div>
+    </div>
+</body>
+</html>

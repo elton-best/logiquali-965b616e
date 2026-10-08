@@ -1,0 +1,57 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Sous-modules spécifiques ISO 14001
+        $iso14001SubModules = [
+            ['module_id' => 3, 'name' => 'Aspects environnementaux', 'code' => 'ASPECTS_ENV', 'icon' => 'mdi-leaf', 'order' => 10, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['module_id' => 3, 'name' => 'Conformité réglementaire environnementale', 'code' => 'CONF_ENV', 'icon' => 'mdi-file-check', 'order' => 11, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        ];
+
+        // Sous-modules spécifiques ISO 45001
+        $iso45001SubModules = [
+            ['module_id' => 3, 'name' => 'Identification des dangers SST', 'code' => 'DANGERS_SST', 'icon' => 'mdi-alert', 'order' => 12, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['module_id' => 3, 'name' => 'Évaluation des risques SST', 'code' => 'RISQUES_SST', 'icon' => 'mdi-shield-alert', 'order' => 13, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['module_id' => 6, 'name' => 'Surveillance santé travailleurs', 'code' => 'SURV_SANTE', 'icon' => 'mdi-heart-pulse', 'order' => 14, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        ];
+
+        // Sous-modules spécifiques ISO 27001
+        $iso27001SubModules = [
+            ['module_id' => 3, 'name' => 'Actifs informationnels', 'code' => 'ACTIFS_INFO', 'icon' => 'mdi-database', 'order' => 15, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['module_id' => 3, 'name' => 'Analyse de risques SI', 'code' => 'RISQUES_SI', 'icon' => 'mdi-security', 'order' => 16, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+            ['module_id' => 6, 'name' => 'Contrôles de sécurité', 'code' => 'CTRL_SEC', 'icon' => 'mdi-shield-lock', 'order' => 17, 'is_active' => true, 'created_at' => now(), 'updated_at' => now()],
+        ];
+
+        // Insérer sous-modules
+        foreach ($iso14001SubModules as $subModule) {
+            $id = DB::table('sub_modules')->insertGetId($subModule);
+            DB::table('norm_sub_module')->insert(['norm_id' => 2, 'sub_module_id' => $id, 'created_at' => now(), 'updated_at' => now()]);
+        }
+
+        foreach ($iso45001SubModules as $subModule) {
+            $id = DB::table('sub_modules')->insertGetId($subModule);
+            DB::table('norm_sub_module')->insert(['norm_id' => 3, 'sub_module_id' => $id, 'created_at' => now(), 'updated_at' => now()]);
+            DB::table('norm_sub_module')->insert(['norm_id' => 4, 'sub_module_id' => $id, 'created_at' => now(), 'updated_at' => now()]);
+        }
+
+        foreach ($iso27001SubModules as $subModule) {
+            $id = DB::table('sub_modules')->insertGetId($subModule);
+            DB::table('norm_sub_module')->insert(['norm_id' => 5, 'sub_module_id' => $id, 'created_at' => now(), 'updated_at' => now()]);
+        }
+    }
+
+    public function down(): void
+    {
+        $subModuleNames = [
+            'Aspects environnementaux', 'Conformité réglementaire environnementale',
+            'Identification des dangers SST', 'Évaluation des risques SST', 'Surveillance santé travailleurs',
+            'Actifs informationnels', 'Analyse de risques SI', 'Contrôles de sécurité'
+        ];
+        DB::table('sub_modules')->whereIn('name', $subModuleNames)->delete();
+    }
+};
