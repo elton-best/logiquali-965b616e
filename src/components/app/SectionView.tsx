@@ -11,7 +11,8 @@ import {
 import {
   historyOf, isOverdue, useAddNote, useDeleteRecord, useRecords, useSaveRecord, useSetStatus, useTransition, type QRecord,
 } from "@/hooks/use-records";
-import { useCurrentSite } from "@/hooks/use-workspace";
+import { computeWorkspace, useCurrentSite } from "@/hooks/use-workspace";
+import { DoubleScroll } from "./DoubleScroll";
 import { ColumnPicker, ExportPreview, useColumns } from "./Extras";
 
 /** Which kinds can spawn which follow-up records from the detail sheet. */
@@ -114,6 +115,8 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
   const detail = detailId ? byId.get(detailId) ?? null : null;
 
   const allOfKind = records.filter((r) => r.kind === cfg.kind && (!hasSiteField || !siteRecord || r.data["site_id"] === site));
+  const ORDER: Record<string, number> = { Management: 1, "Réalisation": 2, Support: 3 };
+  if (cfg.kind === "process") allOfKind.sort((a, b) => (ORDER[String(a.data["type"])] ?? 9) - (ORDER[String(b.data["type"])] ?? 9));
   const list = allOfKind.filter(
     (r) =>
       (statusFilter ? r.status === statusFilter : showArchived || r.status !== "Archivé") &&
@@ -261,7 +264,7 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
           </div>
         ) : (
           <>
-            <div className="hidden overflow-x-auto md:block"><table className="w-full text-sm">
+            <DoubleScroll className="hidden md:block"><table className="w-full text-sm">
               <thead className="border-b border-border bg-background text-left text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="sticky left-0 z-10 bg-background px-4 py-3">Réf.</th>
@@ -289,7 +292,7 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
                   </tr>
                 ))}
               </tbody>
-            </table></div>
+            </table></DoubleScroll>
             <ul className="divide-y divide-border md:hidden">
               {list.map((r) => (
                 <li key={r.id}>
@@ -660,18 +663,27 @@ function RecordForm({
   const [data, setData] = useState<QRecord["data"]>(() => ({ ...(cfg.fields.some((f) => f.key === "version") ? { version: "1.0" } : {}), ...(prefill ?? {}), ...(record?.data ?? {}) }));
   const [error, setError] = useState("");
   const status = record?.status ?? cfg.statuses[0]?.value ?? "";
+  const activeNorms = useMemo(() => [...computeWorkspace(records, null).active], [records]);
+  const multiNorm = activeNorms.length >= 2 && cfg.kind !== "norm";
+  const fields = cfg.fields.filter((f) => !(f.key === "norm" && f.type === "select"));
+  const chosenNorms: string[] = Array.isArray(data["norms"]) ? (data["norms"] as string[]) : data["norm"] ? [String(data["norm"])] : [];
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) { setError(`${cfg.titleLabel} est obligatoire.`); return; }
-    for (const f of cfg.fields) {
+    let payload = data;
+    if (multiNorm) {
+      if (chosenNorms.length === 0) { setError("Sélectionnez au moins une norme concernée."); return; }
+      payload = { ...data, norms: chosenNorms, norm: chosenNorms.join(", ") };
+    } else if (activeNorms.length === 1) payload = { ...data, norms: activeNorms, norm: activeNorms[0] };
+    for (const f of fields) {
       if (f.required && (data[f.key] === undefined || data[f.key] === null || data[f.key] === "")) { setError(`${f.label} est obligatoire.`); return; }
     }
     const dup = records.find((r) => r.kind === cfg.kind && r.id !== record?.id && r.title.trim().toLowerCase() === title.trim().toLowerCase() && r.status !== "Archivé");
     if (dup && !confirm(`Un élément « ${dup.title} » (${dup.reference}) existe déjà. Enregistrer quand même ?`)) return;
     setError("");
     try {
-      await save.mutateAsync({ id: record?.id, kind: cfg.kind, title: title.trim(), status, data, previous: record });
+      await save.mutateAsync({ id: record?.id, kind: cfg.kind, title: title.trim(), status, data: payload, previous: record });
       onClose();
     } catch {
       setError("L'enregistrement a échoué. Vos saisies sont conservées, réessayez.");
@@ -693,7 +705,21 @@ function RecordForm({
             <span className="mb-1.5 block text-xs font-bold text-muted-foreground">{cfg.titleLabel} *</span>
             <input className={input} value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
           </label>
-          {cfg.fields.map((f) => {
+          {multiNorm && (
+            <fieldset className="rounded-xl border border-border p-3">
+              <legend className="px-1 text-xs font-bold text-muted-foreground">Normes concernées *</legend>
+              <div className="flex flex-wrap gap-3">
+                {activeNorms.map((n) => (
+                  <label key={n} className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="h-4 w-4 accent-primary" checked={chosenNorms.includes(n)}
+                      onChange={(e) => setData((d) => ({ ...d, norms: e.target.checked ? [...chosenNorms, n] : chosenNorms.filter((x) => x !== n) }))} />
+                    {n}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )}
+          {fields.map((f) => {
             const val = data[f.key] ?? "";
             const set = (v: string) => setData((d) => ({ ...d, [f.key]: f.type === "number" ? (v === "" ? null : Number(v)) : v }));
             return (
