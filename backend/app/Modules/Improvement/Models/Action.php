@@ -163,6 +163,14 @@ class Action extends Model
         return $this->initiator;
     }
 
+    /**
+     * Alias for deadline (used in legacy notification and UI code)
+     */
+    public function getDeadlineDateAttribute()
+    {
+        return $this->deadline;
+    }
+
     public function actionables(): MorphToMany
     {
         return $this->morphedByMany('*', 'actionable');

@@ -99,7 +99,10 @@ class OperationalPlanningController extends Controller
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',
             'progress' => 'nullable|integer|min:0|max:100',
+            'process_id' => 'nullable|exists:processes,id',
             'project_manager_id' => 'nullable|exists:users,id',
+            'team_user_ids' => 'nullable|array',
+            'team_user_ids.*' => 'exists:users,id',
             'release_notes' => 'nullable|string|max:2000',
         ]);
 
@@ -108,7 +111,7 @@ class OperationalPlanningController extends Controller
         $validated['created_by'] = $user->id;
         $validated['updated_by'] = $user->id;
 
-        $project = OperationalProject::create($validated)->load('projectManager:id,name,email', 'site:id,name');
+        $project = OperationalProject::create($validated)->load('projectManager:id,name,email', 'process:id,title,code', 'site:id,name');
 
         return response()->json(['data' => $project], 201);
     }
@@ -132,12 +135,16 @@ class OperationalPlanningController extends Controller
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date',
             'progress' => 'nullable|integer|min:0|max:100',
+            'process_id' => 'nullable|exists:processes,id',
             'project_manager_id' => 'nullable|exists:users,id',
+            'team_user_ids' => 'nullable|array',
+            'team_user_ids.*' => 'exists:users,id',
             'release_notes' => 'nullable|string|max:2000',
         ]);
 
         $validated['updated_by'] = $request->user()->id;
         $project->update($validated);
+        $project->load('projectManager:id,name,email', 'process:id,title,code', 'site:id,name');
 
         return response()->json(['data' => $project->fresh()->load('projectManager:id,name,email', 'site:id,name')]);
     }

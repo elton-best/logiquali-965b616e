@@ -84,7 +84,11 @@ Route::get('sm-plan/export-xlsx', [SmPlanHierarchicalController::class, 'exportX
 // Vue calendrier global du plan SM
 Route::get('/plan-sm', [PlanSMController::class, 'index']);
 
-// Demandes de modifications du SM
+// Demandes de modifications du SM (Brouillon -> RQ -> CEO - REQ-6.3-01..05)
+Route::post('modifications/{id}/submit-verification', [ModificationController::class, 'submitForVerification']);
+Route::post('modifications/{id}/verify-rq', [ModificationController::class, 'verifyByRq']);
+Route::post('modifications/{id}/approve-ceo', [ModificationController::class, 'approveByCeo']);
+Route::post('modifications/{id}/record-results', [ModificationController::class, 'recordResults']);
 Route::apiResource('modifications', ModificationController::class);
 Route::get('plans/export-xlsx', [PlanController::class, 'exportXlsx']);
 Route::apiResource('plans', PlanController::class);

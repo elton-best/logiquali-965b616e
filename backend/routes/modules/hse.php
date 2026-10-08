@@ -13,6 +13,8 @@ use App\Modules\Hse\Controllers\IpeController;
 use App\Modules\Hse\Controllers\ComplianceObligationAspectController;
 use App\Modules\Hse\Controllers\ComplianceObligationController;
 use App\Modules\Hse\Controllers\ApplicableRequirementController;
+use App\Modules\Hse\Controllers\WorkAccidentController;
+use App\Modules\Hse\Controllers\EmergencyProcedureController;
 
 // ============================================================
 // MODULE HSE & NORMES ASSOCIÉES (ISO 14001, ISO 45001, ISO 50001)
@@ -43,6 +45,15 @@ Route::post('duerp/{id}/dangers', [DuerpController::class, 'storeDanger']);
 Route::put('duerp/{id}/dangers/{dangerId}', [DuerpController::class, 'updateDanger']);
 Route::delete('duerp/{id}/dangers/{dangerId}', [DuerpController::class, 'destroyDanger']);
 Route::apiResource('duerp', DuerpController::class);
+
+// Accidents & Incidents SST (ISO 45001 - REQ-6.1-D08 / REQ-6.1-D09)
+Route::get('work-accidents/statistics', [WorkAccidentController::class, 'statistics']);
+Route::post('work-accidents/{id}/close', [WorkAccidentController::class, 'close']);
+Route::apiResource('work-accidents', WorkAccidentController::class);
+
+// Situations d'urgence & simulations (ISO 45001 / ISO 14001 - REQ-8.2-01 / REQ-8.2-02)
+Route::post('emergency-procedures/{id}/record-drill', [EmergencyProcedureController::class, 'recordDrill']);
+Route::apiResource('emergency-procedures', EmergencyProcedureController::class);
 
 // Habilitations
 Route::get('habilitations/expires-soon', [HabilitationController::class, 'expiresSoon']);

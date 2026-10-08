@@ -44,6 +44,8 @@ Route::prefix('reclamations')->group(function () {
 });
 
 // --- Actions correctives & d'amélioration ---
+Route::get('my-actions', [ActionController::class, 'myActions']);
+Route::get('actions/my-actions', [ActionController::class, 'myActions']);
 Route::get('actions/templates/plan', [ActionController::class, 'downloadPlanTemplate']);
 Route::post('actions/import-plan', [ActionController::class, 'importPlan']);
 Route::prefix('actions')->group(function () {

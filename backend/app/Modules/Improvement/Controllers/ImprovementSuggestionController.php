@@ -162,13 +162,31 @@ class ImprovementSuggestionController extends Controller
         ]);
 
         $status = $validated['decision'] === 'approved' ? 'in_progress' : 'rejected';
+        $assignedTo = $validated['assigned_to'] ?? $suggestion->assigned_to;
 
         $suggestion->update([
             'status' => $status,
-            'assigned_to' => $validated['assigned_to'] ?? $suggestion->assigned_to,
+            'assigned_to' => $assignedTo,
             'validation_comment' => $validated['validation_comment'] ?? null,
             'follow_up' => $validated['validation_comment'] ? ($suggestion->follow_up ? $suggestion->follow_up . "\n" . $validated['validation_comment'] : $validated['validation_comment']) : $suggestion->follow_up,
         ]);
+
+        // REQ-10-01 : Dès que validée, l'action est enregistrée dans le système et assignée
+        if ($validated['decision'] === 'approved' && $assignedTo) {
+            \App\Models\Action::create([
+                'enterprise_id' => $suggestion->site?->enterprise_id ?? $user?->enterprise_id,
+                'site_id' => $suggestion->site_id,
+                'process_id' => $suggestion->process_id,
+                'type' => 'improvement',
+                'title' => 'Suggestion d\'amélioration : ' . $suggestion->title,
+                'description' => $suggestion->description,
+                'source' => 'suggestion',
+                'initiator_id' => $suggestion->proposer_id ?? $user?->id,
+                'responsible_id' => $assignedTo,
+                'deadline' => now()->addDays(30),
+                'status' => 'planned',
+            ]);
+        }
 
         return response()->json($suggestion->load(['site', 'process', 'proposer', 'assignee']));
     }

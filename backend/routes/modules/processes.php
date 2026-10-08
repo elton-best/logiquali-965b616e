@@ -43,6 +43,7 @@ Route::prefix('processes/{process}/reviews')->group(function () {
     Route::post('current/linked-data/actions', [ProcessReviewController::class, 'createLinkedAction']);
     Route::put('current', [ProcessReviewController::class, 'upsertCurrent']);
     Route::post('current/close', [ProcessReviewController::class, 'closeCurrent']);
+    Route::post('current/submit-suggestions', [ProcessReviewController::class, 'submitSuggestionsToRq']);
     Route::get('current/export-pdf', [ProcessReviewController::class, 'exportCurrentPdf']);
     Route::get('current/export-docx', [ProcessReviewController::class, 'exportCurrentDocx']);
 });

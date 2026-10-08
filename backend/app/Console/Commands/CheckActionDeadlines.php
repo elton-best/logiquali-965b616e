@@ -33,32 +33,37 @@ class CheckActionDeadlines extends Command
 
         $now = Carbon::now();
         
-        // Actions avec échéance dans 3 jours (et pas encore complétées)
-        $approachingActions = Action::where('status', '!=', 'completed')
-            ->whereNotNull('deadline_date')
-            ->whereDate('deadline_date', '>=', $now)
-            ->whereDate('deadline_date', '<=', $now->copy()->addDays(3))
+        // Actions avec échéance dans les 7 jours (cadence J-7, J-3, J-1)
+        $approachingActions = Action::whereNotIn('status', ['completed', 'verified', 'cancelled'])
+            ->whereNotNull('deadline')
+            ->whereDate('deadline', '>=', $now)
+            ->whereDate('deadline', '<=', $now->copy()->addDays(7))
             ->get();
 
         foreach ($approachingActions as $action) {
-            $daysRemaining = $now->diffInDays($action->deadline_date, false);
+            $deadline = $action->deadline ? Carbon::parse($action->deadline) : null;
+            if (!$deadline) continue;
             
-            if ($daysRemaining >= 0 && $daysRemaining <= 3) {
-                event(new ActionDeadlineApproaching($action, (int)$daysRemaining));
+            $daysRemaining = (int) $now->diffInDays($deadline, false);
+            
+            // Alerter aux paliers clés : 7 jours, 3 jours, 1 jour, et jour J
+            if (in_array($daysRemaining, [7, 3, 1, 0], true)) {
+                event(new ActionDeadlineApproaching($action, $daysRemaining));
                 $this->line("⚠️  Deadline approaching: {$action->title} ({$daysRemaining} days)");
             }
         }
 
         // Actions en retard
-        $overdueActions = Action::where('status', '!=', 'completed')
-            ->whereNotNull('deadline_date')
-            ->whereDate('deadline_date', '<', $now)
+        $overdueActions = Action::whereNotIn('status', ['completed', 'verified', 'cancelled'])
+            ->whereNotNull('deadline')
+            ->whereDate('deadline', '<', $now)
             ->get();
 
         foreach ($overdueActions as $action) {
-            $daysOverdue = abs($now->diffInDays($action->deadline_date, false));
+            $deadline = $action->deadline ? Carbon::parse($action->deadline) : null;
+            $daysOverdue = $deadline ? abs((int) $now->diffInDays($deadline, false)) : 1;
             
-            event(new ActionOverdue($action, (int)$daysOverdue));
+            event(new ActionOverdue($action, $daysOverdue));
             $this->line("🔴 Overdue: {$action->title} ({$daysOverdue} days late)");
         }
 

@@ -14,8 +14,12 @@ class EmergencyProcedure extends Model
     protected $fillable = [
         'enterprise_id',
         'site_id',
+        'responsible_id',
         'emergency_type',
         'title',
+        'measures',
+        'deadline',
+        'status',
         'procedure_steps',
         'emergency_contacts',
         'required_equipment',
@@ -23,10 +27,12 @@ class EmergencyProcedure extends Model
         'trained_users',
         'last_drill_date',
         'next_drill_date',
+        'drill_report',
         'document_path',
     ];
 
     protected $casts = [
+        'deadline' => 'date',
         'procedure_steps' => 'array',
         'emergency_contacts' => 'array',
         'required_equipment' => 'array',
@@ -44,5 +50,10 @@ class EmergencyProcedure extends Model
     public function site()
     {
         return $this->belongsTo(Site::class);
+    }
+
+    public function responsible()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'responsible_id');
     }
 }

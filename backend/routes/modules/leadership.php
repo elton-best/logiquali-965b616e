@@ -32,10 +32,12 @@ Route::post('org-chart/upload', [OrgChartController::class, 'upload']);
 Route::get('org-chart/current', [OrgChartController::class, 'current']);
 Route::delete('org-chart/{id}', [OrgChartController::class, 'destroy']);
 
-// Fiches de poste (§5.3 / §7.2)
-Route::apiResource('job-descriptions', JobDescriptionController::class);
+// Fiches de poste (§5.3 / §7.2 - Double signature REQ-7.2-03)
+Route::post('job-descriptions/{id}/sign-employee', [JobDescriptionController::class, 'signEmployee']);
+Route::post('job-descriptions/{id}/sign-ceo', [JobDescriptionController::class, 'signCeo']);
 Route::get('job-descriptions/{jobDescription}/pdf', [JobDescriptionController::class, 'downloadPdf']);
 Route::post('job-descriptions/{jobDescription}/generate-draft', [JobDescriptionController::class, 'generateDraftDocx']);
+Route::apiResource('job-descriptions', JobDescriptionController::class);
 
 // Import Fiches de poste
 Route::prefix('job-descriptions/import')->group(function () {

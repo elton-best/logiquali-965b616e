@@ -21,6 +21,53 @@ class ActionController extends Controller
     {
     }
 
+    /**
+     * Menu "Mes actions" sur le tableau de bord (RT-13 / REQ-8.7-03).
+     * Retourne les actions de l'utilisateur connecté triées par échéance
+     * avec filtres par statut et métriques récapitulatives.
+     */
+    public function myActions(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $query = Action::with(['responsible', 'planAction', 'workflowState', 'axes', 'process:id,title,code'])
+            ->where('responsible_id', (int) $user->id);
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->string('status'));
+        }
+
+        if ($request->filled('process_id')) {
+            $query->where('process_id', $request->integer('process_id'));
+        }
+
+        if ($request->filled('priority')) {
+            $query->where('priority', $request->string('priority'));
+        }
+
+        $actions = $query->orderByRaw("CASE WHEN status IN ('completed', 'verified', 'cancelled') THEN 1 ELSE 0 END")
+            ->orderBy('deadline', 'asc')
+            ->paginate($request->integer('per_page', 25));
+
+        // Statistiques pour les filtres cliquables (RT-08)
+        $counts = [
+            'total' => Action::where('responsible_id', $user->id)->count(),
+            'planned' => Action::where('responsible_id', $user->id)->where('status', 'planned')->count(),
+            'in_progress' => Action::where('responsible_id', $user->id)->where('status', 'in_progress')->count(),
+            'overdue' => Action::where('responsible_id', $user->id)->whereNotIn('status', ['completed', 'verified', 'cancelled'])->whereNotNull('deadline')->whereDate('deadline', '<', now())->count(),
+            'completed' => Action::where('responsible_id', $user->id)->whereIn('status', ['completed', 'verified'])->count(),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'counts' => $counts,
+            'data' => $actions,
+        ]);
+    }
+
     public function index(Request $request): JsonResponse
     {
         $this->authorize('viewAny', Action::class);

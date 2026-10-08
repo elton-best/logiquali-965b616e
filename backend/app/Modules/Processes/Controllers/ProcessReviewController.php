@@ -153,6 +153,22 @@ class ProcessReviewController extends Controller
             ], 422);
         }
 
+        // REQ-9.2-09 : Vérifier les actions en retard non replanifiées
+        $pendingOverdueActions = Action::where('process_id', $process->id)
+            ->whereNotIn('status', ['completed', 'verified', 'cancelled'])
+            ->whereNotNull('deadline')
+            ->whereDate('deadline', '<', now())
+            ->whereNull('m7_d4_traceability->replan_decision')
+            ->count();
+
+        if ($pendingOverdueActions > 0 && !$request->boolean('force_close')) {
+            return response()->json([
+                'success' => false,
+                'message' => "Impossible de clôturer la revue : {$pendingOverdueActions} action(s) en retard n'ont pas encore fait l'objet d'une décision de replanification (REQ-9.2-09). Veuillez statuer sur ces actions ou confirmer avec force_close=true.",
+                'pending_overdue_count' => $pendingOverdueActions,
+            ], 422);
+        }
+
         $review->update([
             'status' => ProcessReview::STATUS_COMPLETED,
             'ended_at' => now(),
@@ -172,6 +188,44 @@ class ProcessReviewController extends Controller
                 'computed_metrics',
                 $this->computeMetrics($process)
             )->setAttribute('capabilities', $this->buildCapabilities($process, $user)),
+        ]);
+    }
+
+    /**
+     * Soumission des suggestions d'amélioration de la revue au RQ pour validation (REQ-9.2-11).
+     */
+    public function submitSuggestionsToRq(Request $request, Process $process): JsonResponse
+    {
+        $user = Auth::user();
+        $this->ensureAccess($process, $user, 'update');
+
+        $validated = $request->validate([
+            'suggestions' => ['required', 'array', 'min:1'],
+            'suggestions.*.title' => ['required', 'string', 'max:255'],
+            'suggestions.*.description' => ['required', 'string'],
+            'suggestions.*.normes' => ['nullable', 'array'],
+            'suggestions.*.assigned_to' => ['nullable', 'exists:users,id'],
+        ]);
+
+        $createdSuggestions = [];
+        foreach ($validated['suggestions'] as $item) {
+            $createdSuggestions[] = \App\Models\ImprovementSuggestion::create([
+                'site_id' => $process->site_id,
+                'process_id' => $process->id,
+                'proposer_id' => $user->id,
+                'assigned_to' => $item['assigned_to'] ?? null,
+                'title' => $item['title'],
+                'description' => $item['description'],
+                'normes' => $item['normes'] ?? $process->normes_iso ?? [],
+                'status' => 'pending', // Soumis au RQ
+                'proposed_at' => now()->toDateString(),
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => count($createdSuggestions) . ' suggestion(s) soumise(s) avec succès au Responsable Qualité (RQ).',
+            'data' => $createdSuggestions,
         ]);
     }
 
