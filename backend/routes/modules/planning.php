@@ -9,11 +9,18 @@ use App\Modules\Planning\Controllers\SmPlanHierarchicalController;
 use App\Modules\Planning\Controllers\OperationalPlanningController;
 use App\Modules\Planning\Controllers\PlanSMController;
 use App\Modules\Planning\Controllers\ModificationController;
+use App\Modules\Planning\Controllers\MethodologyGuideController;
 use App\Modules\Improvement\Controllers\PlanController;
 
 // ============================================================
 // CHAPITRE 6 : PLANIFICATION & GESTION DES RISQUES
 // ============================================================
+
+// --- Guides d'utilisation & Matrices méthodologiques (ISO 9001 / ISO 14001 / ISO 45001) ---
+Route::get('methodology-guides', [MethodologyGuideController::class, 'index']);
+Route::get('methodology-guides/{section}', [MethodologyGuideController::class, 'show']);
+Route::get('methodology/matrices', [MethodologyGuideController::class, 'index']);
+Route::get('methodology/matrices/{section}', [MethodologyGuideController::class, 'show']);
 
 // --- 6.1 Risques & Opportunités ---
 Route::post('processes/{process}/risks-opportunities', [ProcessController::class, 'addRiskOpportunity']);

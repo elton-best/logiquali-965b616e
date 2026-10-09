@@ -2394,4 +2394,26 @@ class ProcessController extends Controller
             'message' => 'Processus rejeté et retourné en brouillon',
         ]);
     }
+
+    /**
+     * GET /api/v1/system-settings
+     * Expose configuration and active ISO standards for the site/enterprise
+     */
+    public function systemSettings(Request $request): JsonResponse
+    {
+        $siteId = $request->integer('site_id') ?: Auth::user()?->site_id;
+
+        $settings = [
+            'smq_type' => \App\Models\SystemSetting::get('smq_type', $siteId, 'smq'),
+            'iso_9001_enabled' => (bool) \App\Models\SystemSetting::get('iso_9001_enabled', $siteId, true),
+            'iso_14001_enabled' => (bool) \App\Models\SystemSetting::get('iso_14001_enabled', $siteId, false),
+            'iso_45001_enabled' => (bool) \App\Models\SystemSetting::get('iso_45001_enabled', $siteId, false),
+            'iso_50001_enabled' => (bool) \App\Models\SystemSetting::get('iso_50001_enabled', $siteId, false),
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => $settings,
+        ]);
+    }
 }
