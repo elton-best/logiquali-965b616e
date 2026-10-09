@@ -36,15 +36,35 @@ Route::apiResource('obligations-conformite-environnementales', ObligationConform
 ]);
 
 // --- 2. ISO 45001 : Santé & Sécurité au Travail (DUERP, Habilitations, EPI, VGP) ---
-// DUERP & Dangers (Canevas INRS)
-Route::get('duerp/inrs-families', [DuerpController::class, 'inrsFamilies']);
+// DUERP & Dangers (Canevas INRS & Dynamique)
+Route::get('duerp/inrs-families', [DuerpController::class, 'riskFamilies']);
 Route::get('duerp/export-xlsx', [DuerpController::class, 'exportXlsx']);
+Route::get('duerp/{id}/tree', [DuerpController::class, 'tree']);
+Route::post('duerp/{id}/submit', [DuerpController::class, 'submitForVerification']);
 Route::post('duerp/{id}/submit-verification', [DuerpController::class, 'submitForVerification']);
 Route::post('duerp/{id}/approve', [DuerpController::class, 'approveByCeo']);
+Route::post('duerp/{id}/reject', [DuerpController::class, 'reject']);
 Route::post('duerp/{id}/dangers', [DuerpController::class, 'storeDanger']);
 Route::put('duerp/{id}/dangers/{dangerId}', [DuerpController::class, 'updateDanger']);
 Route::delete('duerp/{id}/dangers/{dangerId}', [DuerpController::class, 'destroyDanger']);
 Route::apiResource('duerp', DuerpController::class);
+
+// Types / Familles de risques personnalisables
+Route::get('duerp-risk-families', [DuerpController::class, 'riskFamilies']);
+Route::post('duerp-risk-families', [DuerpController::class, 'storeRiskFamily']);
+Route::put('duerp-risk-families/{id}', [DuerpController::class, 'updateRiskFamily']);
+Route::delete('duerp-risk-families/{id}', [DuerpController::class, 'destroyRiskFamily']);
+
+// Échelles de cotation dynamiques (Gravité & Fréquence)
+Route::get('duerp-scoring-scales', [DuerpController::class, 'scoringScales']);
+Route::post('duerp-scoring-scales', [DuerpController::class, 'updateScoringScales']);
+Route::put('duerp-scoring-scales', [DuerpController::class, 'updateScoringScales']);
+
+// Unités de travail (Work Units)
+Route::get('duerp-work-units', [DuerpController::class, 'workUnits']);
+Route::post('duerp-work-units', [DuerpController::class, 'storeWorkUnit']);
+Route::put('duerp-work-units/{id}', [DuerpController::class, 'updateWorkUnit']);
+Route::delete('duerp-work-units/{id}', [DuerpController::class, 'destroyWorkUnit']);
 
 // Accidents & Incidents SST (ISO 45001 - REQ-6.1-D08 / REQ-6.1-D09)
 Route::get('work-accidents/statistics', [WorkAccidentController::class, 'statistics']);
