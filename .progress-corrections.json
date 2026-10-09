@@ -1,0 +1,21 @@
+{
+  "phase1": {
+    "task1.1": false,
+    "task1.2": false,
+    "task1.3": false
+  },
+  "phase2": {
+    "task2.1": false,
+    "task2.2": false
+  },
+  "phase3": {
+    "task3.1": false,
+    "task3.2": false
+  },
+  "phase4": {
+    "task4.1": false,
+    "task4.2": false,
+    "task4.3": false,
+    "task4.4": false
+  }
+}

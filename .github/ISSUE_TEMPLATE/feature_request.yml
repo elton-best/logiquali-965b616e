@@ -1,0 +1,32 @@
+name: ✨ Feature Request
+description: Proposer une nouvelle fonctionnalité
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 🎯 Problème / Besoin
+      description: Quel problème cette fonctionnalité résout-elle ?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 💡 Solution Proposée
+      description: Comment imaginez-vous cette fonctionnalité ?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: ⭐ Priorité
+      options:
+        - 🔴 Critique
+        - 🟠 Haute
+        - 🟡 Moyenne
+        - 🟢 Basse
+    validations:
+      required: true

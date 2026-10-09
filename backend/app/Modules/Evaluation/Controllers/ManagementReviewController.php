@@ -109,20 +109,39 @@ class ManagementReviewController extends Controller
             'm12_d3_traceability' => 'nullable|array',
             'decisions' => 'nullable|array',
             'action_items' => 'nullable|array',
+            'input_data' => 'nullable|array',
+            'output_decisions' => 'nullable|array',
+            'resources_data' => 'nullable|array',
+            'resources_data.synthese_observations' => 'nullable|string',
+            'resources_data.decision_action' => 'nullable|string',
+            'resources_data.responsable' => 'nullable|string',
+            'resources_data.responsable_id' => 'nullable|integer',
+            'resources_data.delai' => 'nullable|string',
+            'system_changes_data' => 'nullable|array',
+            'system_changes_data.besoins_changements_systeme' => 'nullable|array',
+            'system_changes_data.autres_besoins_changements_systeme' => 'nullable|array',
             'report_path' => 'nullable|string',
-            'status' => 'required|in:planned,in_progress,completed,reported',
+            'status' => 'nullable|in:planned,in_progress,completed,reported',
         ]);
+
+        if (!empty($validated['resources_data']['synthese_observations']) && empty($validated['resources_adequacy'])) {
+            $validated['resources_adequacy'] = $validated['resources_data']['synthese_observations'];
+        }
+
+        if (empty($validated['status'])) {
+            $validated['status'] = 'planned';
+        }
 
         $review = ManagementReview::create($validated);
 
-        return new ManagementReviewResource($review->load(['site', 'chairman']));
+        return new ManagementReviewResource($review->load(['site', 'chairman', 'openedBy', 'closedBy']));
     }
 
     public function show(ManagementReview $managementReview)
     {
         $this->ensureAccessible($managementReview, request()->user());
 
-        return new ManagementReviewResource($managementReview->load(['site', 'chairman']));
+        return new ManagementReviewResource($managementReview->load(['site', 'chairman', 'openedBy', 'closedBy']));
     }
 
     public function update(Request $request, ManagementReview $managementReview)
@@ -157,13 +176,28 @@ class ManagementReviewController extends Controller
             'm12_d3_traceability' => 'nullable|array',
             'decisions' => 'nullable|array',
             'action_items' => 'nullable|array',
+            'input_data' => 'nullable|array',
+            'output_decisions' => 'nullable|array',
+            'resources_data' => 'nullable|array',
+            'resources_data.synthese_observations' => 'nullable|string',
+            'resources_data.decision_action' => 'nullable|string',
+            'resources_data.responsable' => 'nullable|string',
+            'resources_data.responsable_id' => 'nullable|integer',
+            'resources_data.delai' => 'nullable|string',
+            'system_changes_data' => 'nullable|array',
+            'system_changes_data.besoins_changements_systeme' => 'nullable|array',
+            'system_changes_data.autres_besoins_changements_systeme' => 'nullable|array',
             'report_path' => 'nullable|string',
             'status' => 'sometimes|in:planned,in_progress,completed,reported',
         ]);
 
+        if (!empty($validated['resources_data']['synthese_observations']) && empty($validated['resources_adequacy'])) {
+            $validated['resources_adequacy'] = $validated['resources_data']['synthese_observations'];
+        }
+
         $managementReview->update($validated);
 
-        return new ManagementReviewResource($managementReview->load(['site', 'chairman']));
+        return new ManagementReviewResource($managementReview->fresh()->load(['site', 'chairman', 'openedBy', 'closedBy']));
     }
 
     public function destroy(ManagementReview $managementReview)
@@ -175,13 +209,63 @@ class ManagementReviewController extends Controller
     }
 
     /**
-     * Close review and generate report automatically.
+     * Ouverture formelle de la revue de direction (réservée au RQ, CEO / Direction ou sur permission).
+     */
+    public function open(Request $request, ManagementReview $managementReview)
+    {
+        $user = $request->user();
+        $this->ensureAccessible($managementReview, $user);
+
+        if (!$this->canManageReviewLifecycle($user, $managementReview, 'open')) {
+            return response()->json([
+                'message' => 'Action non autorisée. Seul le Responsable Qualité (RQ), la Direction Générale (CEO) ou un utilisateur avec permission dédiée peut ouvrir la revue de direction.',
+            ], 403);
+        }
+
+        if ($managementReview->status === 'completed') {
+            return response()->json([
+                'message' => 'Cette revue de direction est déjà clôturée.',
+            ], 422);
+        }
+
+        $traceability = is_array($managementReview->m12_d2_traceability)
+            ? $managementReview->m12_d2_traceability
+            : [];
+
+        $traceability[] = [
+            'event' => 'review_opened',
+            'opened_at' => now()->toISOString(),
+            'opened_by' => $user->id,
+            'opened_by_name' => $user->name ?? $user->full_name ?? $user->username,
+        ];
+
+        $managementReview->update([
+            'status' => 'in_progress',
+            'actual_date' => $managementReview->actual_date ?? now()->toDateString(),
+            'opened_at' => $managementReview->opened_at ?? now(),
+            'opened_by_user_id' => $managementReview->opened_by_user_id ?? $user->id,
+            'm12_d2_traceability' => $traceability,
+        ]);
+
+        return new ManagementReviewResource($managementReview->fresh()->load(['site', 'chairman', 'openedBy', 'closedBy']));
+    }
+
+    /**
+     * Clôture formelle de la revue de direction (réservée au RQ, CEO / Direction ou sur permission).
+     * Génère automatiquement le rapport officiel DOCX.
      */
     public function close(Request $request, ManagementReview $managementReview)
     {
-        $this->ensureAccessible($managementReview, $request->user());
+        $user = $request->user();
+        $this->ensureAccessible($managementReview, $user);
 
-        $generator = new \App\Services\ManagementReviewDocxGenerator;
+        if (!$this->canManageReviewLifecycle($user, $managementReview, 'close')) {
+            return response()->json([
+                'message' => 'Action non autorisée. Seul le Responsable Qualité (RQ), la Direction Générale (CEO) ou un utilisateur avec permission dédiée peut clôturer la revue de direction.',
+            ], 403);
+        }
+
+        $generator = new \App\Modules\Evaluation\Services\ManagementReviewDocxGenerator;
         $temporaryPath = $generator->generateReport($managementReview);
 
         $targetPath = sprintf(
@@ -209,19 +293,21 @@ class ManagementReviewController extends Controller
         $traceability[] = [
             'event' => 'review_closed_auto_report_generated',
             'generated_at' => now()->toISOString(),
-            'generated_by' => $request->user()?->id,
+            'generated_by' => $user->id,
             'report_path' => $targetPath,
         ];
 
         $managementReview->update([
             'status' => 'completed',
             'actual_date' => $managementReview->actual_date ?? now()->toDateString(),
+            'closed_at' => now(),
+            'closed_by_user_id' => $user->id,
             'report_path' => $targetPath,
             'generated_at' => now(),
             'm12_d2_traceability' => $traceability,
         ]);
 
-        return new ManagementReviewResource($managementReview->fresh()->load(['site', 'chairman']));
+        return new ManagementReviewResource($managementReview->fresh()->load(['site', 'chairman', 'openedBy', 'closedBy']));
     }
 
     /**
@@ -717,6 +803,15 @@ class ManagementReviewController extends Controller
             })
             ->count();
 
+        $ncTotal = count($generated['nonconformities']);
+        $auditTotal = count($generated['audits']);
+        $actionTotal = count($generated['actions']);
+        $actionsRealisees = collect($generated['actions'])->filter(function ($act) {
+            $st = strtolower((string) ($act['status'] ?? ''));
+            return in_array($st, ['completed', 'verified', 'closed'], true)
+                || (float) ($act['progress_percentage'] ?? $act['progress'] ?? 0) >= 100;
+        })->count();
+
         $contextScore = trim((string) ($contextChanges ?? '')) !== '' ? 100 : 0;
         $c1Score = max(0, min(100, round($customerAvg, 2)));
         $c2Score = $objectiveTotal > 0 ? round(($objectiveAchieved / $objectiveTotal) * 100, 2) : 0;
@@ -727,25 +822,46 @@ class ManagementReviewController extends Controller
 
         return [
             'site_id' => $siteId,
-            'iso_clause' => 'ISO 9001:2015 - 9.3.2',
+            'iso_clause' => 'ISO 9001:2015 - 9.3.2 / 9.3.3',
             'generated_at' => now()->toISOString(),
             'period' => [
                 'from' => $since->toDateString(),
                 'to' => now()->toDateString(),
             ],
             'entries' => [
+                'a' => [
+                    'title' => 'a) État d’avancement des actions des revues précédentes',
+                    'summary' => sprintf('%d action(s) traitée(s)/réalisée(s) sur un total de %d action(s) suivie(s).', $actionsRealisees, $actionTotal),
+                    'synthese_observations' => sprintf('%d action(s) traitée(s)/réalisée(s) sur un total de %d action(s) suivie(s) sur la période.', $actionsRealisees, $actionTotal),
+                    'decision_action' => 'Poursuivre la mise en œuvre et le bouclage des actions prioritaires restantes.',
+                    'responsable' => 'Responsable Qualité',
+                    'delai' => null,
+                    'score_percent' => $actionTotal > 0 ? round(($actionsRealisees / $actionTotal) * 100, 1) : 100,
+                    'metrics' => [
+                        'actions_total' => $actionTotal,
+                        'actions_realisees' => $actionsRealisees,
+                    ],
+                ],
                 'b' => [
                     'title' => 'b) Changements des enjeux internes et externes',
-                    'summary' => $contextChanges ?: 'Aucune synthèse contextuelle rédigée. Mettre à jour les changements de contexte.',
+                    'summary' => $contextChanges ?: 'Synthèse des évolutions contextuelles, réglementaires et stratégiques de l\'organisme.',
+                    'synthese_observations' => $contextChanges ?: 'Synthèse des évolutions contextuelles, réglementaires et stratégiques de l\'organisme.',
+                    'decision_action' => 'Mettre à jour l\'analyse de contexte et les cartographies associées si nécessaire.',
+                    'responsable' => 'Direction Générale',
+                    'delai' => null,
                     'score_percent' => $contextScore,
                     'metrics' => [
-                        'audits_sur_periode' => count($generated['audits']),
-                        'nc_sur_periode' => count($generated['nonconformities']),
+                        'audits_sur_periode' => $auditTotal,
+                        'nc_sur_periode' => $ncTotal,
                     ],
                 ],
                 'c1' => [
                     'title' => 'c1) Satisfaction client et retours des parties intéressées',
                     'summary' => sprintf('%d évaluations client complétées, %d évaluations personnel complétées, moyenne %.1f%%.', $customerCompleted, $personnelCompleted, round($customerAvg, 1)),
+                    'synthese_observations' => sprintf('%d évaluations client complétées, %d évaluations personnel complétées, moyenne %.1f%%.', $customerCompleted, $personnelCompleted, round($customerAvg, 1)),
+                    'decision_action' => 'Renforcer les actions de fidélisation et traiter les motifs d\'insatisfaction récurrents.',
+                    'responsable' => 'Responsable Qualité',
+                    'delai' => null,
                     'score_percent' => $c1Score,
                     'metrics' => [
                         'satisfaction_client_completed' => $customerCompleted,
@@ -756,6 +872,10 @@ class ManagementReviewController extends Controller
                 'c2' => [
                     'title' => 'c2) Niveau d’atteinte des objectifs qualité',
                     'summary' => sprintf('%d objectif(s) atteint(s) sur %d (%s).', $objectiveAchieved, $objectiveTotal, $objectiveTotal > 0 ? round(($objectiveAchieved / $objectiveTotal) * 100, 1).'%' : '0%'),
+                    'synthese_observations' => sprintf('%d objectif(s) atteint(s) sur %d (%s).', $objectiveAchieved, $objectiveTotal, $objectiveTotal > 0 ? round(($objectiveAchieved / $objectiveTotal) * 100, 1).'%' : '0%'),
+                    'decision_action' => 'Reconduire les cibles atteintes et déployer des plans de rattrapage pour les objectifs non atteints.',
+                    'responsable' => 'Pilotes de Processus',
+                    'delai' => null,
                     'score_percent' => $c2Score,
                     'metrics' => [
                         'objectives_total' => $objectiveTotal,
@@ -765,6 +885,10 @@ class ManagementReviewController extends Controller
                 'c4' => [
                     'title' => 'c4) Performance des processus et conformité produits/services',
                     'summary' => sprintf('%d indicateur(s) au niveau cible sur %d ; %d NC majeures détectées.', $kpiOnTarget, $kpiTotal, $majorNcCount),
+                    'synthese_observations' => sprintf('%d indicateur(s) au niveau cible sur %d ; %d NC majeures détectées.', $kpiOnTarget, $kpiTotal, $majorNcCount),
+                    'decision_action' => 'Consolider les processus opérationnels en écart et réviser les seuils d\'alerte.',
+                    'responsable' => 'Pilotes de Processus',
+                    'delai' => null,
                     'score_percent' => $c4Score,
                     'metrics' => [
                         'kpi_total' => $kpiTotal,
@@ -772,9 +896,38 @@ class ManagementReviewController extends Controller
                         'major_nonconformities' => $majorNcCount,
                     ],
                 ],
+                'c5' => [
+                    'title' => 'c5) Non-conformités, réclamations et actions correctives',
+                    'summary' => sprintf('%d non-conformité(s) enregistrée(s) sur la période, dont %d majeure(s).', $ncTotal, $majorNcCount),
+                    'synthese_observations' => sprintf('%d non-conformité(s) enregistrée(s) sur la période, dont %d majeure(s).', $ncTotal, $majorNcCount),
+                    'decision_action' => 'Vérifier systématiquement l\'efficacité des actions correctives avant clôture.',
+                    'responsable' => 'Responsable Qualité',
+                    'delai' => null,
+                    'score_percent' => max(0, 100 - ($majorNcCount * 15)),
+                    'metrics' => [
+                        'nc_total' => $ncTotal,
+                        'major_nonconformities' => $majorNcCount,
+                    ],
+                ],
+                'c6' => [
+                    'title' => 'c6) Résultats de surveillance, de mesure et d\'audits',
+                    'summary' => sprintf('%d audit(s) planifié(s) ou réalisé(s) sur la période.', $auditTotal),
+                    'synthese_observations' => sprintf('%d audit(s) planifié(s) ou réalisé(s) sur la période.', $auditTotal),
+                    'decision_action' => 'Clôturer les constats d\'audit en suspens et finaliser le programme annuel.',
+                    'responsable' => 'Responsable Qualité',
+                    'delai' => null,
+                    'score_percent' => $auditTotal > 0 ? 100 : 75,
+                    'metrics' => [
+                        'audits_total' => $auditTotal,
+                    ],
+                ],
                 'c7' => [
                     'title' => 'c7) Performance des prestataires externes',
                     'summary' => sprintf('%d prestataire(s) suivis ; %d évaluations fournisseurs complétées ; moyenne %.1f%%.', $providerCount, $providerCompleted, round($providerAvg, 1)),
+                    'synthese_observations' => sprintf('%d prestataire(s) suivis ; %d évaluations fournisseurs complétées ; moyenne %.1f%%.', $providerCount, $providerCompleted, round($providerAvg, 1)),
+                    'decision_action' => 'Maintenir la grille d\'agrément et réévaluer les prestataires critiques sous le seuil.',
+                    'responsable' => 'Responsable Achats / RQ',
+                    'delai' => null,
                     'score_percent' => $c7Score,
                     'metrics' => [
                         'providers_total' => $providerCount,
@@ -785,13 +938,85 @@ class ManagementReviewController extends Controller
                 'e' => [
                     'title' => 'e) Efficacité des actions face aux risques et opportunités',
                     'summary' => sprintf('%d action(s) liées aux risques/opportunités, dont %d traitée(s)/vérifiée(s) efficace(s).', $roActionTotal, $roActionEffective),
+                    'synthese_observations' => sprintf('%d action(s) liées aux risques/opportunités, dont %d traitée(s)/vérifiée(s) efficace(s).', $roActionTotal, $roActionEffective),
+                    'decision_action' => 'Réévaluer les niveaux de criticité résiduelle des risques majeurs.',
+                    'responsable' => 'Responsable Qualité',
+                    'delai' => null,
                     'score_percent' => $eScore,
                     'metrics' => [
                         'ro_actions_total' => $roActionTotal,
                         'ro_actions_effective' => $roActionEffective,
                     ],
                 ],
+                'f' => [
+                    'title' => 'f) Opportunités d’amélioration continue',
+                    'summary' => 'Identification des leviers d\'optimisation organisationnelle et de progrès SMI.',
+                    'synthese_observations' => 'Identification des leviers d\'optimisation organisationnelle et de progrès SMI.',
+                    'decision_action' => 'Intégrer les axes d\'amélioration retenus dans le plan d\'actions global.',
+                    'responsable' => 'Direction Générale & RQ',
+                    'delai' => null,
+                    'score_percent' => 100,
+                    'metrics' => [],
+                ],
+            ],
+            'resources_data' => [
+                'synthese_observations' => 'Adéquation et disponibilité des ressources (humaines, matérielles, infrastructure, compétences) pour le fonctionnement optimal du SMI.',
+                'decision_action' => 'Maintenir les moyens alloués et valider les demandes de dotations budgétaires prioritaires.',
+                'responsable' => 'Direction Générale',
+                'delai' => null,
+            ],
+            'system_changes_data' => [
+                'besoins_changements_systeme' => [
+                    [
+                        'decision_action' => 'Ajuster les cartographies de processus et la documentation SMI suite aux évolutions du contexte organisationnel.',
+                        'responsable' => 'Responsable Qualité',
+                        'delai' => null,
+                    ],
+                ],
+                'autres_besoins_changements_systeme' => [],
             ],
         ];
+    }
+
+    private function isQualityUser(User $user): bool
+    {
+        $roleNames = $user->roles->pluck('name')
+            ->map(fn ($name) => mb_strtolower((string) $name))
+            ->all();
+
+        $legacyRole = mb_strtolower((string) ($user->role ?? ''));
+        $isRoleBasedQuality = collect($roleNames)->contains(fn (string $role) =>
+            str_contains($role, 'quality')
+            || str_contains($role, 'qualit')
+            || str_contains($role, 'rq')
+        );
+
+        return $isRoleBasedQuality
+            || str_contains($legacyRole, 'quality')
+            || str_contains($legacyRole, 'qualit')
+            || str_contains($legacyRole, 'rq');
+    }
+
+    private function canManageReviewLifecycle(User $user, ManagementReview $review, string $action = 'manage'): bool
+    {
+        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+            return true;
+        }
+
+        if (method_exists($user, 'isEnterpriseAdmin') && $user->isEnterpriseAdmin()) {
+            return true;
+        }
+
+        if ($this->isQualityUser($user)) {
+            return true;
+        }
+
+        if ($user->can('evaluation.revue_direction.' . $action)
+            || $user->can('management_reviews.' . $action)
+            || $user->can('evaluation.revue_direction.update')) {
+            return true;
+        }
+
+        return false;
     }
 }

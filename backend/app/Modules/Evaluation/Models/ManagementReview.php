@@ -51,6 +51,12 @@ class ManagementReview extends Model
         'status_workflow',
         'validated_by_ceo_at',
         'validated_by_ceo_user_id',
+        'resources_data',
+        'system_changes_data',
+        'opened_at',
+        'opened_by_user_id',
+        'closed_at',
+        'closed_by_user_id',
         'report_path',
         'generated_at',
     ];
@@ -75,6 +81,10 @@ class ManagementReview extends Model
             'input_data' => 'array',
             'output_decisions' => 'array',
             'action_ids' => 'array',
+            'resources_data' => 'array',
+            'system_changes_data' => 'array',
+            'opened_at' => 'datetime',
+            'closed_at' => 'datetime',
             'validated_by_ceo_at' => 'datetime',
             'generated_at' => 'datetime',
         ];
@@ -84,6 +94,7 @@ class ManagementReview extends Model
     {
         return $this->belongsTo(Site::class);
     }
+
     public function chairman()
     {
         return $this->belongsTo(User::class, 'chairman_id');
@@ -92,5 +103,60 @@ class ManagementReview extends Model
     public function validatedByCeo()
     {
         return $this->belongsTo(User::class, 'validated_by_ceo_user_id');
+    }
+
+    public function openedBy()
+    {
+        return $this->belongsTo(User::class, 'opened_by_user_id');
+    }
+
+    public function closedBy()
+    {
+        return $this->belongsTo(User::class, 'closed_by_user_id');
+    }
+
+    public function getResourcesDataAttribute($value)
+    {
+        if (!empty($value)) {
+            return is_string($value) ? json_decode($value, true) : $value;
+        }
+
+        $inputData = $this->input_data;
+        if (is_array($inputData) && !empty($inputData['resources_data'])) {
+            return $inputData['resources_data'];
+        }
+
+        if (!empty($this->resources_adequacy)) {
+            return [
+                'synthese_observations' => $this->resources_adequacy,
+                'decision_action' => null,
+                'responsable' => null,
+                'delai' => null,
+            ];
+        }
+
+        return [
+            'synthese_observations' => null,
+            'decision_action' => null,
+            'responsable' => null,
+            'delai' => null,
+        ];
+    }
+
+    public function getSystemChangesDataAttribute($value)
+    {
+        if (!empty($value)) {
+            return is_string($value) ? json_decode($value, true) : $value;
+        }
+
+        $outputDecisions = $this->output_decisions;
+        if (is_array($outputDecisions) && !empty($outputDecisions['system_changes_data'])) {
+            return $outputDecisions['system_changes_data'];
+        }
+
+        return [
+            'besoins_changements_systeme' => [],
+            'autres_besoins_changements_systeme' => [],
+        ];
     }
 }

@@ -39,7 +39,12 @@ class ManagementReviewResource extends JsonApiResource
             'action_items' => $this->action_items,
             'input_data' => $this->input_data,
             'output_decisions' => $this->output_decisions,
-            'action_ids' => $this->action_ids,
+            'resources_data' => $this->resources_data,
+            'system_changes_data' => $this->system_changes_data,
+            'opened_at' => $this->opened_at?->toISOString(),
+            'opened_by_user_id' => $this->opened_by_user_id,
+            'closed_at' => $this->closed_at?->toISOString(),
+            'closed_by_user_id' => $this->closed_by_user_id,
             'report_path' => $this->report_path,
             'generated_at' => $this->generated_at?->toISOString(),
             'status' => $this->status,
@@ -53,6 +58,8 @@ class ManagementReviewResource extends JsonApiResource
         return [
             'site' => new SiteResource($this->whenLoaded('site')),
             'chairman' => new UserResource($this->whenLoaded('chairman')),
+            'openedBy' => new UserResource($this->whenLoaded('openedBy')),
+            'closedBy' => new UserResource($this->whenLoaded('closedBy')),
         ];
     }
 }

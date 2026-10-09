@@ -233,3 +233,4 @@ return new class extends Migration
         Schema::dropIfExists('duerp_work_units');
     }
 };
+

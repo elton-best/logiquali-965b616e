@@ -5,14 +5,14 @@ namespace App\Modules\Hse\Models;
 use App\Models\Enterprise;
 use App\Models\Process;
 use App\Models\Site;
-use App\Models\User;
+use App\Traits\BelongsToEnterprise;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DuerpWorkUnit extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToEnterprise;
 
     protected $table = 'duerp_work_units';
 
@@ -64,3 +64,4 @@ class DuerpWorkUnit extends Model
         return $this->hasMany(DuerpDanger::class, 'work_unit_id');
     }
 }
+

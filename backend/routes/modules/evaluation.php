@@ -138,6 +138,7 @@ Route::apiResource('evaluation-requests', EvaluationRequestController::class);
 Route::get('management-reviews/{managementReview}/export-docx', [ManagementReviewController::class, 'exportDocx']);
 Route::post('management-reviews/{managementReview}/generate-draft', [ManagementReviewController::class, 'generateDraftDocx']);
 Route::get('management-reviews/sm-synthesis', [ManagementReviewController::class, 'getSmSynthesis']);
+Route::post('management-reviews/{managementReview}/open', [ManagementReviewController::class, 'open']);
 Route::post('management-reviews/{managementReview}/close', [ManagementReviewController::class, 'close']);
 Route::post('management-reviews/{managementReview}/generate-data', [ManagementReviewController::class, 'generateData']);
 Route::post('management-reviews/{managementReview}/generate-sm-synthesis', [ManagementReviewController::class, 'generateSmSynthesis']);

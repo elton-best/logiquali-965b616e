@@ -3,13 +3,14 @@
 namespace App\Modules\Hse\Models;
 
 use App\Models\Enterprise;
+use App\Traits\BelongsToEnterprise;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DuerpRiskFamily extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToEnterprise;
 
     protected $table = 'duerp_risk_families';
 
@@ -37,3 +38,4 @@ class DuerpRiskFamily extends Model
         return $this->hasMany(DuerpDanger::class, 'risk_family_id');
     }
 }
+

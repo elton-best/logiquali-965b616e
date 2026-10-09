@@ -331,27 +331,142 @@ class NonConformityService
             $query->where('detected_at', '<=', $filters['date_to']);
         }
 
-        // Statistiques
-        $total = $query->count();
-        $bySeverity = $query->get()->groupBy('severity')->map->count();
-        $byStatus = $query->get()->groupBy(fn($nc) => $nc->workflowState?->code)->map->count();
+        $allNcs = $query->with(['axes', 'workflowState'])->get();
+        $total = $allNcs->count();
+
+        // NC Clôturées vs NC En cours
+        $ncCloturees = $allNcs->filter(function ($nc) {
+            $status = strtolower((string) ($nc->status ?? ''));
+            $wf = strtolower((string) ($nc->workflowState?->code ?? ''));
+            return in_array($status, ['closed', 'verified', 'termine'], true)
+                || in_array($wf, ['closed', 'verified'], true)
+                || (bool) $nc->effectiveness_verified;
+        })->count();
+
+        $ncEnCours = max(0, $total - $ncCloturees);
+
+        $bySeverity = $allNcs->groupBy('severity')->map->count();
+        $byStatus = $allNcs->groupBy(fn($nc) => $nc->workflowState?->code ?? $nc->status)->map->count();
         $byAxe = [];
 
-        foreach ($query->with('axes')->get() as $nc) {
-            foreach ($nc->axes as $axe) {
+        foreach ($allNcs as $nc) {
+            foreach ($nc->axes ?? [] as $axe) {
                 $byAxe[$axe->code] = ($byAxe[$axe->code] ?? 0) + 1;
             }
         }
 
-        $overdueCount = $query->get()->filter->isOverdue()->count();
-        $verifiedCount = $query->where('effectiveness_verified', true)->count();
-        $avgResolutionDays = $query->whereNotNull('resolution_date')
-            ->get()
-            ->map(fn($nc) => $nc->detected_at->diffInDays($nc->resolution_date))
+        $overdueCount = $allNcs->filter->isOverdue()->count();
+        $verifiedCount = $allNcs->where('effectiveness_verified', true)->count();
+        $avgResolutionDays = $allNcs->whereNotNull('resolution_date')
+            ->map(fn($nc) => $nc->detected_at ? $nc->detected_at->diffInDays($nc->resolution_date) : 0)
             ->avg();
+
+        // Actions issues des non-conformités
+        $ncIds = $allNcs->pluck('id')->all();
+        $actionsQuery = Action::query()->where(function ($q) use ($ncIds) {
+            if (!empty($ncIds)) {
+                $q->whereIn('non_conformity_id', $ncIds)
+                  ->orWhere(function ($sub) use ($ncIds) {
+                      $sub->whereIn('source_type', ['non_conformity', 'nc'])
+                          ->whereIn('source_id', $ncIds);
+                  })
+                  ->orWhere(function ($sub) use ($ncIds) {
+                      $sub->where('source', 'non_conformity')
+                          ->whereIn('process_id', function ($pQuery) use ($ncIds) {
+                              $pQuery->select('process_id')
+                                  ->from('non_conformities')
+                                  ->whereIn('id', $ncIds)
+                                  ->whereNotNull('process_id');
+                          });
+                  });
+            } else {
+                $q->where('source', 'non_conformity')
+                  ->orWhere('source_type', 'non_conformity');
+            }
+        });
+
+        if (isset($filters['site_id'])) {
+            $actionsQuery->where('site_id', $filters['site_id']);
+        }
+
+        $actions = $actionsQuery->get();
+        $actionsTotal = $actions->count();
+        $actionsRealisees = $actions->filter(function ($act) {
+            $st = strtolower((string) ($act->status ?? ''));
+            return in_array($st, ['completed', 'verified', 'closed', 'termine'], true)
+                || (float) ($act->progress_percentage ?? $act->progress ?? 0) >= 100
+                || (bool) $act->effectiveness_verified;
+        })->count();
+        $actionsNonRealisees = max(0, $actionsTotal - $actionsRealisees);
+        $tauxRealisation = $actionsTotal > 0 ? round(($actionsRealisees / $actionsTotal) * 100, 1) : 0.0;
+
+        // Plaintes et Réclamations
+        $reclamationQuery = \App\Models\Reclamation::query();
+        $plainteQuery = \App\Models\Plainte::query();
+
+        if (isset($filters['site_id'])) {
+            $reclamationQuery->where('site_id', $filters['site_id']);
+            $plainteQuery->where('site_id', $filters['site_id']);
+        }
+        if (isset($filters['date_from'])) {
+            $reclamationQuery->where('received_date', '>=', $filters['date_from']);
+            $plainteQuery->where('received_date', '>=', $filters['date_from']);
+        }
+        if (isset($filters['date_to'])) {
+            $reclamationQuery->where('received_date', '<=', $filters['date_to']);
+            $plainteQuery->where('received_date', '<=', $filters['date_to']);
+        }
+
+        $reclamations = $reclamationQuery->get();
+        $reclamationsTotal = $reclamations->count();
+        $reclamationsCloturees = $reclamations->filter(function ($r) {
+            $st = strtolower((string) ($r->status ?? ''));
+            return in_array($st, ['closed', 'cloture', 'traitee', 'resolved'], true) || !empty($r->closed_date);
+        })->count();
+        $reclamationsEnCours = max(0, $reclamationsTotal - $reclamationsCloturees);
+
+        $plaintes = $plainteQuery->get();
+        $plaintesTotal = $plaintes->count();
+        $plaintesCloturees = $plaintes->filter(function ($p) {
+            $st = strtolower((string) ($p->status ?? ''));
+            return in_array($st, ['closed', 'cloture', 'traitee', 'resolved'], true) || !empty($p->closed_date);
+        })->count();
+        $plaintesEnCours = max(0, $plaintesTotal - $plaintesCloturees);
+
+        $plaintesEtReclamationsTotal = $plaintesTotal + $reclamationsTotal;
+        $plaintesEtReclamationsEnCours = $plaintesEnCours + $reclamationsEnCours;
+        $plaintesEtReclamationsCloturees = $plaintesCloturees + $reclamationsCloturees;
 
         return [
             'total' => $total,
+            'nc_en_cours' => $ncEnCours,
+            'nc_cloture' => $ncCloturees,
+            'nc_cloturees' => $ncCloturees,
+            'actions_realisees' => $actionsRealisees,
+            'actions_non_realisees' => $actionsNonRealisees,
+            'actions' => [
+                'total' => $actionsTotal,
+                'realisees' => $actionsRealisees,
+                'non_realisees' => $actionsNonRealisees,
+                'taux_realisation' => $tauxRealisation,
+            ],
+            'plaintes' => [
+                'total' => $plaintesTotal,
+                'en_cours' => $plaintesEnCours,
+                'cloturees' => $plaintesCloturees,
+            ],
+            'reclamations' => [
+                'total' => $reclamationsTotal,
+                'en_cours' => $reclamationsEnCours,
+                'cloturees' => $reclamationsCloturees,
+            ],
+            'plaintes_et_reclamations' => [
+                'total' => $plaintesEtReclamationsTotal,
+                'en_cours' => $plaintesEtReclamationsEnCours,
+                'cloturees' => $plaintesEtReclamationsCloturees,
+                'plaintes_count' => $plaintesTotal,
+                'reclamations_count' => $reclamationsTotal,
+            ],
             'by_severity' => $bySeverity,
             'by_status' => $byStatus,
             'by_axe' => $byAxe,
