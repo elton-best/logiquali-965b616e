@@ -269,3 +269,4 @@ class WorkAccidentController extends Controller
         ]);
     }
 }
+

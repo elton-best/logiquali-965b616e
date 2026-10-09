@@ -30,6 +30,132 @@ class ProcessReviewController extends Controller
         // lorsque la matrice RBAC n'est pas encore resynchronisée sur toutes les bases.
     }
 
+    /**
+     * Liste de l'historique de toutes les revues du processus.
+     */
+    public function index(Process $process): JsonResponse
+    {
+        $user = Auth::user();
+        $this->ensureAccess($process, $user, 'read');
+
+        $reviews = ProcessReview::query()
+            ->where('process_id', $process->id)
+            ->with(['leader:id,name', 'closedBy:id,name'])
+            ->orderByDesc('review_date')
+            ->orderByDesc('id')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => \App\Http\Resources\ProcessReviewResource::collection($reviews),
+        ]);
+    }
+
+    /**
+     * Consultation d'une revue archivée spécifique.
+     */
+    public function show(Process $process, ProcessReview $review): JsonResponse
+    {
+        $user = Auth::user();
+        $this->ensureAccess($process, $user, 'read');
+
+        if ((int) $review->process_id !== (int) $process->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cette revue n’appartient pas à ce processus.',
+            ], 404);
+        }
+
+        $review->setAttribute('computed_metrics', $this->computeMetrics($process));
+        $review->setAttribute('capabilities', $this->buildCapabilities($process, $user));
+
+        return response()->json([
+            'success' => true,
+            'data' => new \App\Http\Resources\ProcessReviewResource($review->load(['leader:id,name', 'closedBy:id,name'])),
+        ]);
+    }
+
+    /**
+     * Création d'une nouvelle revue de processus.
+     */
+    public function store(Request $request, Process $process): JsonResponse
+    {
+        $user = Auth::user();
+        $this->ensureAccess($process, $user, 'update');
+
+        $review = ProcessReview::query()->create([
+            'site_id' => $process->site_id,
+            'process_id' => $process->id,
+            'title' => 'Revue de : ' . ($process->title ?? $process->code ?? 'Processus'),
+            'type' => $request->input('type', 'periodique'),
+            'review_date' => $request->input('review_date', now()->toDateString()),
+            'version_reviewed' => $request->input('version_reviewed', (string) ($process->version ?? '1.0')),
+            'status' => ProcessReview::STATUS_IN_PROGRESS,
+            'started_at' => now(),
+            'led_by' => $user->id,
+            'coverage_start_date' => $request->input('coverage_start_date', now()->startOfYear()->toDateString()),
+            'coverage_end_date' => $request->input('coverage_end_date', now()->toDateString()),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Revue processus créée avec succès.',
+            'data' => new \App\Http\Resources\ProcessReviewResource($review->load(['leader:id,name', 'closedBy:id,name'])),
+        ], 201);
+    }
+
+    /**
+     * Export PDF d'une revue archivée spécifique.
+     */
+    public function exportReviewPdf(Process $process, ProcessReview $review): BinaryFileResponse
+    {
+        $user = Auth::user();
+        $this->ensureAccess($process, $user, 'read');
+
+        if ((int) $review->process_id !== (int) $process->id) {
+            abort(404, 'Cette revue n’appartient pas à ce processus.');
+        }
+
+        $export = $this->reportService->buildPdf($review);
+        $tempPath = storage_path('app/temp/' . $export['filename']);
+        if (!is_dir(dirname($tempPath))) {
+            mkdir(dirname($tempPath), 0755, true);
+        }
+        file_put_contents($tempPath, $export['binary']);
+
+        $document = $this->syncGeneratedReportToInventory($process, $user, $tempPath, 'pdf');
+
+        $response = response()->download($tempPath, $export['filename'])->deleteFileAfterSend(true);
+        if ($document) {
+            $response->headers->set('X-Generated-Document-Id', (string) $document->id);
+        }
+        return $response;
+    }
+
+    /**
+     * Export Word DOCX d'une revue archivée spécifique.
+     */
+    public function exportReviewDocx(Process $process, ProcessReview $review): BinaryFileResponse
+    {
+        $user = Auth::user();
+        $this->ensureAccess($process, $user, 'read');
+
+        if ((int) $review->process_id !== (int) $process->id) {
+            abort(404, 'Cette revue n’appartient pas à ce processus.');
+        }
+
+        $export = $this->reportService->buildDocx($review);
+        $path = (string) $export['path'];
+
+        $document = $this->syncGeneratedReportToInventory($process, $user, $path, 'docx');
+
+        $response = response()->download($path, (string) $export['filename'])->deleteFileAfterSend(true);
+        if ($document) {
+            $response->headers->set('X-Generated-Document-Id', (string) $document->id);
+        }
+        return $response;
+    }
+
     public function current(Process $process): JsonResponse
     {
         $user = Auth::user();
@@ -74,6 +200,11 @@ class ProcessReviewController extends Controller
             'status' => ['nullable', 'in:planned,in_progress'],
             'review_date' => ['nullable', 'date'],
             'next_review_date' => ['nullable', 'date'],
+            'decision' => ['nullable', 'string', 'in:efficace,partiellement_efficace,non_efficace'],
+            'decision_comment' => ['nullable', 'string'],
+            'conclusion' => ['nullable', 'string'],
+            'type' => ['nullable', 'string', 'max:50'],
+            'version_reviewed' => ['nullable', 'string', 'max:50'],
         ]);
 
         if (array_key_exists('identification', $validated) && !$this->canEditIdentification($user)) {
@@ -111,6 +242,21 @@ class ProcessReviewController extends Controller
         if (array_key_exists('status', $validated)) {
             $payload['status'] = $validated['status'];
         }
+        if (array_key_exists('decision', $validated)) {
+            $payload['decision'] = $validated['decision'];
+        }
+        if (array_key_exists('decision_comment', $validated)) {
+            $payload['decision_comment'] = $validated['decision_comment'];
+        }
+        if (array_key_exists('conclusion', $validated)) {
+            $payload['conclusion'] = $validated['conclusion'];
+        }
+        if (array_key_exists('type', $validated)) {
+            $payload['type'] = $validated['type'];
+        }
+        if (array_key_exists('version_reviewed', $validated)) {
+            $payload['version_reviewed'] = $validated['version_reviewed'];
+        }
 
         if ($review->status === ProcessReview::STATUS_PLANNED) {
             $payload['status'] = ProcessReview::STATUS_IN_PROGRESS;
@@ -145,6 +291,13 @@ class ProcessReviewController extends Controller
         $user = Auth::user();
         $this->ensureAccess($process, $user, 'update');
 
+        $validated = $request->validate([
+            'force_close' => ['nullable', 'boolean'],
+            'decision' => ['nullable', 'string', 'in:efficace,partiellement_efficace,non_efficace'],
+            'decision_comment' => ['nullable', 'string'],
+            'conclusion' => ['nullable', 'string'],
+        ]);
+
         $review = $this->resolveCurrentReview($process, $user);
         if ($review->status === ProcessReview::STATUS_COMPLETED) {
             return response()->json([
@@ -169,11 +322,22 @@ class ProcessReviewController extends Controller
             ], 422);
         }
 
-        $review->update([
+        $closePayload = [
             'status' => ProcessReview::STATUS_COMPLETED,
             'ended_at' => now(),
             'closed_by' => $user->id,
-        ]);
+        ];
+        if (array_key_exists('decision', $validated) && $validated['decision']) {
+            $closePayload['decision'] = $validated['decision'];
+        }
+        if (array_key_exists('decision_comment', $validated) && $validated['decision_comment']) {
+            $closePayload['decision_comment'] = $validated['decision_comment'];
+        }
+        if (array_key_exists('conclusion', $validated) && $validated['conclusion']) {
+            $closePayload['conclusion'] = $validated['conclusion'];
+        }
+
+        $review->update($closePayload);
 
         activity()
             ->causedBy($user)

@@ -1,0 +1,517 @@
+{
+  "info": {
+    "name": "BestQHSE - Module Audits QHSE",
+    "description": "Collection complète pour tester le module Audits & Évaluations conformes ISO 9001:2015 §9.2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "BestQHSE-audits"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "program_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "audit_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "pm.environment.set('auth_token', response.token);",
+                  "pm.collectionVariables.set('auth_token', response.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@BestQHSE.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Programmes d'Audits",
+      "item": [
+        {
+          "name": "1.1 Créer Programme 2026",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "pm.collectionVariables.set('program_id', response.id);",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Ref généré', () => pm.expect(response.ref).to.match(/^PRG-AUDIT-2026-\\d{3}$/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"site_id\": 1,\n  \"year\": 2026,\n  \"title\": \"Programme Audits Internes 2026\",\n  \"program_manager_id\": 1,\n  \"objectives\": \"Vérifier la conformité ISO 9001:2015 et améliorer l'efficacité des processus\",\n  \"planned_audits_count\": 12,\n  \"risk_based_criteria\": [\n    \"Criticité risque >= 12\",\n    \"Processus jamais audités\",\n    \"Processus critiques (pilotage)\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/audit-programs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audit-programs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.2 Liste Programmes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-programs?year=2026",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audit-programs"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.3 Générer Suggestions Basées Risques",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const response = pm.response.json();",
+                  "pm.test('Suggestions générées', () => pm.expect(response.suggestions).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"min_criticality\": 12,\n  \"include_all_processes\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/audit-programs/{{program_id}}/generate-from-risks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audit-programs",
+                "{{program_id}}",
+                "generate-from-risks"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.4 Valider Programme",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-programs/{{program_id}}/validate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audit-programs",
+                "{{program_id}}",
+                "validate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.5 Statistiques Programme",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-programs/{{program_id}}/statistics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audit-programs",
+                "{{program_id}}",
+                "statistics"
+              ]
+            }
+          }
+        },
+        {
+          "name": "1.6 Export Calendrier XLSX",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audit-programs/{{program_id}}/export-calendar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audit-programs",
+                "{{program_id}}",
+                "export-calendar"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Audits",
+      "item": [
+        {
+          "name": "2.1 Créer Audit Processus",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "pm.collectionVariables.set('audit_id', response.id);",
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Ref généré', () => pm.expect(response.ref).to.match(/^AUD-\\d{4}-\\d{3}$/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"audit_program_id\": {{program_id}},\n  \"site_id\": 1,\n  \"type\": \"process\",\n  \"title\": \"Audit Processus Achats Q1 2026\",\n  \"planned_date\": \"2026-03-15\",\n  \"quarter\": 1,\n  \"frequency\": \"quarterly\",\n  \"lead_auditor_id\": 2,\n  \"scope\": \"Processus achats et sous-traitance - Clauses ISO 9001 § 8.4\",\n  \"objectives\": \"Vérifier la conformité des achats et la maîtrise des fournisseurs\",\n  \"risk_based_criteria\": \"Processus à risque élevé (criticité 15)\",\n  \"auditor_ids\": [2, 3],\n  \"auditee_ids\": [4, 5],\n  \"process_ids\": [1, 2]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/audits",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.2 Démarrer Audit",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audits/{{audit_id}}/start",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "{{audit_id}}",
+                "start"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.3 Générer Checklist Auto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "pm.test('Checklist générée', () => pm.expect(response.checklist).to.be.an('array'));",
+                  "pm.test('Questions ISO présentes', () => pm.expect(response.count).to.be.above(5));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"iso_clauses\": [\"4.4\", \"6.1\", \"8.4\", \"9.1\", \"10.2\"],\n  \"include_process_risks\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/audits/{{audit_id}}/generate-checklist",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "{{audit_id}}",
+                "generate-checklist"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.4 Ajouter Constat NC Majeure",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"nc_major\",\n  \"title\": \"Absence de procédure documentée pour la sélection des fournisseurs\",\n  \"description\": \"La procédure de sélection et d'évaluation des fournisseurs n'est pas documentée. Constaté lors de l'interview du responsable achats.\",\n  \"evidence\": \"Aucun document formalisé trouvé. Le responsable achats a confirmé qu'il n'existe pas de procédure écrite.\",\n  \"requirement\": \"ISO 9001:2015 § 8.4.1 - L'organisme doit déterminer et appliquer des critères pour l'évaluation, la sélection, la surveillance des performances et la réévaluation des fournisseurs externes.\",\n  \"clause_iso\": \"8.4.1\",\n  \"process_id\": 1,\n  \"location\": \"Service Achats - Bureau R2\",\n  \"qhse_axes\": [\"quality\"],\n  \"severity\": \"high\",\n  \"priority\": 1,\n  \"root_cause\": \"Manque de formalisation et de sensibilisation aux exigences ISO\",\n  \"immediate_action\": \"Utilisation temporaire d'un template Word pour documenter les évaluations\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/audits/{{audit_id}}/finding",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "{{audit_id}}",
+                "finding"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.5 Ajouter Constat NC Mineure",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"nc_minor\",\n  \"title\": \"Enregistrements d'évaluation fournisseurs incomplets\",\n  \"description\": \"3 fournisseurs sur 10 audités n'ont pas d'évaluation formalisée pour l'année 2025\",\n  \"evidence\": \"Fichier Excel des évaluations consulté - lignes vides pour ACME Corp, TechSupply et GlobalParts\",\n  \"clause_iso\": \"8.4.1\",\n  \"severity\": \"medium\",\n  \"priority\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/audits/{{audit_id}}/finding",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "{{audit_id}}",
+                "finding"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.6 Ajouter Opportunité",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"opportunity\",\n  \"title\": \"Digitalisation du processus d'approbation des bons de commande\",\n  \"description\": \"Le processus actuel de validation des BC est manuel (circuit papier). Une digitalisation via workflow pourrait réduire les délais de 5 jours à 1 jour.\",\n  \"severity\": \"low\",\n  \"priority\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/audits/{{audit_id}}/finding",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "{{audit_id}}",
+                "finding"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.7 Envoyer Invitations",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audits/{{audit_id}}/send-invitations",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "{{audit_id}}",
+                "send-invitations"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.8 Finaliser Audit + Générer Rapport",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conclusion\": \"L'audit a révélé que le processus achats est globalement maîtrisé avec un taux de conformité de 75%. Deux non-conformités nécessitent des actions correctives immédiates. Une opportunité d'amélioration a été identifiée pour optimiser les délais de traitement.\",\n  \"format\": \"pdf\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/audits/{{audit_id}}/finalize",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "{{audit_id}}",
+                "finalize"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.9 Télécharger Rapport PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audits/{{audit_id}}/download-report?format=pdf",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "{{audit_id}}",
+                "download-report"
+              ],
+              "query": [
+                {
+                  "key": "format",
+                  "value": "pdf"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2.10 Statistiques Globales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/audits/statistics?year=2026",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "audits",
+                "statistics"
+              ],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2026"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

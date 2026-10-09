@@ -1,0 +1,125 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: logiquali
+      DB_USERNAME: adminpg
+      DB_PASSWORD: Yvan0408
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: adminpg
+          POSTGRES_PASSWORD: Yvan0408
+          POSTGRES_DB: logiquali
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: pdo, pdo_pgsql, mbstring, xml, ctype, json, openssl, zip
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: composer install --no-progress --prefer-dist --ignore-platform-reqs
+
+      - name: Setup environment
+        working-directory: ./backend
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run migrations
+        working-directory: ./backend
+        run: php artisan migrate
+
+      - name: Run tests
+        working-directory: ./backend
+        run: php artisan test
+
+  deploy:
+    needs: [backend-tests]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy to Test Server
+        if: github.ref == 'refs/heads/develop'
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.TEST_SERVER_IP }} << 'EOF'
+            cd /var/www/html/LOGIQUALI
+            git fetch origin develop
+            git reset --hard origin/develop
+            git clean -fd
+            cd backend
+            composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+            php artisan migrate --force
+            chown -R www-data:www-data storage bootstrap/cache
+            chmod -R 775 storage bootstrap/cache
+            php artisan optimize
+            cd ../frontend
+            npm install
+            rm -rf dist
+            npm run build
+          EOF
+
+      - name: Seed Test Database (Strict)
+        if: |
+          contains(github.event.head_commit.message, '[seed-db-confirm]') &&
+          github.ref == 'refs/heads/develop'
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.TEST_SERVER_IP }} << 'EOF'
+            cd /var/www/html/LOGIQUALI/backend
+            php artisan migrate:fresh --seed
+          EOF
+
+      - name: Deploy to Production Server
+        if: github.ref == 'refs/heads/main'
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.PROD_SERVER_IP }} << 'EOF'
+            cd /var/www/html/LOGIQUALI
+            git fetch origin main
+            git checkout main
+            git reset --hard origin/main
+            git clean -fd
+            cd backend
+            composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+            php artisan migrate --force
+            chown -R www-data:www-data storage bootstrap/cache
+            chmod -R 775 storage bootstrap/cache
+            php artisan optimize
+            cd ../frontend
+            npm install
+            rm -rf dist
+            npm run build
+          EOF

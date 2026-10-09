@@ -178,3 +178,4 @@ class EmergencyProcedureController extends Controller
         ]);
     }
 }
+

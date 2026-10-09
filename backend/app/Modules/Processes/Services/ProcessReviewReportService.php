@@ -114,6 +114,23 @@ class ProcessReviewReportService
             }
         }
 
+        if (!empty($review->decision) || !empty($review->conclusion) || !empty($review->next_review_date)) {
+            $section->addTextBreak(1);
+            $section->addText('5. Décision sur l’Efficacité & Conclusion', $headingStyle);
+            if (!empty($review->decision)) {
+                $this->addKeyValue($section, 'Efficacité du processus', strtoupper(str_replace('_', ' ', (string) $review->decision)));
+            }
+            if (!empty($review->decision_comment)) {
+                $this->addSectionParagraph($section, 'Commentaire de décision', (string) $review->decision_comment);
+            }
+            if (!empty($review->conclusion)) {
+                $this->addSectionParagraph($section, 'Conclusion générale', (string) $review->conclusion);
+            }
+            if (!empty($review->next_review_date)) {
+                $this->addKeyValue($section, 'Date prévisionnelle prochaine revue', $this->formatDate($review->next_review_date));
+            }
+        }
+
         $filename = sprintf('Revue_Processus_%s_%s.docx', $process?->code ?? $review->process_id, now()->format('Ymd_His'));
         $tempPath = storage_path('app/temp/' . $filename);
 

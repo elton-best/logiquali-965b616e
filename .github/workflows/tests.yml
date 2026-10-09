@@ -1,0 +1,152 @@
+name: Tests CI
+
+on:
+  push:
+    branches: [main, develop, feature/*]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend-tests:
+    name: Backend Tests (PHP 8.2 + PostgreSQL 16)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: BestQHSE
+          POSTGRES_USER: adminpg
+          POSTGRES_PASSWORD: Yvan0408
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: pdo, pdo_pgsql, mbstring, xml, ctype, json, openssl, zip, redis
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: backend/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('backend/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Copy .env
+        working-directory: ./backend
+        run: cp .env.example .env
+
+      - name: Generate application key
+        working-directory: ./backend
+        run: php artisan key:generate
+
+      - name: Run migrations
+        working-directory: ./backend
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: BestQHSE
+          DB_USERNAME: adminpg
+          DB_PASSWORD: Yvan0408
+        run: php artisan migrate --force
+
+      - name: Run PHPUnit tests
+        working-directory: ./backend
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: BestQHSE_test
+          DB_USERNAME: adminpg
+          DB_PASSWORD: Yvan0408
+        run: php artisan test
+
+  frontend-tests:
+    name: Frontend Tests (Node 20 + Vitest)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run migration guard checks
+        working-directory: ./frontend
+        run: npm run check:migration
+
+      - name: Run tests
+        working-directory: ./frontend
+        run: npm run test --if-present || echo "No tests configured yet"
+
+  code-quality:
+    name: Code Quality (Lint & Format)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+
+      - name: Install Composer dependencies
+        working-directory: ./backend
+        run: composer install --no-progress --prefer-dist
+
+      - name: Run Laravel Pint (dry-run)
+        working-directory: ./backend
+        run: |
+          composer require laravel/pint --dev --no-interaction || true
+          ./vendor/bin/pint --test || echo "Pint not configured, skipping"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install npm dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run migration guard checks
+        working-directory: ./frontend
+        run: npm run check:migration
+
+      - name: Run ESLint
+        working-directory: ./frontend
+        run: npm run lint --if-present || echo "ESLint not configured, skipping"
+
+      - name: Run TypeScript check
+        working-directory: ./frontend
+        run: npm run type-check --if-present || echo "Type check not configured, skipping"

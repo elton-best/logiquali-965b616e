@@ -1,0 +1,22 @@
+- [ ] Valider l’identifiant canonique BegPay → paiement interne (token/referenceId/externalId) sur tous les flux (mobile, web, jobs)
+- [ ] Lister toutes les duplications de “mapping status” (SUCCESSFUL/FAILED/PENDING) dans le code (jobs + controllers)
+- [ ] Créer un `BegPayStatusMapper` (service) unique qui convertit la réponse BegPay → `success|failed|pending`
+- [ ] Remplacer la logique de mapping dupliquée dans :
+  - [ ] `PollUnifiedPaymentStatusJob`
+  - [ ] `PollPaymentStatusJob` (ou le rendre obsolète)
+  - [ ] `PaymentController@checkStatus`
+  - [ ] `DocumentMobileController@checkPayeDocStatus`
+  - [ ] `PaiementMobileController@apiCheckStatus`
+- [ ] Ajouter une garde anti-repoll :
+  - [ ] Dans `UnifiedPaymentService::initiateBegPayPayment()` ne pas dispatch si le paiement est déjà `success` ou `failed`
+- [ ] (Optionnel mais recommandé) Ajouter des champs de contrôle de polling :
+  - [ ] `poll_attempts`
+  - [ ] `poll_expires_at`
+  - [ ] `last_polled_at`
+- [ ] Mettre en place une stratégie de relance contrôlée (backoff + arrêt sur timeout global)
+- [ ] Mettre à jour/ajouter tests (au minimum unit tests pour `BegPayStatusMapper`)
+- [ ] Vérifier via un scénario réel :
+  - [ ] paiement success
+  - [ ] paiement failed
+  - [ ] paiement pending (timeout atteint)
+- [ ] Vérifier la compatibilité avec les endpoints existants côté mobile/web

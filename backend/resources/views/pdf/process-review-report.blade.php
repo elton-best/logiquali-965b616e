@@ -73,5 +73,23 @@
       </ul>
     @endif
   </div>
+
+  @if(!empty($review->decision) || !empty($review->conclusion) || !empty($review->next_review_date))
+    <div class="block">
+      <h3>5. Décision sur l'Efficacité & Conclusion</h3>
+      @if(!empty($review->decision))
+        <p><span class="label">Efficacité du processus:</span> <strong>{{ strtoupper(str_replace('_', ' ', (string) $review->decision)) }}</strong></p>
+      @endif
+      @if(!empty($review->decision_comment))
+        <p><span class="label">Commentaire de décision:</span> <span class="muted">{{ $review->decision_comment }}</span></p>
+      @endif
+      @if(!empty($review->conclusion))
+        <p><span class="label">Conclusion générale:</span> <span class="muted">{{ $review->conclusion }}</span></p>
+      @endif
+      @if(!empty($review->next_review_date))
+        <p><span class="label">Date prévisionnelle prochaine revue:</span> {{ is_string($review->next_review_date) ? $review->next_review_date : $review->next_review_date->format('d/m/Y') }}</p>
+      @endif
+    </div>
+  @endif
 </body>
 </html>
