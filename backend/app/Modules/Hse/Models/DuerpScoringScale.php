@@ -3,12 +3,13 @@
 namespace App\Modules\Hse\Models;
 
 use App\Models\Enterprise;
+use App\Traits\BelongsToEnterprise;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DuerpScoringScale extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToEnterprise;
 
     protected $table = 'duerp_scoring_scales';
 
