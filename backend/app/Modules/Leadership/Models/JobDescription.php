@@ -51,6 +51,9 @@ class JobDescription extends Model
         'employee_signed_at',
         'manager_signature_data',
         'manager_signed_at',
+        'ceo_signature_data',
+        'ceo_signed_at',
+        'ceo_user_id',
         'last_updated',
     ];
 
@@ -67,7 +70,23 @@ class JobDescription extends Model
             'travel_required' => 'boolean',
             'employee_signed_at' => 'datetime',
             'manager_signed_at' => 'datetime',
+            'ceo_signed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * REQ-7.2-03 : Fiche considérée signée uniquement si les 2 signatures sont présentes.
+     */
+    public function getIsFullySignedAttribute(): bool
+    {
+        $hasEmployee = !empty($this->employee_signature_data) || !empty($this->employee_signed_at);
+        $hasCeo = !empty($this->ceo_signature_data) || !empty($this->ceo_signed_at) || !empty($this->manager_signed_at);
+        return $hasEmployee && $hasCeo;
+    }
+
+    public function ceoUser()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'ceo_user_id');
     }
 
     public function site()

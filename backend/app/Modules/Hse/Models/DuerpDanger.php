@@ -41,8 +41,11 @@ class DuerpDanger extends Model
         'duerp_id',
         'organizational_unit',
         'process_id',
+        'work_unit_id',
+        'risk_family_id',
         'work_unit',
         'activity',
+        'activity_name',
         'inrs_family',
         'dangerous_situation',
         'identified_risks',
@@ -52,11 +55,17 @@ class DuerpDanger extends Model
         'raw_risk_score',
         'raw_risk_level',
         'existing_preventions',
+        'mitigation_level',
+        'mitigation_coef',
         'prevention_actions',
         'responsible_id',
         'responsible_name',
         'deadline',
         'action_status', // en_continu, en_cours, realise
+        'action_evaluation_date',
+        'action_effectivity_criteria',
+        'action_efficacy_criteria',
+        'observations',
         'residual_gravity',
         'residual_frequency',
         'residual_risk_score',
@@ -77,10 +86,12 @@ class DuerpDanger extends Model
         'gravity' => 'integer',
         'frequency' => 'integer',
         'raw_risk_score' => 'integer',
+        'mitigation_coef' => 'float',
         'residual_gravity' => 'integer',
         'residual_frequency' => 'integer',
         'residual_risk_score' => 'integer',
         'deadline' => 'date',
+        'action_evaluation_date' => 'date',
         'exposed_workers' => 'array',
         'actions' => 'array',
         'applicable_norms' => 'array',
@@ -92,7 +103,7 @@ class DuerpDanger extends Model
     protected static function booted()
     {
         static::saving(function (DuerpDanger $danger) {
-            // DUERP Canevas: Raw Risk Score = Gravity * Frequency (Scale 1..4)
+            // DUERP Canevas: Raw Risk Score = Gravity * Frequency
             if ($danger->gravity !== null || $danger->frequency !== null) {
                 $g = (int) ($danger->gravity ?? 1);
                 $f = (int) ($danger->frequency ?? 1);
@@ -113,11 +124,17 @@ class DuerpDanger extends Model
                 };
             }
 
-            // Residual calculation if residual values provided
+            // Residual calculation if residual values provided or computed from mitigation
             if ($danger->residual_gravity !== null && $danger->residual_frequency !== null) {
                 $rg = (int) $danger->residual_gravity;
                 $rf = (int) $danger->residual_frequency;
                 $danger->residual_risk_score = $rg * $rf;
+            } elseif ($danger->raw_risk_score !== null && $danger->mitigation_coef !== null) {
+                $coef = (float) $danger->mitigation_coef;
+                $danger->residual_risk_score = (int) max(1, round($danger->raw_risk_score * $coef));
+            }
+
+            if ($danger->residual_risk_score !== null) {
                 $danger->residual_risk_level = match (true) {
                     $danger->residual_risk_score <= 3 => 'Faible',
                     $danger->residual_risk_score <= 8 => 'Moyen',
@@ -130,6 +147,16 @@ class DuerpDanger extends Model
     public function duerp()
     {
         return $this->belongsTo(Duerp::class, 'duerp_id');
+    }
+
+    public function workUnit()
+    {
+        return $this->belongsTo(DuerpWorkUnit::class, 'work_unit_id');
+    }
+
+    public function riskFamily()
+    {
+        return $this->belongsTo(DuerpRiskFamily::class, 'risk_family_id');
     }
 
     public function process()

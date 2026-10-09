@@ -38,13 +38,22 @@ Route::get('system-settings', [ProcessController::class, 'systemSettings']);
 
 // Revues de processus (§9.2)
 Route::prefix('processes/{process}/reviews')->group(function () {
+    // Endpoints singleton / revue active ("current")
     Route::get('current', [ProcessReviewController::class, 'current']);
     Route::get('current/linked-data', [ProcessReviewController::class, 'linkedData']);
     Route::post('current/linked-data/actions', [ProcessReviewController::class, 'createLinkedAction']);
     Route::put('current', [ProcessReviewController::class, 'upsertCurrent']);
     Route::post('current/close', [ProcessReviewController::class, 'closeCurrent']);
+    Route::post('current/submit-suggestions', [ProcessReviewController::class, 'submitSuggestionsToRq']);
     Route::get('current/export-pdf', [ProcessReviewController::class, 'exportCurrentPdf']);
     Route::get('current/export-docx', [ProcessReviewController::class, 'exportCurrentDocx']);
+
+    // Endpoints REST collection & historique (conformité API & audit)
+    Route::get('', [ProcessReviewController::class, 'index']);
+    Route::post('', [ProcessReviewController::class, 'store']);
+    Route::get('{review}', [ProcessReviewController::class, 'show'])->whereNumber('review');
+    Route::get('{review}/export-pdf', [ProcessReviewController::class, 'exportReviewPdf'])->whereNumber('review');
+    Route::get('{review}/export-docx', [ProcessReviewController::class, 'exportReviewDocx'])->whereNumber('review');
 });
 Route::get('processes/{process}/metrics', [ProcessReviewController::class, 'getMetrics']);
 Route::get('processes/{process}/reviews/dashboard-actions', [ProcessController::class, 'listReviewDashboardActions']);

@@ -53,6 +53,8 @@ export const BACKEND_RESOURCES: Record<string, string> = {
   equipment: "equipements",
   energy_use: "consommations-energie",
   work_unit: "duerp-work-units",
+  risk_family: "duerp-risk-families",
+  work_accident: "work-accidents",
   duerp: "duerp",
   sm_change: "modifications",
   sm_plan: "plan-actions",

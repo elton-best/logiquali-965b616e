@@ -509,6 +509,75 @@ class JobDescriptionController extends Controller
         return response()->json(['data' => $document]);
     }
 
+    /**
+     * Signature de la fiche de poste par le titulaire/employé (REQ-7.2-03).
+     */
+    public function signEmployee(Request $request, int $id): JsonResponse
+    {
+        $user = $this->currentUser();
+        if (!$user) {
+            return response()->json(['message' => 'Non authentifié.'], 401);
+        }
+
+        $jobDescription = JobDescription::where('enterprise_id', $user->enterprise_id)->findOrFail($id);
+
+        $validated = $request->validate([
+            'signature_data' => 'nullable|string', // Données image base64 ou URL
+        ]);
+
+        $signatureData = $validated['signature_data'] ?? $user->signature_url ?? $user->signature_path ?? 'signed_by_user_' . $user->id;
+
+        $jobDescription->update([
+            'employee_signature_data' => $signatureData,
+            'employee_signed_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Fiche de poste signée avec succès par le titulaire.',
+            'data' => [
+                'employee_signed_at' => $jobDescription->employee_signed_at,
+                'is_fully_signed' => $jobDescription->is_fully_signed,
+            ],
+        ]);
+    }
+
+    /**
+     * Signature de la fiche de poste par la Direction Générale / CEO (REQ-7.2-03).
+     */
+    public function signCeo(Request $request, int $id): JsonResponse
+    {
+        $user = $this->currentUser();
+        if (!$user) {
+            return response()->json(['message' => 'Non authentifié.'], 401);
+        }
+
+        $jobDescription = JobDescription::where('enterprise_id', $user->enterprise_id)->findOrFail($id);
+
+        $validated = $request->validate([
+            'signature_data' => 'nullable|string', // Données image base64 ou URL
+        ]);
+
+        $signatureData = $validated['signature_data'] ?? $user->signature_url ?? $user->signature_path ?? 'signed_by_ceo_' . $user->id;
+
+        $jobDescription->update([
+            'ceo_signature_data' => $signatureData,
+            'ceo_signed_at' => now(),
+            'ceo_user_id' => $user->id,
+            'manager_signed_at' => now(),
+            'manager_signature_data' => $signatureData,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Fiche de poste signée et validée par la Direction Générale (CEO).',
+            'data' => [
+                'ceo_signed_at' => $jobDescription->ceo_signed_at,
+                'is_fully_signed' => $jobDescription->is_fully_signed,
+            ],
+        ]);
+    }
+
     private function currentUser(): ?User
     {
         $user = Auth::user();

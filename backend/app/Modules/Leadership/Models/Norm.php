@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+use App\Modules\Enterprise\Models\Module;
+use App\Modules\Enterprise\Models\Offer;
+use App\Modules\Enterprise\Models\PermissionNormMapping;
 
 class Norm extends Model
 {

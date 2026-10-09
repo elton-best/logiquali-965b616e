@@ -22,8 +22,9 @@ class OperationalProject extends Model
         'priority',
         'start_date',
         'due_date',
-        'progress',
+        'process_id',
         'project_manager_id',
+        'team_user_ids',
         'release_notes',
         'release_evidences',
         'created_by',
@@ -36,6 +37,7 @@ class OperationalProject extends Model
             'start_date' => 'date',
             'due_date' => 'date',
             'progress' => 'integer',
+            'team_user_ids' => 'array',
             'release_evidences' => 'array',
         ];
     }
@@ -50,9 +52,22 @@ class OperationalProject extends Model
         return $this->belongsTo(Enterprise::class);
     }
 
+    public function process(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Process::class);
+    }
+
     public function projectManager(): BelongsTo
     {
         return $this->belongsTo(User::class, 'project_manager_id');
+    }
+
+    public function getTeamMembersAttribute()
+    {
+        if (empty($this->team_user_ids)) {
+            return collect();
+        }
+        return User::whereIn('id', $this->team_user_ids)->get();
     }
 
     public function activities(): HasMany

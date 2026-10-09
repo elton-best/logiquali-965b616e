@@ -125,6 +125,22 @@ export function useJobDescriptionMutations(siteId: string) {
   return {
     save: useMutation({ mutationFn: (input: { id?: string; payload: Record<string, unknown> }) => backendApi.request(input.id ? `job-descriptions/${input.id}` : "job-descriptions", { method: input.id ? "PUT" : "POST", body: JSON.stringify(input.payload) }), onSuccess: invalidate }),
     remove: useMutation({ mutationFn: (id: string) => backendApi.request(`job-descriptions/${id}`, { method: "DELETE" }), onSuccess: invalidate }),
+    signEmployee: useMutation({
+      mutationFn: (input: { id: string; payload?: Record<string, unknown> }) =>
+        backendApi.request(`job-descriptions/${input.id}/sign-employee`, {
+          method: "POST",
+          body: JSON.stringify(input.payload ?? {}),
+        }),
+      onSuccess: invalidate,
+    }),
+    signCeo: useMutation({
+      mutationFn: (input: { id: string; payload?: Record<string, unknown> }) =>
+        backendApi.request(`job-descriptions/${input.id}/sign-ceo`, {
+          method: "POST",
+          body: JSON.stringify(input.payload ?? {}),
+        }),
+      onSuccess: invalidate,
+    }),
   };
 }
 

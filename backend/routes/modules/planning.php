@@ -9,11 +9,18 @@ use App\Modules\Planning\Controllers\SmPlanHierarchicalController;
 use App\Modules\Planning\Controllers\OperationalPlanningController;
 use App\Modules\Planning\Controllers\PlanSMController;
 use App\Modules\Planning\Controllers\ModificationController;
+use App\Modules\Planning\Controllers\MethodologyGuideController;
 use App\Modules\Improvement\Controllers\PlanController;
 
 // ============================================================
 // CHAPITRE 6 : PLANIFICATION & GESTION DES RISQUES
 // ============================================================
+
+// --- Guides d'utilisation & Matrices méthodologiques (ISO 9001 / ISO 14001 / ISO 45001) ---
+Route::get('methodology-guides', [MethodologyGuideController::class, 'index']);
+Route::get('methodology-guides/{section}', [MethodologyGuideController::class, 'show']);
+Route::get('methodology/matrices', [MethodologyGuideController::class, 'index']);
+Route::get('methodology/matrices/{section}', [MethodologyGuideController::class, 'show']);
 
 // --- 6.1 Risques & Opportunités ---
 Route::post('processes/{process}/risks-opportunities', [ProcessController::class, 'addRiskOpportunity']);
@@ -84,7 +91,11 @@ Route::get('sm-plan/export-xlsx', [SmPlanHierarchicalController::class, 'exportX
 // Vue calendrier global du plan SM
 Route::get('/plan-sm', [PlanSMController::class, 'index']);
 
-// Demandes de modifications du SM
+// Demandes de modifications du SM (Brouillon -> RQ -> CEO - REQ-6.3-01..05)
+Route::post('modifications/{id}/submit-verification', [ModificationController::class, 'submitForVerification']);
+Route::post('modifications/{id}/verify-rq', [ModificationController::class, 'verifyByRq']);
+Route::post('modifications/{id}/approve-ceo', [ModificationController::class, 'approveByCeo']);
+Route::post('modifications/{id}/record-results', [ModificationController::class, 'recordResults']);
 Route::apiResource('modifications', ModificationController::class);
 Route::get('plans/export-xlsx', [PlanController::class, 'exportXlsx']);
 Route::apiResource('plans', PlanController::class);

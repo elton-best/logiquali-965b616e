@@ -780,29 +780,19 @@ class AuthController extends Controller
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|email|unique:users,email',
             'password' => app(SuperAdminSettingsService::class)->passwordRules(),
-            'first_name' => 'nullable|string|max:255',
-            'last_name' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
         ]);
 
         try {
             DB::beginTransaction();
 
             // Créer l'utilisateur client
-            $firstName = trim((string) ($validated['first_name'] ?? ''));
-            $lastName = trim((string) ($validated['last_name'] ?? ''));
-            $displayName = trim($firstName . ' ' . $lastName) ?: $validated['username'];
-
             $user = User::create([
-                'name' => $displayName,
-                'first_name' => $firstName ?: null,
-                'last_name' => $lastName ?: null,
+                'name' => $validated['username'], // Utiliser le username comme name par défaut
                 'username' => $validated['username'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'phone' => $validated['phone'] ?? null,
-                'address' => $validated['address'] ?? null,
                 'user_type' => 'clientb',
                 'enterprise_id' => null,
                 'is_active' => true,
