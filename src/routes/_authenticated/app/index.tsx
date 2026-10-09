@@ -4,6 +4,8 @@ import {
 } from "lucide-react";
 import { useMemo } from "react";
 import { isOverdue, useRecords, type QRecord } from "@/hooks/use-records";
+import { useCurrentSite } from "@/hooks/use-workspace";
+import { useCollaboratorActions, useDashboardStats } from "@/integrations/backend/dashboard";
 import { KINDS, sectionForKind } from "@/components/app/sections";
 import { StatusBadge } from "@/components/app/SectionView";
 
@@ -21,23 +23,36 @@ const QUICK = [
   { label: "Indicateur", section: "indicateurs" },
 ];
 
-function monthKey(d: Date) { return `${d.getFullYear()}-${d.getMonth()}`; }
-
 function Dashboard() {
   const profile = parent.useLoaderData();
-  const { data: records = [], isLoading } = useRecords();
+  const [currentSite] = useCurrentSite();
+  const { data: records = [], isLoading: recordsLoading } = useRecords();
+  const {
+    data: dashboard,
+    isLoading: dashboardLoading,
+    isError: dashboardError,
+  } = useDashboardStats({
+    site_id: currentSite || undefined,
+    scope: currentSite ? "site" : "enterprise",
+  });
+  const { data: collaboratorSummary } = useCollaboratorActions({
+    site_id: currentSite || undefined,
+    scope: currentSite ? "site" : "enterprise",
+    per_page: 20,
+  });
   const of = (k: string) => records.filter((r) => r.kind === k);
 
   const today = new Date(new Date().toDateString());
   const in30 = new Date(today.getTime() + 30 * 864e5);
 
+  const serverStats = dashboard?.stats;
   const kpis = [
-    { label: "Sites actifs", value: of("site").filter((r) => r.status === "Actif").length, icon: MapPin, section: "sites" },
-    { label: "Collaborateurs actifs", value: of("collaborator").filter((r) => r.status === "Actif").length, icon: Users, section: "collaborateurs" },
-    { label: "Actions en retard", value: of("action").filter(isOverdue).length, icon: Target, section: "actions", alert: true },
-    { label: "NC ouvertes", value: of("nc").filter((r) => r.status !== "Clôturée").length, icon: ShieldAlert, section: "non-conformites", alert: true },
-    { label: "Audits à venir", value: of("audit").filter((r) => r.data["date"] && new Date(String(r.data["date"])) >= today && r.status !== "Clôturé").length, icon: ClipboardCheck, section: "audits" },
-    { label: "Processus actifs", value: of("process").filter((r) => r.status === "Actif").length, icon: GitBranch, section: "processus" },
+    { label: "Sites actifs", value: serverStats?.total_sites ?? 0, icon: MapPin, section: "sites" },
+    { label: "Utilisateurs", value: serverStats?.total_users ?? 0, icon: Users, section: "collaborateurs" },
+    { label: "Actions en retard", value: serverStats?.overdue_actions ?? 0, icon: Target, section: "actions", alert: true },
+    { label: "NC ouvertes", value: serverStats?.active_non_conformities ?? 0, icon: ShieldAlert, section: "non-conformites", alert: true },
+    { label: "Audits à venir", value: serverStats?.upcoming_audits ?? 0, icon: ClipboardCheck, section: "audits" },
+    { label: "Processus actifs", value: serverStats?.total_processes ?? 0, icon: GitBranch, section: "processus" },
   ];
 
   const priorities: QRecord[] = [
@@ -48,31 +63,24 @@ function Dashboard() {
     ...of("objective").filter((r) => r.status === "En cours" && Number(r.data["progress"] ?? 0) < 50),
   ].slice(0, 8);
 
-  // Activity evolution: last 6 months — created vs closed (actions + NC)
+  // Évolution de l'activité fournie par le dashboard Laravel.
+  // Le calcul reste côté backend afin que les agrégats respectent le périmètre
+  // entreprise/site et les règles d'accès du compte connecté.
   const months = useMemo(() => {
-    const arr: { key: string; label: string; created: number; closed: number }[] = [];
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - i);
-      arr.push({ key: monthKey(d), label: d.toLocaleDateString("fr-FR", { month: "short" }), created: 0, closed: 0 });
-    }
-    for (const r of records) {
-      if (!["action", "nc", "document", "audit"].includes(r.kind)) continue;
-      const c = arr.find((m) => m.key === monthKey(new Date(r.created_at)));
-      if (c) c.created++;
-      if (CLOSED.includes(r.status) || r.status === "Publié" || r.status === "Clôturé") {
-        const u = arr.find((m) => m.key === monthKey(new Date(r.updated_at)));
-        if (u) u.closed++;
-      }
-    }
-    return arr;
-  }, [records]);
+    return (dashboard?.charts.activity ?? []).map((item, index) => ({
+      key: `${item.label}-${index}`,
+      label: item.label,
+      created: item.documents,
+      closed: item.actions,
+    }));
+  }, [dashboard]);
   const maxBar = Math.max(1, ...months.flatMap((m) => [m.created, m.closed]));
 
   const distribution = [
-    { label: "Documents", n: of("document").length, section: "documents" },
-    { label: "Non-conformités", n: of("nc").length, section: "non-conformites" },
-    { label: "Audits", n: of("audit").length, section: "audits" },
-    { label: "Actions", n: of("action").length, section: "actions" },
+    { label: "Documents", n: dashboard?.charts.distribution.documents ?? 0, section: "documents" },
+    { label: "Non-conformités", n: dashboard?.charts.distribution.nc ?? 0, section: "non-conformites" },
+    { label: "Audits", n: dashboard?.charts.distribution.audits ?? 0, section: "audits" },
+    { label: "Actions", n: dashboard?.charts.distribution.actions ?? 0, section: "actions" },
   ];
   const totalDist = Math.max(1, distribution.reduce((s, d) => s + d.n, 0));
 
@@ -85,17 +93,32 @@ function Dashboard() {
 
   // Governance maturity
   const docOf = (type: string) => of("document").find((d) => d.data["type"] === type);
+  const policyStatus = dashboard?.leadership.policy_status && dashboard.leadership.policy_status !== "not_created"
+    ? dashboard.leadership.policy_status
+    : undefined;
   const governance = [
-    { label: "Politique QHSE", rec: of("policy")[0] ?? docOf("Politique") },
-    { label: "Manuel qualité", rec: docOf("Manuel") },
-    { label: "Périmètre du système", rec: of("scope")[0] },
-    { label: "Revue de direction", rec: of("review")[0] },
-    { label: "Objectifs stratégiques", rec: of("objective")[0] },
+    { label: "Politique QHSE", rec: of("policy")[0] ?? docOf("Politique"), externalStatus: policyStatus },
+    { label: "Manuel qualité", rec: docOf("Manuel"), externalStatus: undefined },
+    { label: "Périmètre du système", rec: of("scope")[0], externalStatus: undefined },
+    { label: "Revue de direction", rec: of("review")[0], externalStatus: undefined },
+    { label: "Objectifs stratégiques", rec: of("objective")[0], externalStatus: undefined },
   ];
 
   const indicators = of("indicator").filter((i) => i.data["target"]);
-  const recent = [...records].sort((a, b) => b.updated_at.localeCompare(a.updated_at)).slice(0, 7);
+  const recent: QRecord[] = (dashboard?.recent_activities ?? []).map((activity) => ({
+    id: String(activity.id),
+    kind: activity.type === "audit" ? "audit" : "action",
+    reference: `${activity.type === "audit" ? "AUD" : "ACT"}-${activity.id}`,
+    title: activity.name,
+    status: "",
+    data: {},
+    created_at: activity.created_at,
+    updated_at: activity.created_at,
+  }));
   const name = profile.first_name || "et bienvenue";
+  const isLoading = recordsLoading || dashboardLoading;
+
+  if (isLoading) return <DashboardSkeleton />;
 
   return (
     <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
@@ -113,6 +136,13 @@ function Dashboard() {
         <div className="flex items-start gap-3 rounded-2xl border border-primary/30 bg-primary-soft/60 p-4 text-sm">
           <Clock3 className="mt-0.5 h-5 w-5 text-primary" />
           <p className="text-foreground">Votre dossier est en cours de validation (24-48h). Certaines fonctions restent limitées.</p>
+        </div>
+      )}
+
+      {dashboardError && (
+        <div className="flex items-start gap-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+          <p>Les agrégats du tableau de bord Laravel n’ont pas pu être chargés. Vérifiez la connexion au backend pour afficher les indicateurs à jour.</p>
         </div>
       )}
 
@@ -160,6 +190,12 @@ function Dashboard() {
         {/* Priorities */}
         <section className="rounded-2xl border border-border bg-card p-6 lg:col-span-2">
           <h2 className="font-display text-base font-bold text-foreground">Priorités</h2>
+          {collaboratorSummary && (collaboratorSummary.stats.overdue_count > 0 || collaboratorSummary.stats.open_count > 0) && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {collaboratorSummary.stats.overdue_count > 0 && <Link to="/app/$section" params={{ section: "mes-actions" }} className="rounded-xl bg-destructive/10 px-3 py-2 text-xs font-bold text-destructive">{collaboratorSummary.stats.overdue_count} action(s) en retard dans Mes actions</Link>}
+              {collaboratorSummary.stats.open_count > 0 && <Link to="/app/$section" params={{ section: "mes-actions" }} className="rounded-xl bg-primary-soft px-3 py-2 text-xs font-bold text-primary">{collaboratorSummary.stats.open_count} action(s) à mener</Link>}
+            </div>
+          )}
           {priorities.length === 0 ? (
             <p className="mt-4 rounded-xl bg-background p-4 text-sm text-muted-foreground">Aucune priorité : pas d'action en retard, de NC critique, d'audit proche ni de document à valider.</p>
           ) : (
@@ -190,7 +226,7 @@ function Dashboard() {
             {governance.map((g) => (
               <li key={g.label} className="flex items-center justify-between gap-2 text-sm">
                 <span className="font-semibold text-foreground">{g.label}</span>
-                {g.rec ? <StatusBadge kind={g.rec.kind} status={g.rec.status} /> : <span className="rounded-full bg-destructive/10 px-2.5 py-0.5 text-[11px] font-bold text-destructive">Non créé</span>}
+                {g.rec ? <StatusBadge kind={g.rec.kind} status={g.rec.status} /> : g.externalStatus ? <span className="rounded-full bg-primary-soft px-2.5 py-0.5 text-[11px] font-bold text-primary">{g.externalStatus}</span> : <span className="rounded-full bg-destructive/10 px-2.5 py-0.5 text-[11px] font-bold text-destructive">Non créé</span>}
               </li>
             ))}
           </ul>
@@ -203,17 +239,17 @@ function Dashboard() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-base font-bold text-foreground">Évolution de l'activité</h2>
             <div className="flex gap-3 text-xs font-semibold text-muted-foreground">
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/30" /> Créés</span>
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary" /> Clôturés / publiés</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary/30" /> Documents</span>
+              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-primary" /> Actions</span>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground">6 derniers mois · documents, NC, audits, actions</p>
+          <p className="text-xs text-muted-foreground">Période fournie par le backend · périmètre entreprise/site appliqué</p>
           <div className="mt-5 flex h-44 items-end gap-2 sm:gap-4">
             {months.map((m) => (
               <div key={m.key} className="flex flex-1 flex-col items-center gap-2">
                 <div className="flex h-36 w-full items-end justify-center gap-1">
-                  <div className="w-1/2 max-w-6 rounded-t-md bg-primary/30" style={{ height: `${(m.created / maxBar) * 100}%`, minHeight: m.created ? 4 : 0 }} title={`${m.created} créés`} />
-                  <div className="w-1/2 max-w-6 rounded-t-md bg-primary" style={{ height: `${(m.closed / maxBar) * 100}%`, minHeight: m.closed ? 4 : 0 }} title={`${m.closed} clôturés`} />
+                  <div className="w-1/2 max-w-6 rounded-t-md bg-primary/30" style={{ height: `${(m.created / maxBar) * 100}%`, minHeight: m.created ? 4 : 0 }} title={`${m.created} documents`} />
+                  <div className="w-1/2 max-w-6 rounded-t-md bg-primary" style={{ height: `${(m.closed / maxBar) * 100}%`, minHeight: m.closed ? 4 : 0 }} title={`${m.closed} actions`} />
                 </div>
                 <span className="text-xs capitalize text-muted-foreground">{m.label}</span>
               </div>
@@ -312,6 +348,80 @@ function Dashboard() {
           </ul>
         )}
       </section>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div
+      className="mx-auto max-w-7xl space-y-6 p-4 md:p-8"
+      aria-busy="true"
+      aria-label="Chargement du tableau de bord"
+    >
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-3">
+          <div className="h-3 w-28 animate-pulse rounded-full bg-primary/15" />
+          <div className="h-9 w-64 animate-pulse rounded-xl bg-secondary" />
+          <div className="h-4 w-80 max-w-full animate-pulse rounded-full bg-secondary" />
+        </div>
+        <div className="h-10 w-36 animate-pulse rounded-xl bg-secondary" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {Array.from({ length: 6 }, (_, index) => (
+          <div key={index} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div className="h-9 w-9 animate-pulse rounded-xl bg-primary/10" />
+              <div className="h-4 w-4 animate-pulse rounded-full bg-secondary" />
+            </div>
+            <div className="mt-4 h-8 w-14 animate-pulse rounded-lg bg-secondary" />
+            <div className="mt-2 h-3 w-24 animate-pulse rounded-full bg-secondary" />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="min-h-[280px] rounded-2xl border border-border bg-card p-6 shadow-sm lg:col-span-2">
+          <div className="h-5 w-28 animate-pulse rounded-full bg-secondary" />
+          <div className="mt-2 h-3 w-56 animate-pulse rounded-full bg-secondary" />
+          <div className="mt-8 flex h-40 items-end gap-3 sm:gap-5">
+            {[42, 70, 54, 86, 62, 78, 48, 92].map((height, index) => (
+              <div key={index} className="flex h-full flex-1 items-end">
+                <div className="w-full animate-pulse rounded-t-xl bg-primary/20" style={{ height: `${height}%` }} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="min-h-[280px] rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="h-5 w-44 animate-pulse rounded-full bg-secondary" />
+          <div className="mt-6 space-y-5">
+            {["w-full", "w-4/5", "w-11/12", "w-2/3"].map((width, index) => (
+              <div key={index} className="space-y-2">
+                <div className={`h-3 ${width} animate-pulse rounded-full bg-secondary`} />
+                <div className="h-2 w-full animate-pulse rounded-full bg-primary/15" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {[0, 1].map((panel) => (
+          <div key={panel} className="min-h-[190px] rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="h-5 w-44 animate-pulse rounded-full bg-secondary" />
+            <div className="mt-6 space-y-4">
+              {[0, 1, 2].map((row) => (
+                <div key={row} className="flex items-center gap-3">
+                  <div className="h-9 w-9 animate-pulse rounded-xl bg-primary/10" />
+                  <div className="flex-1 space-y-2"><div className="h-3 w-3/4 animate-pulse rounded-full bg-secondary" /><div className="h-2 w-1/2 animate-pulse rounded-full bg-secondary" /></div>
+                  <div className="h-5 w-14 animate-pulse rounded-full bg-primary/10" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

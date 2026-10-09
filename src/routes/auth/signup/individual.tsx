@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, Lock, Mail, MailCheck, MapPin, Phone, User } from "lucide-react";
+import { Lock, Mail, MailCheck, Phone, User } from "lucide-react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { backendApi } from "@/integrations/backend/client";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LqInput } from "@/components/auth/LqInput";
 import { LqButton } from "@/components/lq/LqButton";
@@ -12,9 +12,10 @@ export const Route = createFileRoute("/auth/signup/individual")({
   head: () => ({
     meta: [
       { title: "Inscription particulier — LOGIQUALI" },
-      { name: "description", content: "Créez votre compte particulier LOGIQUALI en quelques secondes." },
-      { property: "og:title", content: "Inscription particulier — LOGIQUALI" },
-      { property: "og:description", content: "Créez votre compte particulier LOGIQUALI." },
+      {
+        name: "description",
+        content: "Créez votre compte particulier LOGIQUALI en quelques secondes.",
+      },
     ],
   }),
   component: IndividualSignupPage,
@@ -27,7 +28,6 @@ function IndividualSignupPage() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [company, setCompany] = useState("");
   const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -40,39 +40,42 @@ function IndividualSignupPage() {
     if (score < 2) return;
     setError("");
     setBusy(true);
-    const { error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/login`,
-        data: {
-          account_type: "individual",
-          first_name: firstName,
-          last_name: lastName,
-          phone,
-          company_name: company || null,
-          company_address: address || null,
-        },
-      },
-    });
-    setBusy(false);
-    if (authError) {
+    try {
+      const username = `${firstName}.${lastName}`.toLowerCase().replace(/[^a-z0-9.]+/g, "");
+      await backendApi.auth.registerClient({
+        username: username || email.split("@")[0],
+        email,
+        password,
+        password_confirmation: password,
+        first_name: firstName,
+        last_name: lastName,
+        phone,
+        address,
+      });
+      setDone(true);
+    } catch (authError) {
       setError(authErrorMessage(authError));
-      return;
+    } finally {
+      setBusy(false);
     }
-    setDone(true);
   };
 
   if (done) {
     return (
-      <AuthLayout title="Compte créé" subtitle="Plus qu'une étape avant d'accéder à votre espace.">
+      <AuthLayout
+        title="Compte créé"
+        subtitle="Votre compte est prêt. Vérifiez votre e-mail pour finaliser l'activation."
+      >
         <div className="rounded-3xl border border-border bg-card p-8 text-center">
           <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-soft text-primary">
             <MailCheck className="h-8 w-8" />
           </span>
-          <h2 className="mt-5 font-display text-lg font-bold text-foreground">Vérifiez votre e-mail</h2>
+          <h2 className="mt-5 font-display text-lg font-bold text-foreground">
+            Vérifiez votre e-mail
+          </h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Cliquez sur le lien reçu pour activer votre compte immédiatement.
+            Un lien de vérification vous a été envoyé à {email}. Après vérification, vous pourrez
+            vous reconnecter.
           </p>
           <LqButton to="/auth/login" className="mt-6" withArrow>
             Aller à la connexion
@@ -85,7 +88,7 @@ function IndividualSignupPage() {
   return (
     <AuthLayout
       title="Inscription particulier"
-      subtitle="Activation instantanée après vérification de votre e-mail."
+      subtitle="Création directement gérée par le backend LOGIQUALI."
     >
       <form onSubmit={submit} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -124,28 +127,19 @@ function IndividualSignupPage() {
           onChange={(e) => setPhone(e.target.value)}
           required
         />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <LqInput
-            label="Entreprise (optionnel)"
-            icon={Building2}
-            placeholder="—"
-            value={company}
-            onChange={(e) => setCompany(e.target.value)}
-          />
-          <LqInput
-            label="Adresse (optionnel)"
-            icon={MapPin}
-            placeholder="—"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
-        </div>
+        <LqInput
+          label="Adresse"
+          icon={User}
+          placeholder="Cotonou, Bénin"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+        />
         <div>
           <LqInput
             label="Mot de passe"
             icon={Lock}
             type="password"
-            placeholder="8 caractères minimum"
+            placeholder="8 caractères, une majuscule et un chiffre"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={8}
@@ -157,9 +151,7 @@ function IndividualSignupPage() {
                 {[0, 1, 2, 3].map((i) => (
                   <span
                     key={i}
-                    className={`h-1.5 flex-1 rounded-full transition-colors ${
-                      i < score ? (score <= 1 ? "bg-destructive" : "bg-primary") : "bg-border"
-                    }`}
+                    className={`h-1.5 flex-1 rounded-full ${i < score ? (score <= 1 ? "bg-destructive" : "bg-primary") : "bg-border"}`}
                   />
                 ))}
               </div>

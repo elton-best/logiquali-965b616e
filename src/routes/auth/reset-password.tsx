@@ -1,49 +1,42 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { KeyRound, Lock, ShieldAlert } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { backendApi } from "@/integrations/backend/client";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LqInput } from "@/components/auth/LqInput";
 import { LqButton } from "@/components/lq/LqButton";
 import { authErrorMessage } from "@/lib/auth-errors";
 
 export const Route = createFileRoute("/auth/reset-password")({
+  validateSearch: (search: Record<string, unknown>): { token?: string; email?: string } => ({
+    token: typeof search.token === "string" ? search.token : undefined,
+    email: typeof search.email === "string" ? search.email : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Nouveau mot de passe — LOGIQUALI" },
       { name: "description", content: "Définissez un nouveau mot de passe pour votre compte." },
-      { property: "og:title", content: "Nouveau mot de passe — LOGIQUALI" },
-      {
-        property: "og:description",
-        content: "Définissez un nouveau mot de passe pour votre compte.",
-      },
     ],
   }),
   component: ResetPasswordPage,
 });
 
 function ResetPasswordPage() {
-  // "checking" -> "form" (recovery session detected) | "invalid" | "done"
-  const [status, setStatus] = useState<"checking" | "form" | "invalid" | "done">("checking");
+  const { token, email } = Route.useSearch();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    let alive = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (alive) setStatus(data.user ? "form" : "invalid");
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const [done, setDone] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token || !email) {
+      setError("Le lien de réinitialisation est incomplet ou expiré.");
+      return;
+    }
     if (password.length < 8) {
-      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      setError("Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.");
       return;
     }
     if (password !== confirm) {
@@ -52,37 +45,30 @@ function ResetPasswordPage() {
     }
     setError("");
     setBusy(true);
-    // Recovery session: current password is not required here.
-    const { error: authError } = await supabase.auth.updateUser({ password });
-    setBusy(false);
-    if (authError) {
+    try {
+      await backendApi.auth.resetPassword({
+        token,
+        email,
+        password,
+        password_confirmation: confirm,
+      });
+      setDone(true);
+    } catch (authError) {
       setError(authErrorMessage(authError));
-      return;
+    } finally {
+      setBusy(false);
     }
-    setStatus("done");
   };
 
-  if (status === "checking") {
+  if (!token || !email) {
     return (
-      <AuthLayout title="Vérification du lien" subtitle="Un instant…">
-        <p className="text-sm text-muted-foreground">Nous vérifions votre lien de réinitialisation.</p>
-      </AuthLayout>
-    );
-  }
-
-  if (status === "invalid") {
-    return (
-      <AuthLayout
-        title="Lien expiré"
-        subtitle="Ce lien de réinitialisation n'est plus valable."
-      >
+      <AuthLayout title="Lien expiré" subtitle="Ce lien de réinitialisation n'est plus valable.">
         <div className="rounded-3xl border border-border bg-card p-8 text-center">
           <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
             <ShieldAlert className="h-8 w-8" />
           </span>
           <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
-            Les liens de réinitialisation ne sont valables qu'une heure. Demandez un nouveau
-            lien pour continuer.
+            Demandez un nouveau lien pour continuer.
           </p>
           <LqButton to="/auth/forgot-password" className="mt-6" withArrow>
             Demander un nouveau lien
@@ -92,12 +78,9 @@ function ResetPasswordPage() {
     );
   }
 
-  if (status === "done") {
+  if (done) {
     return (
-      <AuthLayout
-        title="Mot de passe mis à jour"
-        subtitle="Votre nouveau mot de passe est actif."
-      >
+      <AuthLayout title="Mot de passe mis à jour" subtitle="Votre nouveau mot de passe est actif.">
         <div className="rounded-3xl border border-border bg-card p-8 text-center">
           <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-soft text-primary">
             <KeyRound className="h-8 w-8" />
@@ -139,10 +122,20 @@ function ResetPasswordPage() {
           error={error}
           required
         />
+        {error && (
+          <p className="rounded-xl bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive">
+            {error}
+          </p>
+        )}
         <LqButton type="submit" className="w-full" size="lg" withArrow>
           {busy ? "Enregistrement…" : "Enregistrer le mot de passe"}
         </LqButton>
       </form>
+      <p className="mt-8 text-center text-sm text-muted-foreground">
+        <Link to="/auth/login" className="font-bold text-primary hover:underline">
+          Retour à la connexion
+        </Link>
+      </p>
     </AuthLayout>
   );
 }

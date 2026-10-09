@@ -14,6 +14,7 @@ import {
 import { computeWorkspace, useCurrentSite } from "@/hooks/use-workspace";
 import { DoubleScroll } from "./DoubleScroll";
 import { ColumnPicker, ExportPreview, useColumns } from "./Extras";
+import { ListLoading } from "./LoadingState";
 
 /** Which kinds can spawn which follow-up records from the detail sheet. */
 const FOLLOW_UPS: Record<string, { label: string; section: string; kind?: string }[]> = {
@@ -247,7 +248,7 @@ export function SectionView({ section, openId, createNew, newKind, originId }: P
 
       <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card">
         {isLoading ? (
-          <p className="p-8 text-center text-sm text-muted-foreground">Chargement…</p>
+          <div className="p-3 sm:p-4"><ListLoading rows={6} /></div>
         ) : list.length === 0 ? (
           <div className="flex flex-col items-center px-6 py-14 text-center">
             <p className="font-display text-base font-bold text-foreground">
@@ -634,7 +635,7 @@ function DetailSheet({
                     toast.error(`Suppression impossible : ${incoming.length} élément(s) y sont liés. Archivez-le plutôt pour conserver l'historique.`);
                     return;
                   }
-                  if (confirm(`Supprimer définitivement « ${record.title} » ?`)) { del.mutate(record.id); onClose(); }
+                  if (confirm(`Supprimer définitivement « ${record.title} » ?`)) { del.mutate({ id: record.id, kind: record.kind }); onClose(); }
                 }}
                 aria-label="Supprimer"
                 className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-border px-4 text-sm font-semibold text-destructive hover:border-destructive"
@@ -693,7 +694,7 @@ function RecordForm({
   const input = "h-11 w-full rounded-xl border border-input bg-card px-3.5 text-sm outline-none focus:border-primary";
 
   return (
-    <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 md:p-8">
+    <div className="mx-auto max-w-5xl">
       <button type="button" onClick={onClose} className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline">← Retour</button>
       <div>
         <div>
