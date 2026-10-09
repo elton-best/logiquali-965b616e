@@ -64,3 +64,4 @@ class DuerpWorkUnit extends Model
         return $this->hasMany(DuerpDanger::class, 'work_unit_id');
     }
 }
+

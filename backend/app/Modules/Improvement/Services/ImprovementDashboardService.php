@@ -58,10 +58,39 @@ class ImprovementDashboardService
 
         $ncs = $query->with('workflowState')->get();
 
+        $openCount = $ncs->filter(fn($nc) => !$nc->isFinal())->count();
+        $closedCount = $ncs->filter(fn($nc) => $nc->isInState('closed') || (bool) $nc->effectiveness_verified)->count();
+
+        $ncIds = $ncs->pluck('id')->all();
+        $ncActions = Action::query()
+            ->where(function ($q) use ($ncIds) {
+                if (!empty($ncIds)) {
+                    $q->whereIn('non_conformity_id', $ncIds)
+                      ->orWhere(fn ($sub) => $sub->whereIn('source_type', ['non_conformity', 'nc'])->whereIn('source_id', $ncIds));
+                } else {
+                    $q->where('source', 'non_conformity')->orWhere('source_type', 'non_conformity');
+                }
+            })
+            ->when($siteId, fn ($q) => $q->where('site_id', $siteId))
+            ->get();
+
+        $actionsRealisees = $ncActions->filter(function ($act) {
+            $st = strtolower((string) ($act->status ?? ''));
+            return in_array($st, ['completed', 'verified', 'closed', 'termine'], true)
+                || (float) ($act->progress_percentage ?? $act->progress ?? 0) >= 100
+                || (bool) $act->effectiveness_verified;
+        })->count();
+        $actionsNonRealisees = max(0, $ncActions->count() - $actionsRealisees);
+
         return [
             'total' => $ncs->count(),
-            'open' => $ncs->filter(fn($nc) => !$nc->isFinal())->count(),
-            'closed' => $ncs->filter(fn($nc) => $nc->isInState('closed'))->count(),
+            'open' => $openCount,
+            'closed' => $closedCount,
+            'nc_en_cours' => $openCount,
+            'nc_cloture' => $closedCount,
+            'nc_cloturees' => $closedCount,
+            'actions_realisees' => $actionsRealisees,
+            'actions_non_realisees' => $actionsNonRealisees,
             'by_severity' => $ncs->groupBy('severity')->map->count(),
             'by_source' => $ncs->groupBy('source')->map->count(),
             'by_priority' => $ncs->groupBy('priority')->map->count(),

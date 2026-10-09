@@ -37,3 +37,4 @@ class DuerpRiskFamily extends Model
         return $this->hasMany(DuerpDanger::class, 'risk_family_id');
     }
 }
+

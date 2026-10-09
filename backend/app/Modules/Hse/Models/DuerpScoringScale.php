@@ -35,3 +35,4 @@ class DuerpScoringScale extends Model
         return $this->belongsTo(Enterprise::class);
     }
 }
+

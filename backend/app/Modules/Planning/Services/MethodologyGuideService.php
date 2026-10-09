@@ -14,6 +14,7 @@ class MethodologyGuideService
             'duerp' => $this->getDuerpGuide(),
             'aes' => $this->getAesGuide(),
             'process_reviews' => $this->getProcessReviewGuide(),
+            'management_reviews' => $this->getManagementReviewGuide(),
         ];
     }
 
@@ -401,6 +402,57 @@ class MethodologyGuideService
             'closing_rules' => [
                 'rule_replan' => 'REQ-9.2-09 : Impossibilité de clôturer la revue si des actions en retard n’ont pas fait l’objet d’une décision de replanification motivée.',
                 'rule_suggestions' => 'REQ-9.2-11 : Transmission directe des propositions d’amélioration au Responsable Qualité (RQ).',
+            ],
+        ];
+    }
+
+    /**
+     * Guide méthodologique et gouvernance de la Revue de Direction (ISO 9001:2015 §9.3).
+     */
+    public function getManagementReviewGuide(): array
+    {
+        return [
+            'id' => 'management_reviews',
+            'title' => 'Guide de conduite et exigences de la Revue de Direction globale SMI',
+            'norme' => 'ISO 9001:2015 §9.3 / ISO 14001:2015 §9.3 / ISO 45001:2018 §9.3',
+            'description' => 'Dispositif annuel ou périodique d’évaluation globale de la pertinence, de l’adéquation et de l’efficacité du système de management intégré.',
+            'quadruplet_structure' => [
+                'synthese_observations' => 'Analyse des données factuelles consolidées, écarts et constats relevés sur la période.',
+                'decision_action' => 'Orientation stratégique, arbitrage managérial ou action corrective arrêtée par la direction.',
+                'responsable' => 'Désignation nominative ou fonctionnelle du pilote de mise en œuvre de la décision.',
+                'delai' => 'Échéance planifiée pour l’exécution ou la réévaluation de l’action.',
+            ],
+            'input_elements' => [
+                'a' => 'Actions des revues précédentes : avancement et vérification d’efficacité.',
+                'b' => 'Changements internes/externes : contexte, parties intéressées, enjeux stratégiques.',
+                'c1' => 'Satisfaction client et parties intéressées : retours d’enquêtes et réclamations.',
+                'c2' => 'Objectifs qualité / SMI : taux d’atteinte réel vs cibles fixées.',
+                'c4' => 'Performance des processus : KPI, conformité des produits et prestations.',
+                'c5' => 'Non-conformités : typologie, gravité, coûts d’impact et plans d’actions.',
+                'c6' => 'Résultats d’audits : audits internes, audits de certification et audits fournisseurs.',
+                'c7' => 'Prestataires externes : évaluations périodiques et conformité des approvisionnements.',
+                'e' => 'Risques et opportunités : pertinence et efficacité des actions préventives.',
+                'f' => 'Opportunités d’amélioration : innovations, synergies et gains organisationnels.',
+            ],
+            'sections_sorties' => [
+                'resources_data' => [
+                    'clause' => 'ISO 9001 §9.3.3.b',
+                    'title' => 'Besoins et ressources',
+                    'fields' => ['synthese_observations', 'decision_action', 'responsable', 'delai'],
+                    'description' => 'Adéquation des ressources humaines, compétences, infrastructures et moyens financiers alloués au SMI.',
+                ],
+                'system_changes_data' => [
+                    'clause' => 'ISO 9001 §9.3.3.c',
+                    'title' => 'Modifications du système',
+                    'subsections' => [
+                        'besoins_changements_systeme' => 'Besoins de changements prioritaires à apporter au système (décision/action, responsable, délai).',
+                        'autres_besoins_changements_systeme' => 'Autres ajustements organisationnels ou évolutions SMI (décision/action, responsable, délai).',
+                    ],
+                ],
+            ],
+            'governance_rules' => [
+                'open_permission' => 'L’ouverture de la revue est strictement réservée au Responsable Qualité (RQ), à la Direction Générale (CEO) ou aux profils habilités avec permission dédiée.',
+                'close_permission' => 'La clôture définitive et la validation du rapport DOCX officiel requièrent l’autorité du RQ ou du CEO (Direction Générale).',
             ],
         ];
     }
