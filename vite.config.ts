@@ -7,6 +7,19 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  // Allow the Arena live-preview hostname to reach the Vite dev server.
+  vite: {
+    server: {
+      allowedHosts: true,
+      proxy: {
+        "/api": {
+          target: process.env.BACKEND_URL || "http://127.0.0.1:8000",
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

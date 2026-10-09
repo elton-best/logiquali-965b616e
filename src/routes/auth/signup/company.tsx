@@ -12,7 +12,7 @@ import {
   User,
 } from "lucide-react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { backendApi } from "@/integrations/backend/client";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { LqInput } from "@/components/auth/LqInput";
 import { LqButton } from "@/components/lq/LqButton";
@@ -23,33 +23,40 @@ export const Route = createFileRoute("/auth/signup/company")({
     meta: [
       { title: "Inscription entreprise — LOGIQUALI" },
       { name: "description", content: "Créez l'espace QHSE de votre entreprise en 3 étapes." },
-      { property: "og:title", content: "Inscription entreprise — LOGIQUALI" },
-      { property: "og:description", content: "Créez l'espace QHSE de votre entreprise en 3 étapes." },
     ],
   }),
   component: CompanySignupPage,
 });
 
-const STEPS = ["Entreprise", "Administrateur", "Identité"];
+const STEPS = ["Entreprise", "Administrateur", "Pièces justificatives"];
+type DocumentKey = "id_document" | "rccm_document" | "ifu_document";
 
-function FileDrop({ label }: { label: string }) {
-  const [name, setName] = useState("");
+function FileDrop({
+  label,
+  file,
+  onChange,
+}: {
+  label: string;
+  file: File | null;
+  onChange: (file: File | null) => void;
+}) {
   return (
     <label className="flex cursor-pointer items-center gap-4 rounded-2xl border-[1.5px] border-dashed border-input bg-card p-4 transition-colors hover:border-primary hover:bg-primary-soft/40">
       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
-        {name ? <Check className="h-5 w-5" /> : <Upload className="h-5 w-5" />}
+        {file ? <Check className="h-5 w-5" /> : <Upload className="h-5 w-5" />}
       </span>
       <span className="min-w-0">
-        <span className="block text-sm font-bold text-foreground">{label}</span>
+        <span className="block text-sm font-bold text-foreground">{label} *</span>
         <span className="block truncate text-xs text-muted-foreground">
-          {name || "PDF, JPG ou PNG — 5 Mo max"}
+          {file?.name || "PDF, JPG ou PNG — 5 Mo max"}
         </span>
       </span>
       <input
         type="file"
         accept=".pdf,.jpg,.jpeg,.png"
         className="hidden"
-        onChange={(e) => setName(e.target.files?.[0]?.name ?? "")}
+        onChange={(e) => onChange(e.target.files?.[0] ?? null)}
+        required={!file}
       />
     </label>
   );
@@ -61,13 +68,20 @@ function CompanySignupPage() {
   const [companyName, setCompanyName] = useState("");
   const [rccm, setRccm] = useState("");
   const [ifu, setIfu] = useState("");
+  const [field, setField] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
+  const [city, setCity] = useState("Cotonou");
   const [phone, setPhone] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [files, setFiles] = useState<Record<DocumentKey, File | null>>({
+    id_document: null,
+    rccm_document: null,
+    ifu_document: null,
+  });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -77,48 +91,71 @@ function CompanySignupPage() {
       setError("Les mots de passe ne correspondent pas.");
       return;
     }
-    setError("");
     if (step < 2) {
+      setError("");
       setStep(step + 1);
       return;
     }
-    setBusy(true);
-    const { error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/login`,
-        data: {
-          account_type: "company",
-          first_name: firstName,
-          last_name: lastName,
-          phone,
-          company_name: companyName,
-          company_rccm: rccm,
-          company_ifu: ifu,
-          company_address: companyAddress,
-        },
-      },
-    });
-    setBusy(false);
-    if (authError) {
-      setError(authErrorMessage(authError));
+    if (!files.id_document || !files.rccm_document || !files.ifu_document) {
+      setError("Les trois pièces justificatives sont obligatoires pour le backend.");
       return;
     }
-    setDone(true);
+    setError("");
+    setBusy(true);
+    try {
+      const username =
+        `${firstName}.${lastName}`.toLowerCase().replace(/[^a-z0-9.]+/g, "") || email.split("@")[0];
+      const payload = new FormData();
+      const values: Record<string, string> = {
+        enterprise_name: companyName,
+        email,
+        enterprise_email: email,
+        registration_number: rccm,
+        rccm_number: rccm,
+        ifu,
+        ifu_number: ifu,
+        address: companyAddress,
+        city,
+        country: "Bénin",
+        first_name: firstName,
+        last_name: lastName,
+        job_title: "Administrateur entreprise",
+        username,
+        password,
+        password_confirmation: confirm,
+        phone,
+        field,
+      };
+      Object.entries(values).forEach(([key, value]) => payload.append(key, value));
+      payload.append("id_type", "CNI");
+      payload.append("id_document", files.id_document);
+      payload.append("rccm_document", files.rccm_document);
+      payload.append("ifu_document", files.ifu_document);
+      await backendApi.auth.registerEnterprise(payload);
+      setDone(true);
+    } catch (authError) {
+      setError(authErrorMessage(authError));
+    } finally {
+      setBusy(false);
+    }
   };
 
   if (done) {
     return (
-      <AuthLayout title="Dossier envoyé" subtitle="Votre compte entreprise est en attente de validation.">
+      <AuthLayout
+        title="Dossier envoyé"
+        subtitle="Votre compte entreprise est en attente de validation."
+      >
         <div className="rounded-3xl border border-border bg-card p-8 text-center">
           <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-soft text-primary">
             <MailCheck className="h-8 w-8" />
           </span>
-          <h2 className="mt-5 font-display text-lg font-bold text-foreground">Vérifiez votre e-mail</h2>
+          <h2 className="mt-5 font-display text-lg font-bold text-foreground">
+            Vérifiez votre e-mail
+          </h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Un lien de vérification vous a été envoyé. Nos équipes examinent votre dossier sous
-            24 à 48h ; vous serez notifié dès l'activation de votre espace.
+            Votre dossier a été transmis au backend LOGIQUALI. Vérifiez votre e-mail puis attendez
+            la validation de l'entreprise sous 24 à 48 h.
           </p>
           <LqButton to="/" variant="ghost" className="mt-6">
             Retour à l'accueil
@@ -131,34 +168,27 @@ function CompanySignupPage() {
   return (
     <AuthLayout
       title="Inscription entreprise"
-      subtitle="3 étapes pour créer l'espace QHSE de votre organisation."
+      subtitle="Les informations et pièces sont envoyées au backend Laravel LOGIQUALI."
     >
-      {/* Stepper */}
       <ol className="mb-8 flex items-center">
         {STEPS.map((label, i) => (
           <li key={label} className="flex flex-1 items-center last:flex-none">
             <div className="flex items-center gap-2">
               <span
-                className={`flex h-8 w-8 items-center justify-center rounded-full font-display text-xs font-extrabold transition-colors ${
-                  i < step
-                    ? "bg-primary text-primary-foreground"
-                    : i === step
-                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-                      : "bg-secondary text-muted-foreground"
-                }`}
+                className={`flex h-8 w-8 items-center justify-center rounded-full font-display text-xs font-extrabold ${i < step || i === step ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}
               >
                 {i < step ? <Check className="h-4 w-4" /> : i + 1}
               </span>
               <span
-                className={`hidden text-xs font-bold sm:block ${
-                  i <= step ? "text-foreground" : "text-muted-foreground"
-                }`}
+                className={`hidden text-xs font-bold sm:block ${i <= step ? "text-foreground" : "text-muted-foreground"}`}
               >
                 {label}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <span className={`mx-3 h-0.5 flex-1 rounded ${i < step ? "bg-primary" : "bg-border"}`} />
+              <span
+                className={`mx-3 h-0.5 flex-1 rounded ${i < step ? "bg-primary" : "bg-border"}`}
+              />
             )}
           </li>
         ))}
@@ -194,6 +224,14 @@ function CompanySignupPage() {
               />
             </div>
             <LqInput
+              label="Domaine d'activité"
+              icon={Building2}
+              placeholder="Conseil, industrie, services…"
+              value={field}
+              onChange={(e) => setField(e.target.value)}
+              required
+            />
+            <LqInput
               label="Adresse du siège"
               icon={MapPin}
               placeholder="Cotonou, Bénin"
@@ -201,15 +239,24 @@ function CompanySignupPage() {
               onChange={(e) => setCompanyAddress(e.target.value)}
               required
             />
-            <LqInput
-              label="Téléphone"
-              icon={Phone}
-              type="tel"
-              placeholder="+229 00 00 00 00"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-            />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <LqInput
+                label="Ville"
+                icon={MapPin}
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                required
+              />
+              <LqInput
+                label="Téléphone"
+                icon={Phone}
+                type="tel"
+                placeholder="+229 00 00 00 00"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+            </div>
           </>
         )}
         {step === 1 && (
@@ -245,7 +292,7 @@ function CompanySignupPage() {
               label="Mot de passe"
               icon={Lock}
               type="password"
-              placeholder="8 caractères minimum"
+              placeholder="8 caractères, une majuscule et un chiffre"
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -265,9 +312,21 @@ function CompanySignupPage() {
         )}
         {step === 2 && (
           <>
-            <FileDrop label="Pièce d'identité de l'administrateur" />
-            <FileDrop label="Extrait RCCM" />
-            <FileDrop label="Attestation IFU" />
+            <FileDrop
+              label="Pièce d'identité de l'administrateur"
+              file={files.id_document}
+              onChange={(file) => setFiles((current) => ({ ...current, id_document: file }))}
+            />
+            <FileDrop
+              label="Extrait RCCM"
+              file={files.rccm_document}
+              onChange={(file) => setFiles((current) => ({ ...current, rccm_document: file }))}
+            />
+            <FileDrop
+              label="Attestation IFU"
+              file={files.ifu_document}
+              onChange={(file) => setFiles((current) => ({ ...current, ifu_document: file }))}
+            />
             {error && (
               <p className="rounded-xl bg-destructive/10 px-4 py-3 text-xs font-semibold text-destructive">
                 {error}
@@ -280,10 +339,14 @@ function CompanySignupPage() {
             </label>
           </>
         )}
-
         <div className="flex gap-3 pt-3">
           {step > 0 && (
-            <LqButton variant="ghost" onClick={() => setStep(step - 1)} className="flex-1">
+            <LqButton
+              type="button"
+              variant="ghost"
+              onClick={() => setStep(step - 1)}
+              className="flex-1"
+            >
               Retour
             </LqButton>
           )}
@@ -292,7 +355,6 @@ function CompanySignupPage() {
           </LqButton>
         </div>
       </form>
-
       <p className="mt-8 text-center text-sm text-muted-foreground">
         Vous êtes un particulier ?{" "}
         <Link to="/auth/signup/individual" className="font-bold text-primary hover:underline">

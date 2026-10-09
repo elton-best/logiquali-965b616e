@@ -1,18 +1,10 @@
-import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { backendApi, type BackendProfile } from "@/integrations/backend/client";
 
-export const getMyProfile = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
-      .from("profiles")
-      .select(
-        "id, email, first_name, last_name, phone, account_type, status, company_name, company_rccm, company_ifu, company_address, created_at"
-      )
-      .eq("id", context.userId)
-      .single();
-    if (error) throw new Error("Profil introuvable");
-    return data;
-  });
+/** Profile contract consumed by the existing TanStack routes and dashboards. */
+export const getMyProfile = async (): Promise<BackendProfile> => backendApi.auth.me();
 
-export type Profile = Awaited<ReturnType<typeof getMyProfile>>;
+export type Profile = BackendProfile;
+
+export async function updateMyProfile(input: Record<string, unknown>): Promise<BackendProfile> {
+  return backendApi.profile.update(input);
+}
