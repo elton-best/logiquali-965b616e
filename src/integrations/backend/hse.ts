@@ -7,6 +7,7 @@ import { flattenResource } from "@/integrations/backend/context";
  * - DUERP dynamique (familles, échelles, unités de travail, tree, submit/reject/approve)
  * - Accidents du travail SST + statistiques + clôture
  * - Situations d'urgence + enregistrement d'exercice (drill)
+ * - Habilitations (stats, expires-soon, renew, export) — porté du frontend Vue
  */
 
 export const DUERP_FAMILIES_KEY = ["duerp-risk-families"] as const;
@@ -252,4 +253,118 @@ export function useEmergencyProcedureMutations() {
       onSuccess: invalidate,
     }),
   };
+}
+
+// --- Habilitations (porté du frontend Vue : HabilitationsView + habilitationService) ---
+export const HABILITATIONS_KEY = ["habilitations"] as const;
+export const HABILITATIONS_STATS_KEY = ["habilitations-stats"] as const;
+
+export type HabilitationStats = {
+  total: number;
+  active: number;
+  expired: number;
+  expiring_soon: number;
+  expiring_critical: number;
+  by_type: Record<string, number>;
+};
+
+export async function fetchHabilitations(params?: { per_page?: number; status?: string }) {
+  const query = new URLSearchParams();
+  query.set("per_page", String(params?.per_page ?? 100));
+  if (params?.status) query.set("status", params.status);
+  const payload = await backendApi.request<unknown>(`habilitations?${query.toString()}`);
+  const root =
+    payload && typeof payload === "object" ? (payload as Record<string, unknown>) : {};
+  const data = (root.data ?? payload) as unknown;
+  // Laravel paginate: { data: [...] } — collection directe sinon
+  const items = Array.isArray(data)
+    ? data
+    : Array.isArray((data as Record<string, unknown>)?.data)
+      ? ((data as Record<string, unknown>).data as unknown[])
+      : [];
+  return items.map(flattenResource);
+}
+
+export async function fetchHabilitationsStats() {
+  const payload = await backendApi.request<{ data?: HabilitationStats } & HabilitationStats>(
+    "habilitations/stats",
+  );
+  const data = (payload.data ?? payload) as HabilitationStats;
+  return {
+    total: Number(data.total ?? 0),
+    active: Number(data.active ?? 0),
+    expired: Number(data.expired ?? 0),
+    expiring_soon: Number(data.expiring_soon ?? 0),
+    expiring_critical: Number(data.expiring_critical ?? 0),
+    by_type: (data.by_type ?? {}) as Record<string, number>,
+  } satisfies HabilitationStats;
+}
+
+export async function fetchHabilitationsExpiring(days = 30) {
+  return listOf(
+    await backendApi.request<unknown>(`habilitations/expires-soon?days=${days}`),
+  );
+}
+
+export function useHabilitations(params?: { per_page?: number; status?: string }) {
+  return useQuery({
+    queryKey: [...HABILITATIONS_KEY, params ?? {}],
+    queryFn: () => fetchHabilitations(params),
+    staleTime: 20_000,
+  });
+}
+
+export function useHabilitationsStats() {
+  return useQuery({
+    queryKey: HABILITATIONS_STATS_KEY,
+    queryFn: fetchHabilitationsStats,
+    staleTime: 30_000,
+    retry: 1,
+  });
+}
+
+export function useHabilitationMutations() {
+  const client = useQueryClient();
+  const invalidate = () => {
+    client.invalidateQueries({ queryKey: HABILITATIONS_KEY });
+    client.invalidateQueries({ queryKey: HABILITATIONS_STATS_KEY });
+    client.invalidateQueries({ queryKey: ["qhse-records"] });
+  };
+  return {
+    save: useMutation({
+      mutationFn: (input: { id?: string | number; payload: Record<string, unknown> }) =>
+        backendApi.request(input.id ? `habilitations/${input.id}` : "habilitations", {
+          method: input.id ? "PUT" : "POST",
+          body: JSON.stringify(input.payload),
+        }),
+      onSuccess: invalidate,
+    }),
+    renew: useMutation({
+      mutationFn: (input: { id: string | number; payload: Record<string, unknown> }) =>
+        backendApi.request(`habilitations/${input.id}/renew`, {
+          method: "POST",
+          body: JSON.stringify(input.payload),
+        }),
+      onSuccess: invalidate,
+    }),
+    remove: useMutation({
+      mutationFn: (id: string | number) =>
+        backendApi.request(`habilitations/${id}`, { method: "DELETE" }),
+      onSuccess: invalidate,
+    }),
+  };
+}
+
+export function downloadHabilitationsExport(rows: string[][]) {
+  const filename = `habilitations_${new Date().toISOString().slice(0, 10)}.csv`;
+  const csv = rows
+    .map((row) => row.map((cell) => `"${String(cell ?? "").replace(/"/g, '""')}"`).join(";"))
+    .join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
 }

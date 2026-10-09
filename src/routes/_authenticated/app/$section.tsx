@@ -10,6 +10,7 @@ import { ContextOrganisationPage, StakeholdersPage } from "@/components/app/Orga
 import { ProcessDetailsPage, ProcessEditorPage, ProcessManagementPage } from "@/components/app/ProcessPages";
 import { ScopePage } from "@/components/app/ScopePages";
 import { CollaboratorsPage, JobDescriptionsPage, OrgChartPage, PolicyPage, ResponsibilitiesPage } from "@/components/app/LeadershipPages";
+import { HabilitationsPage } from "@/components/app/HabilitationsPage";
 
 const GUIDE: Record<string, { id: string; label: string; render: () => React.ReactNode }[]> = {
   risques: [{ id: "ro", label: "Risques & opportunités (grille, tableau, actions)", render: () => <RisksView /> }],
@@ -19,7 +20,7 @@ const GUIDE: Record<string, { id: string; label: string; render: () => React.Rea
   "revue-direction": [{ id: "cons", label: "Consolidation des revues de processus", render: () => <ManagementConsolidation /> }],
 };
 
-const CUSTOM = ["entreprise", "roles", "abonnement", "taches", "verification", "approbation", "normes", "preferences", "journal", "mes-actions", "boite-reception"];
+const CUSTOM = ["entreprise", "roles", "abonnement", "taches", "verification", "approbation", "normes", "preferences", "journal", "mes-actions", "boite-reception", "habilitations"];
 
 type Search = { open?: string | undefined; new?: number | undefined; origin?: string | undefined; kind?: string | undefined };
 
@@ -54,6 +55,7 @@ function SectionPage() {
     case "journal": return <JournalPage />;
     case "mes-actions": return <MyActionsPage />;
     case "boite-reception": return <InboxPage />;
+    case "habilitations": return <HabilitationsPage />;
     case "contexte": return <ContextOrganisationPage />;
     case "parties-interessees": return <StakeholdersPage />;
     case "perimetre": return <ScopePage />;

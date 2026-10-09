@@ -2,8 +2,8 @@
 
 namespace App\Services\Context;
 
-use App\Models\Site;
-use App\Models\User;
+use App\Modules\Enterprise\Models\Site;
+use App\Modules\Enterprise\Models\User;
 use Illuminate\Http\Request;
 
 class SiteContextService
